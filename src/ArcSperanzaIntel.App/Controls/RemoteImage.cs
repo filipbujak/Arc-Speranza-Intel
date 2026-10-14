@@ -20,7 +20,7 @@ public sealed class RemoteImage : Image
     public static readonly StyledProperty<int> DecodeWidthProperty =
         AvaloniaProperty.Register<RemoteImage, int>(nameof(DecodeWidth), 128);
 
-    /// <summary>Schemat: rysujemy jak w grze — biały rysunek na błękitnym tle z siatką.</summary>
+    /// <summary>Schemat: przedmiot na błękitnym tle z białą siatką, jak w grze.</summary>
     public static readonly StyledProperty<bool> IsBlueprintProperty =
         AvaloniaProperty.Register<RemoteImage, bool>(nameof(IsBlueprint));
 
@@ -31,8 +31,7 @@ public sealed class RemoteImage : Image
         GradientStops = { new GradientStop(Color.Parse("#2F86C9"), 0), new GradientStop(Color.Parse("#1C5E99"), 1) },
     };
 
-    private static readonly IPen BlueprintGrid = new Pen(new SolidColorBrush(Color.Parse("#30FFFFFF")), 1);
-    private static readonly IBrush BlueprintInk = Brushes.White;
+    private static readonly IPen BlueprintGrid = new Pen(new SolidColorBrush(Color.Parse("#45FFFFFF")), 1);
 
     private static readonly Dictionary<string, Bitmap> BlueprintCache = [];
 
@@ -44,7 +43,7 @@ public sealed class RemoteImage : Image
 
     /// <summary>
     /// Image.Render jest zapieczętowany, więc schemat rysujemy raz do osobnej bitmapy:
-    /// błękitne tło z siatką + biała sylwetka ikony (maska z kanału alfa).
+    /// błękitne tło z siatką + ikona przedmiotu w normalnych kolorach.
     /// </summary>
     private static Bitmap Blueprint(string url, Bitmap bmp)
     {
@@ -60,9 +59,8 @@ public sealed class RemoteImage : Image
                 ctx.DrawLine(BlueprintGrid, new Point(Math.Round(x) + 0.5, 0), new Point(Math.Round(x) + 0.5, area.Height));
             for (var y = step; y < area.Height; y += step)
                 ctx.DrawLine(BlueprintGrid, new Point(0, Math.Round(y) + 0.5), new Point(area.Width, Math.Round(y) + 0.5));
-            var inset = area.Deflate(area.Width * 0.08);
-            using (ctx.PushOpacityMask(new ImageBrush(bmp) { Stretch = Stretch.Uniform }, inset))
-                ctx.FillRectangle(BlueprintInk, inset);
+            // sam przedmiot w normalnych kolorach, na błękitnym tle z siatką
+            ctx.DrawImage(bmp, new Rect(0, 0, px.Width, px.Height), area.Deflate(area.Width * 0.08));
         }
         if (BlueprintCache.Count > 400) BlueprintCache.Clear();
         BlueprintCache[url] = rtb;
