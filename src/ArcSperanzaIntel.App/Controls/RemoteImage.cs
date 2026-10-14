@@ -34,10 +34,7 @@ public sealed class RemoteImage : Image
     private static readonly IPen BlueprintGrid = new Pen(new SolidColorBrush(Color.Parse("#30FFFFFF")), 1);
     private static readonly IBrush BlueprintInk = Brushes.White;
 
-    static RemoteImage()
-    {
-        AffectsRender<RemoteImage>(IsBlueprintProperty);
-    }
+    private static readonly Dictionary<string, Bitmap> BlueprintCache = [];
 
     public bool IsBlueprint
     {
@@ -45,32 +42,37 @@ public sealed class RemoteImage : Image
         set => SetValue(IsBlueprintProperty, value);
     }
 
-    public override void Render(DrawingContext ctx)
+    /// <summary>
+    /// Image.Render jest zapieczętowany, więc schemat rysujemy raz do osobnej bitmapy:
+    /// błękitne tło z siatką + biała sylwetka ikony (maska z kanału alfa).
+    /// </summary>
+    private static Bitmap Blueprint(string url, Bitmap bmp)
     {
-        if (!IsBlueprint || Source is not Bitmap bmp)
+        if (BlueprintCache.TryGetValue(url, out var hit)) return hit;
+        var px = bmp.PixelSize;
+        var rtb = new RenderTargetBitmap(px, new Vector(96, 96));
+        var area = new Rect(0, 0, px.Width, px.Height);
+        using (var ctx = rtb.CreateDrawingContext())
         {
-            base.Render(ctx);
-            return;
+            ctx.DrawRectangle(BlueprintBack, null, area, px.Width * 0.04, px.Width * 0.04);
+            var step = Math.Max(6, Math.Min(area.Width, area.Height) / 6);
+            for (var x = step; x < area.Width; x += step)
+                ctx.DrawLine(BlueprintGrid, new Point(Math.Round(x) + 0.5, 0), new Point(Math.Round(x) + 0.5, area.Height));
+            for (var y = step; y < area.Height; y += step)
+                ctx.DrawLine(BlueprintGrid, new Point(0, Math.Round(y) + 0.5), new Point(area.Width, Math.Round(y) + 0.5));
+            var inset = area.Deflate(area.Width * 0.08);
+            using (ctx.PushOpacityMask(new ImageBrush(bmp) { Stretch = Stretch.Uniform }, inset))
+                ctx.FillRectangle(BlueprintInk, inset);
         }
+        if (BlueprintCache.Count > 400) BlueprintCache.Clear();
+        BlueprintCache[url] = rtb;
+        return rtb;
+    }
 
-        var area = new Rect(Bounds.Size);
-        if (area.Width <= 0 || area.Height <= 0) return;
-        ctx.DrawRectangle(BlueprintBack, null, area, 2, 2);
-
-        var step = Math.Max(6, Math.Min(area.Width, area.Height) / 6);
-        for (var x = step; x < area.Width; x += step)
-            ctx.DrawLine(BlueprintGrid, new Point(Math.Round(x) + 0.5, 0), new Point(Math.Round(x) + 0.5, area.Height));
-        for (var y = step; y < area.Height; y += step)
-            ctx.DrawLine(BlueprintGrid, new Point(0, Math.Round(y) + 0.5), new Point(area.Width, Math.Round(y) + 0.5));
-
-        // biała sylwetka ikony: maska z kanału alfa obrazka
-        var size = bmp.Size;
-        var scale = Math.Min(area.Width / size.Width, area.Height / size.Height) * 0.86;
-        var w = size.Width * scale;
-        var h = size.Height * scale;
-        var dest = new Rect((area.Width - w) / 2, (area.Height - h) / 2, w, h);
-        using (ctx.PushOpacityMask(new ImageBrush(bmp) { Stretch = Stretch.Fill }, dest))
-            ctx.FillRectangle(BlueprintInk, dest);
+    /// <summary>Ustawia obraz — dla schematu wersję błękitną.</summary>
+    private void Show(string url, Bitmap? bmp)
+    {
+        Source = bmp is not null && IsBlueprint ? Blueprint(url, bmp) : bmp;
     }
 
     public string? Url
@@ -107,9 +109,21 @@ public sealed class RemoteImage : Image
         if (change.Property == UrlProperty)
         {
             _loadedUrl = null;
-            Source = Url is null ? null : ImageCache.Shared?.Peek(Url);
-            if (Source is not null) _loadedUrl = Url;
-            else if (_inViewport) TryLoad();
+            var cached = Url is null ? null : ImageCache.Shared?.Peek(Url);
+            if (cached is not null && Url is not null)
+            {
+                Show(Url, cached);
+                _loadedUrl = Url;
+            }
+            else
+            {
+                Source = null;
+                if (_inViewport) TryLoad();
+            }
+        }
+        else if (change.Property == IsBlueprintProperty && Url is { } u && ImageCache.Shared?.Peek(u) is { } bmp)
+        {
+            Show(u, bmp);
         }
     }
 
@@ -128,6 +142,6 @@ public sealed class RemoteImage : Image
             return;
         }
         if (Url != url) return; // kontrolka dostała już inny adres
-        Dispatcher.UIThread.Post(() => { if (Url == url) Source = bmp; });
+        Dispatcher.UIThread.Post(() => { if (Url == url) Show(url, bmp); });
     }
 }

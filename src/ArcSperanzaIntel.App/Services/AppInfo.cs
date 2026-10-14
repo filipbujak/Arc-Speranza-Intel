@@ -6,7 +6,7 @@ namespace ArcSperanzaIntel.App.Services;
 public static class AppInfo
 {
     /// <summary>Repozytorium na GitHubie — z jego Releases instalator pobiera aktualizacje.</summary>
-    public const string RepoUrl = "https://github.com/OWNER/arc-speranza-intel";
+    public const string RepoUrl = "https://github.com/filipbujak/Arc-Speranza-Intel";
 
     public static string Version { get; } =
         (Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "1.0.0")
