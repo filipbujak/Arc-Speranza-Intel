@@ -1,0 +1,235 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- ============================================================ PALETA ARC -->
+  <Styles.Resources>
+    <Color x:Key="ArcBlackColor">#0B0C0E</Color>
+    <SolidColorBrush x:Key="ArcBlack" Color="#0B0C0E" />
+    <SolidColorBrush x:Key="ArcPanel" Color="#121418" />
+    <SolidColorBrush x:Key="ArcPanel2" Color="#181B21" />
+    <SolidColorBrush x:Key="ArcRaised" Color="#1F232A" />
+    <SolidColorBrush x:Key="ArcHover" Color="#2A2F38" />
+    <SolidColorBrush x:Key="ArcLine" Color="#272C35" />
+    <SolidColorBrush x:Key="ArcLine2" Color="#363C47" />
+    <SolidColorBrush x:Key="ArcText" Color="#ECE7DC" />
+    <SolidColorBrush x:Key="ArcMuted" Color="#9298A3" />
+    <SolidColorBrush x:Key="ArcDim" Color="#646B78" />
+
+    <SolidColorBrush x:Key="ArcYellow" Color="#FFC72C" />
+    <SolidColorBrush x:Key="ArcYellowSoft" Color="#26FFC72C" />
+    <SolidColorBrush x:Key="ArcGreen" Color="#3FD07A" />
+    <SolidColorBrush x:Key="ArcGreenSoft" Color="#223FD07A" />
+    <SolidColorBrush x:Key="ArcRed" Color="#F0503F" />
+    <SolidColorBrush x:Key="ArcRedSoft" Color="#22F0503F" />
+    <SolidColorBrush x:Key="ArcBlue" Color="#36B5E6" />
+    <SolidColorBrush x:Key="ArcBlueSoft" Color="#2236B5E6" />
+
+    <FontFamily x:Key="BodyFont">avares://ArcSperanzaIntel/Assets/Fonts#Barlow</FontFamily>
+    <FontFamily x:Key="HeadFont">avares://ArcSperanzaIntel/Assets/Fonts#Barlow Condensed</FontFamily>
+  </Styles.Resources>
+
+  <!-- ============================================================ PODSTAWA -->
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{StaticResource ArcBlack}" />
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+    <Setter Property="FontFamily" Value="{StaticResource BodyFont}" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+
+  <Style Selector="TextBlock.h1">
+    <Setter Property="FontFamily" Value="{StaticResource HeadFont}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="24" />
+  </Style>
+  <Style Selector="TextBlock.h2">
+    <Setter Property="FontFamily" Value="{StaticResource HeadFont}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="18" />
+  </Style>
+  <!-- etykieta sekcji: wersaliki, rozstrzelone, przygaszone -->
+  <Style Selector="TextBlock.label">
+    <Setter Property="FontFamily" Value="{StaticResource HeadFont}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="LetterSpacing" Value="1.4" />
+    <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
+  </Style>
+  <Style Selector="TextBlock.muted">
+    <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
+  </Style>
+  <Style Selector="TextBlock.dim">
+    <Setter Property="Foreground" Value="{StaticResource ArcDim}" />
+  </Style>
+  <Style Selector="TextBlock.small">
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+  <Style Selector="TextBlock.mono">
+    <Setter Property="FontFamily" Value="Consolas, Cascadia Mono, monospace" />
+  </Style>
+
+  <!-- ============================================================ PANELE -->
+  <Style Selector="Border.panel">
+    <Setter Property="Background" Value="{StaticResource ArcPanel}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcLine}" />
+  </Style>
+  <Style Selector="Border.card">
+    <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcLine}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="3" />
+  </Style>
+  <Style Selector="Border.overlay">
+    <Setter Property="Background" Value="#F0121418" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="BoxShadow" Value="0 10 30 0 #99000000" />
+  </Style>
+  <Style Selector="Border.divider">
+    <Setter Property="Height" Value="1" />
+    <Setter Property="Background" Value="{StaticResource ArcLine}" />
+  </Style>
+
+  <!-- ============================================================ PRZYCISKI -->
+  <Style Selector="Button">
+    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="FontFamily" Value="{StaticResource BodyFont}" />
+  </Style>
+
+  <!-- płaski: bez tła, podświetlenie przy najechaniu -->
+  <Style Selector="Button.flat">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
+  </Style>
+  <Style Selector="Button.flat:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ArcRaised}" />
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+  </Style>
+
+  <!-- obramowany -->
+  <Style Selector="Button.ghost">
+    <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+  </Style>
+  <Style Selector="Button.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ArcRaised}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcYellow}" />
+  </Style>
+
+  <!-- główny: żółty -->
+  <Style Selector="Button.primary">
+    <Setter Property="Background" Value="{StaticResource ArcYellow}" />
+    <Setter Property="Foreground" Value="#111111" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="12,7" />
+  </Style>
+  <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#FFD65C" />
+    <Setter Property="Foreground" Value="#111111" />
+  </Style>
+
+  <!-- zielony: ukończ / zrobione -->
+  <Style Selector="Button.done">
+    <Setter Property="Background" Value="{StaticResource ArcGreenSoft}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcGreen}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{StaticResource ArcGreen}" />
+    <Setter Property="Padding" Value="10,5" />
+  </Style>
+  <Style Selector="Button.done:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ArcGreen}" />
+    <Setter Property="Foreground" Value="#0B0C0E" />
+  </Style>
+
+  <!-- czerwony: niebezpieczne -->
+  <Style Selector="Button.danger">
+    <Setter Property="Background" Value="{StaticResource ArcRedSoft}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcRed}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{StaticResource ArcRed}" />
+    <Setter Property="Padding" Value="12,7" />
+  </Style>
+  <Style Selector="Button.danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ArcRed}" />
+    <Setter Property="Foreground" Value="#0B0C0E" />
+  </Style>
+
+  <!-- zakładki górnego paska -->
+  <Style Selector="Button.tab">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="14,0" />
+    <Setter Property="Height" Value="52" />
+    <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
+    <Setter Property="FontFamily" Value="{StaticResource HeadFont}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="CornerRadius" Value="0" />
+  </Style>
+  <Style Selector="Button.tab:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+  </Style>
+  <Style Selector="Button.tab.active">
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+  </Style>
+  <Style Selector="Button.tab.active /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+  </Style>
+
+  <!-- chip / przełącznik w filtrach -->
+  <Style Selector="ToggleButton.chip">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
+  </Style>
+  <Style Selector="ToggleButton.chip:checked /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ArcYellowSoft}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcYellow}" />
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+  </Style>
+
+  <!-- ============================================================ POLA -->
+  <Style Selector="TextBox">
+    <Setter Property="Background" Value="{StaticResource ArcBlack}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
+    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="Padding" Value="10,7" />
+  </Style>
+  <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+    <Setter Property="BorderBrush" Value="{StaticResource ArcYellow}" />
+    <Setter Property="Background" Value="{StaticResource ArcBlack}" />
+  </Style>
+  <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="{StaticResource ArcBlack}" />
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="Background" Value="{StaticResource ArcBlack}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
+  </Style>
+
+  <Style Selector="CheckBox">
+    <Setter Property="MinHeight" Value="26" />
+  </Style>
+
+  <Style Selector="ToolTip">
+    <Setter Property="Background" Value="{StaticResource ArcRaised}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+  </Style>
+
+  <Style Selector="ScrollViewer">
+    <Setter Property="AllowAutoHide" Value="True" />
+  </Style>
+</Styles>

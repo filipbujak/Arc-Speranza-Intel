@@ -1,0 +1,337 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="using:ArcSperanzaIntel.App.Localization"
+             xmlns:vm="using:ArcSperanzaIntel.App.ViewModels"
+             xmlns:views="using:ArcSperanzaIntel.App.Views"
+             xmlns:icons="using:ArcSperanzaIntel.App.Icons"
+             xmlns:c="using:ArcSperanzaIntel.App.Controls"
+             x:Class="ArcSperanzaIntel.App.Views.QuestsView"
+             x:DataType="vm:QuestsViewModel">
+
+  <UserControl.Styles>
+    <Style Selector="Button.row">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="10,6" />
+      <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+    </Style>
+    <Style Selector="Button.row:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid ColumnDefinitions="300,*,Auto">
+
+    <!-- ====================================================== LEWY PANEL -->
+    <Border Classes="panel" BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+        <!-- postęp -->
+        <StackPanel Margin="16,16,16,10" Spacing="6">
+          <TextBlock Text="{l:T ProgressTitle}" Classes="label" />
+          <TextBlock Text="{Binding ProgressText}" FontFamily="{StaticResource HeadFont}" FontWeight="Bold" FontSize="30" />
+          <ProgressBar Value="{Binding ProgressPercent}" Maximum="100" Height="4" MinHeight="4" Foreground="{StaticResource ArcGreen}"
+                       Background="{StaticResource ArcLine}" />
+          <TextBlock Text="{Binding CountsText}" Classes="muted small" />
+        </StackPanel>
+
+        <!-- wyszukiwarka z podpowiedziami -->
+        <StackPanel Grid.Row="1" Margin="16,6,16,6" Spacing="6">
+          <Border Classes="divider" Margin="-16,0,-16,8" />
+          <Panel>
+            <TextBox x:Name="Search" Text="{Binding SearchText}" Watermark="{l:T SearchQuest}" Padding="32,7,10,7" />
+            <PathIcon Data="{x:Static icons:UiIcons.Search}" Width="14" Height="14" Foreground="{StaticResource ArcDim}"
+                      HorizontalAlignment="Left" Margin="11,0,0,0" IsHitTestVisible="False" />
+          </Panel>
+          <Border Classes="card" IsVisible="{Binding HasSuggestions}">
+            <ItemsControl ItemsSource="{Binding Suggestions}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:QuestListItemViewModel">
+                  <Button Classes="row" Command="{Binding OpenCommand}">
+                    <Grid ColumnDefinitions="3,*,Auto">
+                      <Border Background="{Binding TraderBrush}" Margin="-10,-6,0,-6" />
+                      <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                        <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Trader}" Classes="dim small" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="2" Text="{Binding Status}" FontSize="10" FontWeight="Bold" LetterSpacing="1"
+                                 Foreground="{Binding StatusBrush}" VerticalAlignment="Center" />
+                    </Grid>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Border>
+        </StackPanel>
+
+        <!-- handlarze -->
+        <StackPanel Grid.Row="2" Margin="16,8,16,6" Spacing="6">
+          <TextBlock Text="{l:T HighlightTraders}" Classes="label" />
+          <ItemsControl ItemsSource="{Binding Traders}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:TraderChipViewModel">
+                <ToggleButton Classes="chip" IsChecked="{Binding IsOn}" Margin="0,0,6,6">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Ellipse Width="8" Height="8" Fill="{Binding ColorBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Name}" />
+                  </StackPanel>
+                </ToggleButton>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <TextBlock Grid.Row="3" Text="{l:T AvailableNow}" Classes="label" Margin="16,10,16,4" />
+        <ScrollViewer Grid.Row="4" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding AvailableQuests}" Margin="6,0,6,16">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:QuestListItemViewModel">
+                <Button Classes="row" Command="{Binding OpenCommand}">
+                  <Grid ColumnDefinitions="3,*">
+                    <Border Background="{Binding TraderBrush}" Margin="-10,-6,0,-6" />
+                    <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                      <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Trader}" Classes="dim small" />
+                    </StackPanel>
+                  </Grid>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+
+    <!-- ====================================================== GRAF -->
+    <Panel Grid.Column="1" ClipToBounds="True">
+      <c:QuestGraphCanvas x:Name="Graph" Nodes="{Binding Nodes}" Edges="{Binding Edges}" />
+
+      <StackPanel Orientation="Horizontal" Spacing="14" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="14">
+        <Button Classes="ghost" Command="{Binding FitCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <PathIcon Data="{x:Static icons:UiIcons.Fit}" Width="14" Height="14" />
+            <TextBlock Text="{l:T FitGraph}" />
+          </StackPanel>
+        </Button>
+        <Border Classes="overlay" Padding="12,6">
+          <StackPanel Orientation="Horizontal" Spacing="14">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border Width="10" Height="10" Background="{StaticResource ArcGreen}" CornerRadius="2" VerticalAlignment="Center" />
+              <TextBlock Text="{l:T StatusDone}" Classes="small muted" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border Width="10" Height="10" Background="{StaticResource ArcYellow}" CornerRadius="2" VerticalAlignment="Center" />
+              <TextBlock Text="{l:T StatusAvailable}" Classes="small muted" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border Width="10" Height="10" Background="#4A5263" CornerRadius="2" VerticalAlignment="Center" />
+              <TextBlock Text="{l:T StatusLocked}" Classes="small muted" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <views:WantedItemsPanel DataContext="{Binding Wanted}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="14" />
+
+      <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="12" Padding="8,3" Background="#B30B0C0E" CornerRadius="2"
+              IsHitTestVisible="False">
+        <TextBlock Text="{l:T GraphHelp}" Classes="dim small" />
+      </Border>
+    </Panel>
+
+    <!-- ====================================================== SZCZEGÓŁY QUESTU -->
+    <Border Grid.Column="2" Classes="panel" BorderThickness="1,0,0,0" Width="390"
+            IsVisible="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <ContentControl Content="{Binding Selected}">
+        <ContentControl.ContentTemplate>
+          <DataTemplate x:DataType="vm:QuestDetailViewModel">
+            <DockPanel>
+              <!-- dół boxa: przejście do mapy i ukończenie -->
+              <Border DockPanel.Dock="Bottom" BorderBrush="{StaticResource ArcLine}" BorderThickness="0,1,0,0" Padding="16,12"
+                      Background="{StaticResource ArcPanel}">
+                <StackPanel Spacing="8">
+                  <ItemsControl ItemsSource="{Binding Maps}" IsVisible="{Binding IsMapChoiceOpen}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:MapChoiceViewModel">
+                        <Button Classes="ghost" Command="{Binding GoCommand}" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                          <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="1" Text="{Binding Hint}" Classes="dim small" VerticalAlignment="Center" />
+                          </Grid>
+                        </Button>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <Grid ColumnDefinitions="*,8,*">
+                    <Button Classes="primary" Command="{Binding GoToMapCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{x:Static icons:UiIcons.Map}" Width="15" Height="15" Foreground="#111111" />
+                        <TextBlock Text="{l:T GoToMap}" />
+                      </StackPanel>
+                    </Button>
+                    <Button Grid.Column="2" Classes="done" Content="{Binding ToggleText}" Command="{Binding ToggleQuestCommand}"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                  <Panel>
+                    <c:RemoteImage Url="{Binding ImageUrl}" DecodeWidth="780" Height="160" Stretch="UniformToFill"
+                                   IsVisible="{Binding HasImage}" />
+                    <Button Classes="ghost" Padding="6" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10"
+                            Command="{Binding CloseCommand}">
+                      <PathIcon Data="{x:Static icons:UiIcons.Close}" Width="12" Height="12" />
+                    </Button>
+                  </Panel>
+
+                  <StackPanel Margin="18,14,18,18" Spacing="10">
+                    <TextBlock Text="{Binding Name}" Classes="h1" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <Border Background="{Binding StatusBrush}" CornerRadius="2" Padding="7,2">
+                        <TextBlock Text="{Binding StatusText}" FontSize="11" FontWeight="Bold" LetterSpacing="1" Foreground="#0B0C0E" />
+                      </Border>
+                      <TextBlock Text="{Binding Trader}" Foreground="{Binding TraderBrush}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      <Button Classes="flat" Content="{l:T Guide}" Padding="6,2" FontSize="12" Command="{Binding OpenGuideCommand}"
+                              IsVisible="{Binding HasGuide}" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding Description}" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding HasDescription}" />
+
+                    <!-- subtaski -->
+                    <StackPanel Spacing="4" IsVisible="{Binding HasObjectives}">
+                      <TextBlock Text="{l:T Subtasks}" Classes="label" Margin="0,8,0,2" />
+                      <ItemsControl ItemsSource="{Binding Objectives}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:ObjectiveViewModel">
+                            <Border Classes="card" Padding="10,8" Margin="0,0,0,6">
+                              <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Opacity="{Binding TextOpacity}" VerticalAlignment="Center"
+                                           Margin="0,0,10,0" />
+                                <Button Grid.Column="1" Classes="done" Content="{Binding ButtonText}" Command="{Binding ToggleCommand}"
+                                        IsVisible="{Binding IsNotDone}" FontSize="12" />
+                                <Button Grid.Column="1" Classes="ghost" Content="{Binding ButtonText}" Command="{Binding ToggleCommand}"
+                                        IsVisible="{Binding IsDone}" FontSize="12" />
+                              </Grid>
+                            </Border>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+
+                    <!-- itemy do zdobycia -->
+                    <StackPanel Spacing="4" IsVisible="{Binding HasRequiredItems}">
+                      <TextBlock Text="{l:T ItemsToGet}" Classes="label" Margin="0,8,0,2" />
+                      <ItemsControl ItemsSource="{Binding RequiredItems}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:ItemChipViewModel">
+                            <Button Classes="row" Command="{Binding OpenCommand}" Padding="4">
+                              <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Width="40" Height="40" Background="{StaticResource ArcBlack}" BorderBrush="{Binding RarityBrush}"
+                                        BorderThickness="0,0,0,2" CornerRadius="2">
+                                  <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="80" Margin="3" />
+                                </Border>
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="2" Text="{Binding QuantityText}" Foreground="{StaticResource ArcYellow}" FontWeight="Bold"
+                                           VerticalAlignment="Center" Margin="0,0,6,0" />
+                              </Grid>
+                            </Button>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+
+                    <!-- startowe -->
+                    <StackPanel Spacing="4" IsVisible="{Binding HasGrantedItems}">
+                      <TextBlock Text="{l:T GrantedAtStart}" Classes="label" Margin="0,8,0,2" />
+                      <ItemsControl ItemsSource="{Binding GrantedItems}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:ItemChipViewModel">
+                            <Button Classes="row" Command="{Binding OpenCommand}" Padding="4">
+                              <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Width="34" Height="34" Background="{StaticResource ArcBlack}" BorderBrush="{Binding RarityBrush}"
+                                        BorderThickness="0,0,0,2" CornerRadius="2">
+                                  <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="68" Margin="3" />
+                                </Border>
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="2" Text="{Binding QuantityText}" Classes="muted" VerticalAlignment="Center" Margin="0,0,6,0" />
+                              </Grid>
+                            </Button>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+
+                    <!-- nagrody -->
+                    <StackPanel Spacing="4" IsVisible="{Binding HasRewards}">
+                      <TextBlock Text="{l:T Rewards}" Classes="label" Margin="0,8,0,2" />
+                      <ItemsControl ItemsSource="{Binding Rewards}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                          </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:ItemChipViewModel">
+                            <Button Classes="flat" Padding="0" Margin="0,0,6,6" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Name}">
+                              <Panel Width="54" Height="54">
+                                <Border Background="{StaticResource ArcBlack}" BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,2" CornerRadius="2">
+                                  <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="108" Margin="5" />
+                                </Border>
+                                <TextBlock Text="{Binding QuantityText}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right"
+                                           VerticalAlignment="Bottom" Margin="0,0,4,3" />
+                              </Panel>
+                            </Button>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <TextBlock Text="{Binding CurrencyText}" Foreground="{StaticResource ArcYellow}" FontWeight="SemiBold" />
+                    </StackPanel>
+
+                    <!-- wymaga / odblokowuje -->
+                    <StackPanel Spacing="2" IsVisible="{Binding HasPrerequisites}">
+                      <TextBlock Text="{l:T Requires}" Classes="label" Margin="0,8,0,2" />
+                      <ItemsControl ItemsSource="{Binding Prerequisites}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:QuestLinkViewModel">
+                            <Button Classes="row" Command="{Binding OpenCommand}" Padding="6,4">
+                              <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{Binding Mark}" Foreground="{Binding MarkBrush}" FontWeight="Bold" />
+                                <TextBlock Text="{Binding Name}" />
+                              </StackPanel>
+                            </Button>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                    <StackPanel Spacing="2" IsVisible="{Binding HasUnlocks}">
+                      <TextBlock Text="{l:T Unlocks}" Classes="label" Margin="0,8,0,2" />
+                      <ItemsControl ItemsSource="{Binding Unlocks}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:QuestLinkViewModel">
+                            <Button Classes="row" Command="{Binding OpenCommand}" Padding="6,4">
+                              <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{Binding Mark}" Foreground="{Binding MarkBrush}" FontWeight="Bold" />
+                                <TextBlock Text="{Binding Name}" />
+                              </StackPanel>
+                            </Button>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </StackPanel>
+                </StackPanel>
+              </ScrollViewer>
+            </DockPanel>
+          </DataTemplate>
+        </ContentControl.ContentTemplate>
+      </ContentControl>
+    </Border>
+  </Grid>
+</UserControl>

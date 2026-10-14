@@ -1,0 +1,354 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="using:ArcSperanzaIntel.App.Localization"
+             xmlns:vm="using:ArcSperanzaIntel.App.ViewModels"
+             xmlns:views="using:ArcSperanzaIntel.App.Views"
+             xmlns:icons="using:ArcSperanzaIntel.App.Icons"
+             xmlns:c="using:ArcSperanzaIntel.App.Controls"
+             x:Class="ArcSperanzaIntel.App.Views.MapsView"
+             x:DataType="vm:MapsViewModel">
+
+  <UserControl.Styles>
+    <Style Selector="Button.mapopt">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="12,7" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
+    </Style>
+    <Style Selector="Button.mapopt:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+      <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+    </Style>
+    <Style Selector="Button.mapopt.active">
+      <Setter Property="Background" Value="{StaticResource ArcRaised}" />
+      <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+    </Style>
+    <Style Selector="Button.floor">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="10,5" />
+      <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
+    </Style>
+    <Style Selector="Button.floor.active">
+      <Setter Property="Background" Value="{StaticResource ArcYellow}" />
+      <Setter Property="Foreground" Value="#111111" />
+      <Setter Property="BorderBrush" Value="{StaticResource ArcYellow}" />
+    </Style>
+    <Style Selector="Button.filter">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="4,3" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+    </Style>
+    <Style Selector="Button.filter:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid ColumnDefinitions="310,*">
+
+    <!-- ====================================================== LEWY PANEL -->
+    <Border Classes="panel" BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+
+        <!-- wybór mapy -->
+        <StackPanel Grid.Row="0" Margin="0,14,0,6">
+          <TextBlock Text="{l:T MapTitle}" Classes="label" Margin="16,0,0,6" />
+          <ItemsControl ItemsSource="{Binding MapOptions}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:MapOptionViewModel">
+                <Button Classes="mapopt" Classes.active="{Binding IsActive}" Command="{Binding SelectCommand}">
+                  <Grid ColumnDefinitions="3,*,Auto">
+                    <Border Background="{StaticResource ArcYellow}" IsVisible="{Binding IsActive}" Margin="-12,-7,0,-7" />
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Medium" Margin="6,0,0,0" VerticalAlignment="Center" />
+                    <Border Grid.Column="2" Background="{StaticResource ArcYellowSoft}" BorderBrush="{StaticResource ArcYellow}"
+                            BorderThickness="1" CornerRadius="2" Padding="6,0" IsVisible="{Binding HasQuests}"
+                            ToolTip.Tip="{l:T MapQuestCountTip}">
+                      <TextBlock Text="{Binding QuestCount}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource ArcYellow}" />
+                    </Border>
+                  </Grid>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- piętra -->
+        <StackPanel Grid.Row="1" Margin="16,4,16,8" IsVisible="{Binding HasFloors}" Spacing="6">
+          <TextBlock Text="{l:T FloorTitle}" Classes="label" />
+          <ItemsControl ItemsSource="{Binding FloorOptions}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="6" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:FloorOptionViewModel">
+                <Button Classes="floor" Classes.active="{Binding IsActive}" Content="{Binding Name}" Command="{Binding SelectCommand}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- wyszukiwarka markerów -->
+        <StackPanel Grid.Row="2" Margin="16,6,16,6" Spacing="6">
+          <Border Classes="divider" Margin="-16,0,-16,8" />
+          <Panel>
+            <TextBox Text="{Binding SearchText}" Watermark="{l:T SearchMarkers}" Padding="32,7,10,7" />
+            <PathIcon Data="{x:Static icons:UiIcons.Search}" Width="14" Height="14" Foreground="{StaticResource ArcDim}"
+                      HorizontalAlignment="Left" Margin="11,0,0,0" IsHitTestVisible="False" />
+          </Panel>
+          <Border Classes="card" IsVisible="{Binding HasSearchResults}" MaxHeight="240">
+            <ScrollViewer>
+              <ItemsControl ItemsSource="{Binding SearchResults}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:MarkerSearchResultViewModel">
+                    <Button Classes="filter" Command="{Binding GoCommand}" Padding="8,5">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <Ellipse Width="8" Height="8" Fill="{Binding ColorBrush}" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                          <TextBlock Text="{Binding Label}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Text="{Binding Sub}" Classes="dim small" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                      </Grid>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Border>
+        </StackPanel>
+
+        <!-- pokaż / ukryj wszystko -->
+        <StackPanel Grid.Row="3" Margin="16,2,16,8" Spacing="8">
+          <Grid ColumnDefinitions="*,6,*,6,Auto">
+            <Button Classes="ghost" Command="{Binding ShowAllCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{x:Static icons:UiIcons.Eye}" Width="14" Height="14" />
+                <TextBlock Text="Show all" />
+              </StackPanel>
+            </Button>
+            <Button Grid.Column="2" Classes="ghost" Command="{Binding HideAllCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{x:Static icons:UiIcons.EyeOff}" Width="14" Height="14" />
+                <TextBlock Text="Hide all" />
+              </StackPanel>
+            </Button>
+            <Button Grid.Column="4" Classes="ghost" Command="{Binding ResetFiltersCommand}" ToolTip.Tip="{l:T DefaultFilters}">
+              <PathIcon Data="{x:Static icons:UiIcons.Reset}" Width="14" Height="14" />
+            </Button>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto">
+            <CheckBox Content="{l:T OnlyFavorites}" IsChecked="{Binding OnlyFavorites}" />
+            <TextBlock Grid.Column="1" Classes="dim small" VerticalAlignment="Center">
+              <Run Text="{Binding VisibleCount}" />
+              <Run Text="{l:T OnMapSuffix}" />
+            </TextBlock>
+          </Grid>
+        </StackPanel>
+
+        <!-- grupy filtrów -->
+        <ScrollViewer Grid.Row="4" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding FilterGroups}" Margin="8,0,8,16">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:FilterGroupViewModel">
+                <StackPanel Margin="0,4">
+                  <Grid ColumnDefinitions="*,Auto,Auto">
+                    <Button Classes="flat" Command="{Binding ToggleCommand}" HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch" Padding="8,6" Foreground="{StaticResource ArcText}">
+                      <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                        <PathIcon Data="{x:Static icons:UiIcons.ChevronDown}" Width="11" Height="11" IsVisible="{Binding IsExpanded}" />
+                        <PathIcon Data="{x:Static icons:UiIcons.ChevronRight}" Width="11" Height="11" IsVisible="{Binding !IsExpanded}" />
+                        <Ellipse Grid.Column="1" Width="9" Height="9" Fill="{Binding ColorBrush}" Margin="8,0" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Text="{Binding Title}" Classes="label" Foreground="{StaticResource ArcText}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="3" Text="{Binding TotalCount}" Classes="dim small" VerticalAlignment="Center" />
+                      </Grid>
+                    </Button>
+                    <Button Grid.Column="1" Classes="flat" Padding="5" Command="{Binding ShowAllCommand}" ToolTip.Tip="{l:T ShowGroup}">
+                      <PathIcon Data="{x:Static icons:UiIcons.Eye}" Width="13" Height="13" />
+                    </Button>
+                    <Button Grid.Column="2" Classes="flat" Padding="5" Command="{Binding HideAllCommand}" ToolTip.Tip="{l:T HideGroup}">
+                      <PathIcon Data="{x:Static icons:UiIcons.EyeOff}" Width="13" Height="13" />
+                    </Button>
+                  </Grid>
+                  <ItemsControl ItemsSource="{Binding Items}" IsVisible="{Binding IsExpanded}" Margin="4,2,0,4">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <UniformGrid Columns="2" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:FilterItemViewModel">
+                        <Button Classes="filter" Command="{Binding ToggleCommand}" Opacity="{Binding RowOpacity}" ToolTip.Tip="{Binding Label}">
+                          <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Panel Width="20" Height="20">
+                              <Ellipse Fill="{Binding IconBrush}" />
+                              <PathIcon Data="{Binding Icon}" Width="12" Height="12" Foreground="#111317" />
+                            </Panel>
+                            <TextBlock Grid.Column="1" Text="{Binding Label}" FontSize="12.5" Margin="7,0,4,0"
+                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="2" Text="{Binding Count}" Classes="dim small" VerticalAlignment="Center" Margin="0,0,4,0" />
+                          </Grid>
+                        </Button>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+
+    <!-- ====================================================== MAPA -->
+    <Panel Grid.Column="1" ClipToBounds="True">
+      <c:MapCanvas x:Name="Canvas"
+                   Map="{Binding SelectedMap}"
+                   Floor="{Binding CurrentFloor}"
+                   Markers="{Binding MarkerVisuals}"
+                   Pins="{Binding Pins}" />
+
+      <!-- dymki markerów i pinezek (pozycja liczona w kodzie, śledzą mapę) -->
+      <Canvas x:Name="Overlay">
+        <Border x:Name="MarkerCard" Classes="overlay" Width="320" Padding="0"
+                IsVisible="{Binding SelectedCard, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <ContentControl Content="{Binding SelectedCard}">
+            <ContentControl.ContentTemplate>
+              <DataTemplate x:DataType="vm:MarkerCardViewModel">
+                <Grid ColumnDefinitions="4,*">
+                  <Border Background="{Binding AccentBrush}" CornerRadius="3,0,0,3" />
+                  <Grid Grid.Column="1" RowDefinitions="Auto,*">
+                  <!-- nagłówek stoi w miejscu, reszta się przewija (długie questy typu To The Skies) -->
+                  <StackPanel Margin="14,12,12,8" Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel>
+                        <TextBlock Text="{Binding Title}" Classes="h2" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Subtitle}" Classes="muted small" TextWrapping="Wrap" MaxLines="3"
+                                   TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Subtitle}" />
+                      </StackPanel>
+                      <Button Grid.Column="1" Classes="flat" Padding="4" VerticalAlignment="Top" Command="{Binding CloseCommand}">
+                        <PathIcon Data="{x:Static icons:UiIcons.Close}" Width="12" Height="12" />
+                      </Button>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsQuest}">
+                      <Border Background="{Binding StatusBrush}" CornerRadius="2" Padding="6,1">
+                        <TextBlock Text="{Binding StatusText}" FontSize="11" FontWeight="Bold" Foreground="#0B0C0E" LetterSpacing="1" />
+                      </Border>
+                      <TextBlock Text="{Binding TraderText}" Classes="muted small" VerticalAlignment="Center" />
+                    </StackPanel>
+                  </StackPanel>
+
+                  <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                  <StackPanel Margin="14,0,12,12" Spacing="8">
+
+                    <TextBlock Text="{Binding Loot}" Classes="muted small" TextWrapping="Wrap" IsVisible="{Binding HasLoot}" />
+                    <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsLocked}">
+                      <PathIcon Data="{x:Static icons:UiIcons.Lock}" Width="12" Height="12" Foreground="{StaticResource ArcRed}" />
+                      <TextBlock Text="{l:T BehindLockedDoor}" Classes="small" Foreground="{StaticResource ArcRed}" />
+                    </StackPanel>
+
+                    <!-- subtaski questu -->
+                    <StackPanel IsVisible="{Binding HasObjectives}" Spacing="4">
+                      <TextBlock Text="{l:T Subtasks}" Classes="label" Margin="0,4,0,0" />
+                      <ItemsControl ItemsSource="{Binding Objectives}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:ObjectiveViewModel">
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,3">
+                              <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="13" Opacity="{Binding TextOpacity}"
+                                         VerticalAlignment="Center" Margin="0,0,8,0" />
+                              <Button Grid.Column="1" Classes="done" Content="{Binding ButtonText}" Command="{Binding ToggleCommand}"
+                                      IsVisible="{Binding IsNotDone}" FontSize="12" />
+                              <Button Grid.Column="1" Classes="ghost" Content="{Binding ButtonText}" Command="{Binding ToggleCommand}"
+                                      IsVisible="{Binding IsDone}" FontSize="12" />
+                            </Grid>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+
+                    <WrapPanel Orientation="Horizontal" Margin="0,4,0,0">
+                      <Button Classes="ghost" Content="{Binding FavoriteText}" Command="{Binding ToggleFavoriteCommand}" Margin="0,0,6,6" />
+                      <Button Classes="ghost" Content="{Binding QuestButtonText}" Command="{Binding ToggleQuestCommand}"
+                              IsVisible="{Binding IsQuest}" Margin="0,0,6,6" />
+                      <Button Classes="ghost" Content="{l:T QuestTree}" Command="{Binding ShowInTreeCommand}" IsVisible="{Binding IsQuest}" Margin="0,0,6,6" />
+                      <Button Classes="flat" Content="{l:T HideThisType}" Command="{Binding HideTypeCommand}" IsVisible="{Binding IsNotQuest}" Margin="0,0,6,6" />
+                    </WrapPanel>
+                  </StackPanel>
+                  </ScrollViewer>
+                  </Grid>
+                </Grid>
+              </DataTemplate>
+            </ContentControl.ContentTemplate>
+          </ContentControl>
+        </Border>
+
+        <Border x:Name="PinCard" Classes="overlay" Width="280" Padding="14,12"
+                IsVisible="{Binding SelectedPin, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <ContentControl Content="{Binding SelectedPin}">
+            <ContentControl.ContentTemplate>
+              <DataTemplate x:DataType="vm:PinCardViewModel">
+                <StackPanel Spacing="8">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <PathIcon Data="{x:Static icons:UiIcons.Pin}" Width="16" Height="16" Foreground="{StaticResource ArcYellow}" />
+                    <TextBlock Grid.Column="1" Text="{l:T MyPin}" Classes="label" Margin="8,0" VerticalAlignment="Center" />
+                    <Button Grid.Column="2" Classes="flat" Padding="4" Command="{Binding CloseCommand}">
+                      <PathIcon Data="{x:Static icons:UiIcons.Close}" Width="12" Height="12" />
+                    </Button>
+                  </Grid>
+                  <TextBlock Text="{Binding Note}" TextWrapping="Wrap" />
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Classes="ghost" Command="{Binding EditCommand}">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{x:Static icons:UiIcons.Edit}" Width="12" Height="12" />
+                        <TextBlock Text="{l:T Edit}" />
+                      </StackPanel>
+                    </Button>
+                    <Button Classes="danger" Command="{Binding DeleteCommand}" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{x:Static icons:UiIcons.Trash}" Width="12" Height="12" />
+                        <TextBlock Text="{l:T Delete}" />
+                      </StackPanel>
+                    </Button>
+                  </StackPanel>
+                  <TextBlock Text="{l:T DragPinHelp}" Classes="dim small" />
+                </StackPanel>
+              </DataTemplate>
+            </ContentControl.ContentTemplate>
+          </ContentControl>
+        </Border>
+      </Canvas>
+
+      <!-- szukane itemy -->
+      <views:WantedItemsPanel DataContext="{Binding Wanted}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="14" />
+
+      <!-- ładowanie markerów -->
+      <Border Classes="overlay" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="14" Padding="14,8"
+              IsVisible="{Binding IsLoadingMarkers}">
+        <TextBlock Text="{l:T LoadingMarkers}" Classes="muted" />
+      </Border>
+
+      <!-- zoom -->
+      <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="14,14,14,34" Spacing="2">
+        <Button x:Name="ZoomIn" Classes="ghost" Padding="8" ToolTip.Tip="{l:T ZoomIn}">
+          <PathIcon Data="{x:Static icons:UiIcons.Plus}" Width="14" Height="14" />
+        </Button>
+        <Button x:Name="ZoomOut" Classes="ghost" Padding="8" ToolTip.Tip="{l:T ZoomOut}">
+          <PathIcon Data="{x:Static icons:UiIcons.Minus}" Width="14" Height="14" />
+        </Button>
+      </StackPanel>
+
+      <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="12" Padding="8,3" Background="#B30B0C0E" CornerRadius="2"
+              IsHitTestVisible="False">
+        <TextBlock Text="{l:T MapHelp}" Classes="dim small" />
+      </Border>
+    </Panel>
+  </Grid>
+</UserControl>

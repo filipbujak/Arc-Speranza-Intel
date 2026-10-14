@@ -1,0 +1,41 @@
+name: Release
+
+# Nowa wersja: git tag v1.2.0 && git push origin v1.2.0
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Version from tag
+        shell: pwsh
+        run: echo "VERSION=$('${{ github.ref_name }}'.TrimStart('v'))" >> $env:GITHUB_ENV
+
+      - name: Test
+        run: dotnet test tests/ArcSperanzaIntel.Tests -c Release
+
+      - name: Publish (self-contained, no .NET needed on the user's PC)
+        run: dotnet publish src/ArcSperanzaIntel.App -c Release -r win-x64 --self-contained true -p:Version=${{ env.VERSION }} -o publish
+
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk
+
+      - name: Download previous release (for delta updates)
+        continue-on-error: true
+        run: vpk download github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} -o releases
+
+      - name: Pack installer
+        run: vpk pack -u ArcSperanzaIntel -v ${{ env.VERSION }} -p publish -e ArcSperanzaIntel.exe --packTitle "ARC Speranza Intel" --packAuthors "Filip" -i src/ArcSperanzaIntel.App/Assets/app.ico -o releases
+
+      - name: Upload to GitHub Releases
+        run: vpk upload github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} -o releases --publish --releaseName "ARC Speranza Intel ${{ env.VERSION }}" --tag ${{ github.ref_name }}

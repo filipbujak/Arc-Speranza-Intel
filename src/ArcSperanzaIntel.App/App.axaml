@@ -1,0 +1,20 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ArcSperanzaIntel.App.App"
+             RequestedThemeVariant="Dark">
+  <Application.Styles>
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Dark"
+                               Accent="#FFC72C"
+                               RegionColor="#0B0C0E"
+                               AltHigh="#0B0C0E"
+                               ChromeMediumLow="#15181D"
+                               ChromeMedium="#1C2027"
+                               ChromeHigh="#2A2F38"
+                               BaseHigh="#ECE7DC" />
+      </FluentTheme.Palettes>
+    </FluentTheme>
+    <StyleInclude Source="avares://ArcSperanzaIntel/Styles/Theme.axaml" />
+  </Application.Styles>
+</Application>

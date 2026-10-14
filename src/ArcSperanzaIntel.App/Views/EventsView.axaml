@@ -1,0 +1,197 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="using:ArcSperanzaIntel.App.Localization"
+             xmlns:vm="using:ArcSperanzaIntel.App.ViewModels"
+             xmlns:icons="using:ArcSperanzaIntel.App.Icons"
+             xmlns:c="using:ArcSperanzaIntel.App.Controls"
+             x:Class="ArcSperanzaIntel.App.Views.EventsView"
+             x:DataType="vm:EventsViewModel">
+
+  <UserControl.Styles>
+    <Style Selector="Button.mapfilter">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0,0,0,0" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="Padding" Value="12,8" />
+      <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
+      <Setter Property="CornerRadius" Value="2" />
+    </Style>
+    <Style Selector="Button.mapfilter:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+    </Style>
+    <Style Selector="Button.mapfilter.active /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ArcYellowSoft}" />
+    </Style>
+    <Style Selector="Button.mapfilter.active">
+      <Setter Property="Foreground" Value="{StaticResource ArcYellow}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.eventcard">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="0,0,8,8" />
+    </Style>
+    <Style Selector="Border.eventface">
+      <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+      <Setter Property="BorderBrush" Value="{StaticResource ArcLine}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+    </Style>
+    <Style Selector="Button.eventcard:pointerover Border.eventface">
+      <Setter Property="Background" Value="{StaticResource ArcRaised}" />
+      <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid ColumnDefinitions="290,*">
+
+    <!-- ====================================================== FILTR MAP -->
+    <Border Classes="panel" BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,*,Auto">
+        <StackPanel Margin="16,16,16,8" Spacing="6">
+          <TextBlock Text="{l:T EventsTitle}" Classes="label" />
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="8,0,8,8" Spacing="4">
+            <TextBlock Text="{l:T MapsFilterTitle}" Classes="label" Margin="8,4,0,2" />
+            <ItemsControl ItemsSource="{Binding MapFilters}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:EventMapFilterViewModel">
+                  <Button Classes="mapfilter" Classes.active="{Binding IsActive}" Command="{Binding SelectCommand}" Content="{Binding Name}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock Text="{l:T ModesTitle}" Classes="label" Margin="8,14,0,2" />
+            <ItemsControl ItemsSource="{Binding ModeFilters}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:EventModeFilterViewModel">
+                  <Button Classes="mapfilter" Classes.active="{Binding IsActive}" Command="{Binding SelectCommand}" Padding="10,6">
+                    <Grid ColumnDefinitions="Auto,*">
+                      <Border Width="28" Height="28" Margin="0,0,10,0" Background="{StaticResource ArcBlack}" CornerRadius="2"
+                              IsVisible="{Binding HasIcon}" VerticalAlignment="Center">
+                        <c:RemoteImage Url="{Binding IconUrl}" DecodeWidth="56" Margin="2" />
+                      </Border>
+                      <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding HasInfo}">
+                          <Ellipse Width="6" Height="6" Fill="{StaticResource ArcRed}" IsVisible="{Binding IsLive}" VerticalAlignment="Center" />
+                          <TextBlock Text="{Binding Info}" Classes="dim small" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                      </StackPanel>
+                    </Grid>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </ScrollViewer>
+        <StackPanel Grid.Row="2" Margin="16,8,16,16" Spacing="8">
+          <Button Classes="ghost" Command="{Binding RefreshCommand}" IsEnabled="{Binding !IsRefreshing}" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <PathIcon Data="{x:Static icons:UiIcons.Refresh}" Width="13" Height="13" />
+              <TextBlock Text="{l:T EventsRefresh}" />
+            </StackPanel>
+          </Button>
+          <TextBlock Text="{Binding SourceText}" Classes="dim small" TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ====================================================== LISTA -->
+    <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Margin="22,16,22,30" Spacing="10">
+
+        <TextBlock Text="{l:T EventsNoData}" Classes="muted" IsVisible="{Binding NoData}" />
+
+        <TextBlock Text="{Binding ModeTitle}" Classes="h1" LetterSpacing="2" Foreground="{StaticResource ArcYellow}"
+                   IsVisible="{Binding ModeTitle, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+        <!-- trwa teraz -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Ellipse Width="8" Height="8" Fill="{StaticResource ArcRed}" VerticalAlignment="Center" />
+          <TextBlock Text="{l:T EventsNow}" Classes="h2" LetterSpacing="1.5" />
+        </StackPanel>
+        <TextBlock Text="{l:T EventsNoneNow}" Classes="dim small" IsVisible="{Binding NoActive}" />
+        <ItemsControl ItemsSource="{Binding Active}" IsVisible="{Binding HasActive}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:EventCardViewModel">
+              <Button Classes="eventcard" Command="{Binding OpenMapCommand}" ToolTip.Tip="{l:T OpenMap}">
+                <Border Classes="eventface" Width="300">
+                  <Grid ColumnDefinitions="4,Auto,*" RowDefinitions="*,Auto">
+                    <Border Grid.RowSpan="2" Background="{Binding AccentBrush}" CornerRadius="3,0,0,3" />
+                    <Border Grid.Column="1" Width="52" Height="52" Margin="12,12,0,10" Background="{StaticResource ArcBlack}" CornerRadius="2">
+                      <c:RemoteImage Url="{Binding IconUrl}" DecodeWidth="104" Margin="4" />
+                    </Border>
+                    <StackPanel Grid.Column="2" Margin="12,10,12,8" VerticalAlignment="Center" Spacing="2">
+                      <TextBlock Text="{Binding Name}" Classes="h2" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding MapName}" Foreground="{StaticResource ArcYellow}" FontWeight="SemiBold" FontSize="13" />
+                      <TextBlock Classes="muted small">
+                        <Run Text="{Binding HoursText}" />
+                        <Run Text=" · " />
+                        <Run Text="{Binding TimeText}" />
+                      </TextBlock>
+                    </StackPanel>
+                    <ProgressBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Value="{Binding Progress}" Maximum="100"
+                                 Height="3" MinHeight="3" Margin="12,0,12,10" Foreground="{Binding AccentBrush}"
+                                 Background="{StaticResource ArcLine}" />
+                  </Grid>
+                </Border>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- nadchodzące -->
+        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,14,0,0" IsVisible="{Binding HasUpcoming}">
+          <PathIcon Data="{x:Static icons:UiIcons.Events}" Width="15" Height="15" Foreground="{StaticResource ArcBlue}" />
+          <TextBlock Text="{l:T EventsUpcoming}" Classes="h2" LetterSpacing="1.5" />
+        </StackPanel>
+        <ItemsControl ItemsSource="{Binding Upcoming}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:EventSlotViewModel">
+              <Grid ColumnDefinitions="130,*" Margin="0,0,0,6">
+                <StackPanel Margin="0,8,0,0" Spacing="1">
+                  <TextBlock Text="{Binding Header}" FontWeight="Bold" LetterSpacing="1" />
+                  <TextBlock Text="{Binding InText}" Classes="dim small" />
+                </StackPanel>
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding Events}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:EventCardViewModel">
+                      <Button Classes="eventcard" Command="{Binding OpenMapCommand}" ToolTip.Tip="{Binding HoursText}">
+                        <Border Classes="eventface" Width="230">
+                          <Grid ColumnDefinitions="3,Auto,*">
+                            <Border Background="{Binding AccentBrush}" CornerRadius="3,0,0,3" />
+                            <Border Grid.Column="1" Width="34" Height="34" Margin="10,8,0,8" Background="{StaticResource ArcBlack}" CornerRadius="2">
+                              <c:RemoteImage Url="{Binding IconUrl}" DecodeWidth="68" Margin="3" />
+                            </Border>
+                            <StackPanel Grid.Column="2" Margin="10,0" VerticalAlignment="Center">
+                              <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                              <TextBlock Text="{Binding MapName}" Classes="muted small" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                          </Grid>
+                        </Border>
+                      </Button>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

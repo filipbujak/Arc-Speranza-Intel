@@ -1,0 +1,318 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="using:ArcSperanzaIntel.App.Localization"
+             xmlns:vm="using:ArcSperanzaIntel.App.ViewModels"
+             xmlns:icons="using:ArcSperanzaIntel.App.Icons"
+             xmlns:c="using:ArcSperanzaIntel.App.Controls"
+             x:Class="ArcSperanzaIntel.App.Views.ShopsView"
+             x:DataType="vm:ShopsViewModel">
+
+  <UserControl.Styles>
+    <Style Selector="Button.offer">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="0,0,8,8" />
+    </Style>
+    <Style Selector="Border.offerface">
+      <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+      <Setter Property="BorderBrush" Value="{StaticResource ArcLine}" />
+      <Setter Property="CornerRadius" Value="3" />
+    </Style>
+    <!-- hover po stylu bazowym: w Avalonii późniejszy styl wygrywa -->
+    <Style Selector="Button.offer:pointerover Border.offerface">
+      <Setter Property="Background" Value="{StaticResource ArcHover}" />
+      <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
+    </Style>
+    <Style Selector="Border.offerface.hl">
+      <Setter Property="BorderBrush" Value="{StaticResource ArcYellow}" />
+      <Setter Property="Background" Value="{StaticResource ArcYellowSoft}" />
+    </Style>
+    <Style Selector="Button.result">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="8,5" />
+      <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+    </Style>
+    <Style Selector="Button.result:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid ColumnDefinitions="300,*">
+
+    <!-- ====================================================== WYSZUKIWARKA -->
+    <Border Classes="panel" BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,Auto,*">
+        <StackPanel Margin="16,16,16,8" Spacing="8">
+          <TextBlock Text="{l:T TabTraders}" Classes="label" />
+          <TextBlock Text="{Binding TotalText}" Classes="muted small" />
+          <Panel>
+            <TextBox x:Name="Search" Text="{Binding SearchText}" Watermark="{l:T SearchTraders}" Padding="32,7,10,7" />
+            <PathIcon Data="{x:Static icons:UiIcons.Search}" Width="14" Height="14" Foreground="{StaticResource ArcDim}"
+                      HorizontalAlignment="Left" Margin="11,0,0,0" IsHitTestVisible="False" />
+          </Panel>
+          <TextBlock Text="{l:T NobodySells}" Classes="dim small" IsVisible="{Binding NoResults}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="16,4,16,8" Spacing="6">
+          <TextBlock Text="{l:T Show}" Classes="label" />
+          <ItemsControl ItemsSource="{Binding TraderChips}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:TraderToggleViewModel">
+                <ToggleButton Classes="chip" IsChecked="{Binding IsOn}" Margin="0,0,6,6">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Ellipse Width="8" Height="8" Fill="{Binding ColorBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Name}" />
+                  </StackPanel>
+                </ToggleButton>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding HasResults}">
+          <ItemsControl ItemsSource="{Binding Results}" Margin="8,0,8,16">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:OfferSearchResultViewModel">
+                <Button Classes="result" Command="{Binding GoCommand}">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Border Width="34" Height="34" Background="{StaticResource ArcBlack}" CornerRadius="2">
+                      <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="68" Margin="3" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="10,0" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Trader}" Classes="dim small" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                      <c:RemoteImage Url="{Binding CurrencyIconUrl}" DecodeWidth="32" Width="16" Height="16" />
+                      <TextBlock Text="{Binding PriceText}" Foreground="{StaticResource ArcText}" FontWeight="SemiBold" />
+                    </StackPanel>
+                  </Grid>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+
+    <!-- ====================================================== HANDLARZE I OFERTY -->
+    <ScrollViewer Grid.Column="1" x:Name="Scroller" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Margin="22,16,22,30">
+        <TextBlock Text="{l:T NoTraders}"
+                   Classes="muted" IsVisible="{Binding NoTraders}" />
+        <ItemsControl ItemsSource="{Binding Traders}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:TraderSectionViewModel">
+              <StackPanel Margin="0,6,0,18" IsVisible="{Binding IsVisible}">
+                <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,12">
+                  <Border Width="58" Height="58" CornerRadius="29" ClipToBounds="True" BorderBrush="{Binding AccentBrush}"
+                          BorderThickness="2" Background="{StaticResource ArcPanel2}">
+                    <c:RemoteImage Url="{Binding PortraitUrl}" DecodeWidth="120" Stretch="UniformToFill" />
+                  </Border>
+                  <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding NameUpper}" Classes="h1" LetterSpacing="2" Foreground="{Binding AccentBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <TextBlock Text="{Binding CountText}" Classes="dim small" />
+                      <TextBlock Text="·" Classes="dim small" />
+                      <TextBlock Text="{Binding CurrencyText}" Classes="dim small" />
+                    </StackPanel>
+                  </StackPanel>
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Offers}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:OfferCardViewModel">
+                      <Button Classes="offer" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tooltip}">
+                        <Border Classes="offerface" Classes.hl="{Binding IsHighlighted}" BorderThickness="{Binding BorderThickness}"
+                                Width="132" Height="150">
+                          <Grid RowDefinitions="*,Auto,Auto,3">
+                            <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="128" Width="66" Height="66" Margin="0,10,0,0" />
+                            <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center"
+                                       MaxLines="2" TextTrimming="CharacterEllipsis" Margin="8,4,8,2" />
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Margin="0,0,0,7">
+                              <c:RemoteImage Url="{Binding CurrencyIconUrl}" DecodeWidth="32" Width="16" Height="16"
+                                             ToolTip.Tip="{Binding CurrencyTip}" VerticalAlignment="Center" />
+                              <TextBlock Text="{Binding PriceText}" FontWeight="Bold" Foreground="{Binding PriceBrush}" FontSize="13"
+                                         VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Border Grid.Row="3" Background="{Binding RarityBrush}" CornerRadius="0,0,3,3" />
+                          </Grid>
+                        </Border>
+                      </Button>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- ====================================================== ERMAL -->
+        <ContentControl Content="{Binding Ermal}" IsVisible="{Binding HasErmal}">
+          <ContentControl.ContentTemplate>
+            <DataTemplate x:DataType="vm:ErmalSectionViewModel">
+              <StackPanel Margin="0,6,0,18" IsVisible="{Binding IsVisible}" Spacing="0">
+                <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,12">
+                  <Border Width="58" Height="58" CornerRadius="29" ClipToBounds="True" BorderBrush="{Binding AccentBrush}"
+                          BorderThickness="2" Background="{StaticResource ArcPanel2}">
+                    <c:RemoteImage Url="{Binding PortraitUrl}" DecodeWidth="120" Stretch="UniformToFill" />
+                  </Border>
+                  <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center" Spacing="2">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <TextBlock Text="{Binding NameUpper}" Classes="h1" LetterSpacing="2" Foreground="{Binding AccentBrush}" />
+                      <Border Background="{StaticResource ArcRedSoft}" BorderBrush="{StaticResource ArcRed}" BorderThickness="1"
+                              CornerRadius="2" Padding="6,1" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                          <PathIcon Data="{x:Static icons:UiIcons.Timer}" Width="10" Height="10" Foreground="{StaticResource ArcRed}" />
+                          <TextBlock Text="{Binding CountdownText}" FontSize="10" FontWeight="Bold" LetterSpacing="1"
+                                     Foreground="{StaticResource ArcRed}" />
+                        </StackPanel>
+                      </Border>
+                    </StackPanel>
+                    <TextBlock Text="{Binding InfoText}" Classes="dim small" TextWrapping="Wrap" MaxWidth="640" HorizontalAlignment="Left" />
+                  </StackPanel>
+                </Grid>
+
+                <TextBlock Text="{l:T WeeklyOffers}" Classes="label" Margin="0,4,0,8" />
+                <ItemsControl ItemsSource="{Binding Offers}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ErmalOfferViewModel">
+                      <Border Classes="offerface offer" Classes.hl="{Binding IsHighlighted}" BorderThickness="{Binding BorderThickness}"
+                              Width="276" Margin="0,0,8,8" VerticalAlignment="Top">
+                        <StackPanel>
+                          <Button Classes="offer" Margin="0" Command="{Binding OpenCommand}" HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch">
+                            <Grid ColumnDefinitions="Auto,*" Margin="10">
+                              <Border Width="56" Height="56" Background="{StaticResource ArcBlack}" CornerRadius="2">
+                                <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="112" Margin="4" />
+                              </Border>
+                              <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" Spacing="3">
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding TypeText}" Classes="dim small" />
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                  <c:RemoteImage Url="{Binding CoinsIconUrl}" DecodeWidth="32" Width="16" Height="16"
+                                                 ToolTip.Tip="{l:T ErmalCostTip}" />
+                                  <TextBlock Text="{Binding CostText}" FontWeight="Bold" Foreground="{StaticResource ArcYellow}" />
+                                </StackPanel>
+                              </StackPanel>
+                            </Grid>
+                          </Button>
+                          <Border Height="3" Background="{Binding RarityBrush}" />
+                          <Button Classes="flat" Command="{Binding ToggleExpandedCommand}" HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Left" Padding="10,6" CornerRadius="0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                              <PathIcon Data="{x:Static icons:UiIcons.Swap}" Width="12" Height="12" />
+                              <TextBlock Text="{Binding AcceptedHeader}" Classes="label" />
+                            </StackPanel>
+                          </Button>
+                          <ItemsControl ItemsSource="{Binding Accepted}" IsVisible="{Binding IsExpanded}" Margin="6,0,6,8">
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate x:DataType="vm:ErmalAcceptedViewModel">
+                                <Button Classes="result" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tip}" Padding="4,3">
+                                  <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Border Width="26" Height="26" Background="{StaticResource ArcBlack}" CornerRadius="2"
+                                            BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,2">
+                                      <Panel>
+                                        <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="52" Margin="2" IsVisible="{Binding HasIcon}" />
+                                        <PathIcon Data="{x:Static icons:UiIcons.Items}" Width="12" Height="12" IsVisible="{Binding NoIcon}"
+                                                  Foreground="{StaticResource ArcMuted}" />
+                                      </Panel>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" Margin="8,0" VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Grid.Column="2" Text="{Binding ValueText}" FontSize="12" FontWeight="SemiBold"
+                                               Foreground="{StaticResource ArcMuted}" VerticalAlignment="Center" />
+                                  </Grid>
+                                </Button>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="{l:T PermanentServices}" Classes="label" Margin="0,10,0,8" IsVisible="{Binding HasServices}" />
+                <ItemsControl ItemsSource="{Binding Services}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ErmalServiceViewModel">
+                      <Border Classes="offerface" BorderThickness="1" Width="420" Margin="0,0,8,8" VerticalAlignment="Top">
+                        <StackPanel>
+                          <StackPanel Margin="12,10" Spacing="4">
+                            <Grid ColumnDefinitions="*,Auto">
+                              <TextBlock Text="{Binding Name}" Classes="h2" />
+                              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                <c:RemoteImage Url="{Binding CoinsIconUrl}" DecodeWidth="32" Width="16" Height="16" />
+                                <TextBlock Text="{Binding CostText}" FontWeight="Bold" Foreground="{StaticResource ArcYellow}" />
+                              </StackPanel>
+                            </Grid>
+                            <TextBlock Text="{Binding Description}" Classes="muted small" TextWrapping="Wrap" />
+                          </StackPanel>
+                          <Button Classes="flat" Command="{Binding ToggleExpandedCommand}" HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Left" Padding="12,6" CornerRadius="0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                              <PathIcon Data="{x:Static icons:UiIcons.Swap}" Width="12" Height="12" />
+                              <TextBlock Text="{Binding AcceptedHeader}" Classes="label" />
+                            </StackPanel>
+                          </Button>
+                          <ItemsControl ItemsSource="{Binding Accepted}" IsVisible="{Binding IsExpanded}" Margin="6,0,6,8">
+                            <ItemsControl.ItemsPanel>
+                              <ItemsPanelTemplate>
+                                <UniformGrid Columns="2" />
+                              </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate x:DataType="vm:ErmalAcceptedViewModel">
+                                <Button Classes="result" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tip}" Padding="4,3">
+                                  <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Border Width="26" Height="26" Background="{StaticResource ArcBlack}" CornerRadius="2"
+                                            BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,2">
+                                      <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="52" Margin="2" />
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" Margin="8,0" VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Grid.Column="2" Text="{Binding ValueText}" FontSize="12" FontWeight="SemiBold"
+                                               Foreground="{StaticResource ArcMuted}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                  </Grid>
+                                </Button>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </DataTemplate>
+          </ContentControl.ContentTemplate>
+        </ContentControl>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

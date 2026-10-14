@@ -1,0 +1,161 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="using:ArcSperanzaIntel.App.Localization"
+             xmlns:vm="using:ArcSperanzaIntel.App.ViewModels"
+             xmlns:icons="using:ArcSperanzaIntel.App.Icons"
+             x:Class="ArcSperanzaIntel.App.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel MaxWidth="820" Margin="32,26,32,40" Spacing="28" HorizontalAlignment="Left">
+
+      <TextBlock Text="{l:T SettingsTitle}" Classes="h1" LetterSpacing="2" />
+
+      <!-- skróty -->
+      <StackPanel Spacing="10">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <PathIcon Data="{x:Static icons:UiIcons.Keyboard}" Width="18" Height="18" Foreground="{StaticResource ArcYellow}" />
+          <TextBlock Text="{l:T KeybindsTitle}" Classes="label" Foreground="{StaticResource ArcText}" VerticalAlignment="Center" />
+        </StackPanel>
+        <TextBlock Classes="muted small" TextWrapping="Wrap"
+                   Text="{l:T KeybindsHelp}" />
+        <Border Classes="card" Padding="0">
+          <ItemsControl ItemsSource="{Binding Keybinds}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:KeybindRowViewModel">
+                <Border BorderBrush="{StaticResource ArcLine}" BorderThickness="0,0,0,1" Padding="16,10">
+                  <Grid ColumnDefinitions="*,Auto,260">
+                    <TextBlock Text="{Binding Description}" VerticalAlignment="Center" />
+                    <Border Grid.Column="1" Background="{StaticResource ArcBlueSoft}" BorderBrush="{StaticResource ArcBlue}" BorderThickness="1"
+                            CornerRadius="2" Padding="6,1" Margin="10,0" IsVisible="{Binding IsGlobal}" VerticalAlignment="Center">
+                      <TextBlock Text="{l:T Global}" FontSize="10" FontWeight="Bold" LetterSpacing="1" Foreground="{StaticResource ArcBlue}" />
+                    </Border>
+                    <Button Grid.Column="2" Classes="ghost" Content="{Binding ButtonText}" Command="{Binding StartCaptureCommand}"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" FontWeight="SemiBold" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </Border>
+        <Button Classes="flat" Command="{Binding ResetKeybindsCommand}" HorizontalAlignment="Left">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <PathIcon Data="{x:Static icons:UiIcons.Reset}" Width="13" Height="13" />
+            <TextBlock Text="{l:T ResetKeybinds}" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+
+      <!-- język -->
+      <StackPanel Spacing="10">
+        <TextBlock Text="{l:T LanguageTitle}" Classes="label" Foreground="{StaticResource ArcText}" />
+        <Border Classes="card" Padding="16,12">
+          <StackPanel Spacing="10">
+            <StackPanel Orientation="Horizontal" Spacing="18">
+              <RadioButton GroupName="lang" IsChecked="{Binding IsPolish}" Content="Polski" />
+              <RadioButton GroupName="lang" IsChecked="{Binding IsEnglish}" Content="English" />
+            </StackPanel>
+            <TextBlock Text="{l:T LanguageHelp}" Classes="muted small" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- okno -->
+      <StackPanel Spacing="10">
+        <TextBlock Text="{l:T WindowTitle}" Classes="label" Foreground="{StaticResource ArcText}" />
+        <Border Classes="card" Padding="16,12">
+          <ToggleSwitch IsChecked="{Binding AlwaysOnTop}" OnContent="{l:T AlwaysOnTopOn}" OffContent="{l:T AlwaysOnTopOff}" />
+        </Border>
+      </StackPanel>
+
+      <!-- dane -->
+      <StackPanel Spacing="10">
+        <TextBlock Text="{l:T DataTitle}" Classes="label" Foreground="{StaticResource ArcText}" />
+        <Border Classes="card" Padding="16,12">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="muted small" TextWrapping="Wrap"
+                       Text="{l:T DataHelp}" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Classes="ghost" Command="{Binding RefreshDataCommand}" IsEnabled="{Binding !IsRefreshing}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <PathIcon Data="{x:Static icons:UiIcons.Refresh}" Width="13" Height="13" />
+                  <TextBlock Text="{l:T RefreshDataNow}" />
+                </StackPanel>
+              </Button>
+              <Button Classes="flat" Content="{l:T OpenDataFolder}" Command="{Binding OpenDataFolderCommand}" />
+            </StackPanel>
+            <TextBlock Classes="dim small" TextWrapping="Wrap">
+              <Run Text="{l:T ProgressPrefix}" />
+              <Run Text="{Binding DataFolder}" />
+            </TextBlock>
+            <TextBlock Classes="dim small" TextWrapping="Wrap">
+              <Run Text="Cache: " />
+              <Run Text="{Binding CacheFolder}" />
+            </TextBlock>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- aktualizacje -->
+      <StackPanel Spacing="10">
+        <TextBlock Text="{l:T UpdateTitle}" Classes="label" Foreground="{StaticResource ArcText}" />
+        <Border Classes="card" Padding="16,12">
+          <StackPanel Spacing="10">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Classes="ghost" Command="{Binding CheckUpdatesCommand}" IsEnabled="{Binding !IsCheckingUpdates}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <PathIcon Data="{x:Static icons:UiIcons.Refresh}" Width="13" Height="13" />
+                  <TextBlock Text="{l:T CheckUpdates}" />
+                </StackPanel>
+              </Button>
+              <Button Classes="primary" Content="{l:T InstallUpdate}" Command="{Binding InstallUpdateCommand}"
+                      IsVisible="{Binding HasUpdate}" IsEnabled="{Binding !IsCheckingUpdates}" />
+            </StackPanel>
+            <TextBlock Text="{Binding UpdateStatus}" Classes="muted small" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- reset -->
+      <StackPanel Spacing="10">
+        <TextBlock Text="RESET" Classes="label" Foreground="{StaticResource ArcRed}" />
+        <Border Classes="card" Padding="16,12" BorderBrush="#55F0503F">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="muted small" TextWrapping="Wrap"
+                       Text="{l:T ResetHelp}" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Classes="danger" Content="{l:T ResetQuests}" Command="{Binding ResetQuestsCommand}" />
+              <Button Classes="danger" Command="{Binding ResetAppCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <PathIcon Data="{x:Static icons:UiIcons.Trash}" Width="13" Height="13" />
+                  <TextBlock Text="{l:T ResetApp}" />
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- informacje -->
+      <StackPanel Spacing="8">
+        <TextBlock Text="{l:T AboutTitle}" Classes="label" Foreground="{StaticResource ArcText}" />
+        <TextBlock Text="{Binding Version}" FontWeight="SemiBold" />
+        <TextBlock Classes="muted small" TextWrapping="Wrap"
+                   Text="{l:T AboutText}" />
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="{l:T CreditData}" Classes="muted small" VerticalAlignment="Center" />
+          <Button Classes="flat" Content="MetaForge (metaforge.app/arc-raiders)" Foreground="{StaticResource ArcYellow}" Padding="4,1"
+                  FontSize="12" Command="{Binding OpenMetaForgeCommand}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="{l:T CreditMarkers}" Classes="muted small"
+                     VerticalAlignment="Center" />
+          <Button Classes="flat" Content="game-icons.net" Foreground="{StaticResource ArcYellow}" Padding="4,1" FontSize="12"
+                  Command="{Binding OpenGameIconsCommand}" />
+        </StackPanel>
+        <TextBlock Text="{l:T CreditUi}"
+                   Classes="muted small" TextWrapping="Wrap" />
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
