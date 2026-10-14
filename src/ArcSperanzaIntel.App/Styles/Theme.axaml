@@ -76,13 +76,13 @@
     <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
     <Setter Property="BorderBrush" Value="{StaticResource ArcLine}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="CornerRadius" Value="8" />
   </Style>
   <Style Selector="Border.overlay">
     <Setter Property="Background" Value="#F0121418" />
     <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="CornerRadius" Value="10" />
     <Setter Property="BoxShadow" Value="0 10 30 0 #99000000" />
   </Style>
   <Style Selector="Border.divider">
@@ -92,7 +92,7 @@
 
   <!-- ============================================================ PRZYCISKI -->
   <Style Selector="Button">
-    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="CornerRadius" Value="6" />
     <Setter Property="FontFamily" Value="{StaticResource BodyFont}" />
   </Style>
 
@@ -160,26 +160,37 @@
   </Style>
 
   <!-- zakładki górnego paska -->
+  <!-- zakładki: zaokrąglone "pigułki", aktywna podświetlona na żółto -->
   <Style Selector="Button.tab">
     <Setter Property="Background" Value="Transparent" />
-    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="14,0" />
-    <Setter Property="Height" Value="52" />
+    <Setter Property="Height" Value="36" />
+    <Setter Property="Margin" Value="3,0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
     <Setter Property="FontFamily" Value="{StaticResource HeadFont}" />
     <Setter Property="FontWeight" Value="SemiBold" />
-    <Setter Property="FontSize" Value="16" />
-    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="CornerRadius" Value="18" />
   </Style>
   <Style Selector="Button.tab:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-    <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
-    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
-  </Style>
-  <Style Selector="Button.tab.active">
+    <Setter Property="Background" Value="{StaticResource ArcHover}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="Foreground" Value="{StaticResource ArcText}" />
   </Style>
   <Style Selector="Button.tab.active /template/ ContentPresenter#PART_ContentPresenter">
-    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+    <Setter Property="Background" Value="{StaticResource ArcYellowSoft}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcYellow}" />
+    <Setter Property="Foreground" Value="{StaticResource ArcYellow}" />
+  </Style>
+  <!-- okrągły przycisk (ustawienia, koło zębate) -->
+  <Style Selector="Button.tab.round">
+    <Setter Property="Width" Value="38" />
+    <Setter Property="Height" Value="38" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="19" />
   </Style>
 
   <!-- chip / przełącznik w filtrach -->
@@ -187,7 +198,7 @@
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="CornerRadius" Value="6" />
     <Setter Property="Padding" Value="8,4" />
     <Setter Property="FontSize" Value="12" />
     <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />

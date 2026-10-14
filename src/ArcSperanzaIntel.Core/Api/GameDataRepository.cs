@@ -9,6 +9,7 @@ public interface IGameDataSource
     Task<DataResult<IReadOnlyList<Item>>> GetItemsAsync(bool forceRefresh, CancellationToken ct);
     Task<DataResult<TradersData>> GetTradersAsync(bool forceRefresh, CancellationToken ct);
     Task<DataResult<IReadOnlyList<GameEvent>>> GetEventsAsync(bool forceRefresh, CancellationToken ct);
+    Task<DataResult<IReadOnlyList<Station>>> GetHideoutAsync(bool forceRefresh, CancellationToken ct);
     Task<DataResult<IReadOnlyList<MapMarker>>> GetMarkersAsync(string mapId, bool forceRefresh, CancellationToken ct);
 }
 
@@ -29,10 +30,13 @@ public sealed class GameDataRepository(MetaForgeHttp http, JsonFileCache cache, 
         LoadAsync("quests", forceRefresh, c => http.GetAllPagesAsync("arc-raiders/quests", c), MetaForgeParser.ParseQuests, ct);
 
     public Task<DataResult<IReadOnlyList<Item>>> GetItemsAsync(bool forceRefresh, CancellationToken ct) =>
-        LoadAsync("items", forceRefresh, c => http.GetAllPagesAsync("arc-raiders/items", c), MetaForgeParser.ParseItems, ct);
+        LoadAsync("items-v2", forceRefresh, c => http.GetAllPagesAsync("arc-raiders/items?includeComponents=true", c), MetaForgeParser.ParseItems, ct);
 
     public Task<DataResult<TradersData>> GetTradersAsync(bool forceRefresh, CancellationToken ct) =>
         LoadAsync("traders", forceRefresh, c => http.GetStringAsync("arc-raiders/traders", c), MetaForgeParser.ParseTraders, ct);
+
+    public Task<DataResult<IReadOnlyList<Station>>> GetHideoutAsync(bool forceRefresh, CancellationToken ct) =>
+        LoadAsync("hideout", forceRefresh, c => http.GetStringAsync("arc-raiders/hideout", c), MetaForgeParser.ParseHideout, ct);
 
     /// <summary>Harmonogram wydarzeń (ok. 1,5 doby do przodu) — krótki cache, bo szybko się dezaktualizuje.</summary>
     public Task<DataResult<IReadOnlyList<GameEvent>>> GetEventsAsync(bool forceRefresh, CancellationToken ct) =>

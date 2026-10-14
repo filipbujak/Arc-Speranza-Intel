@@ -37,6 +37,10 @@
         </Border.Transitions>
         <StackPanel>
           <Border Classes="divider" />
+          <StackPanel Orientation="Horizontal" Spacing="14" Margin="14,8,14,2">
+            <CheckBox Content="{l:T TrackQuests}" IsChecked="{Binding TrackQuests}" FontSize="12" MinHeight="24" />
+            <CheckBox Content="{l:T TrackStations}" IsChecked="{Binding TrackStations}" FontSize="12" MinHeight="24" />
+          </StackPanel>
           <TextBlock Text="{l:T WantedEmpty}"
                      Classes="dim small" TextWrapping="Wrap" Margin="14,12" IsVisible="{Binding IsEmpty}" />
           <ScrollViewer MaxHeight="600" HorizontalScrollBarVisibility="Disabled">
@@ -44,18 +48,25 @@
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:WantedGroupViewModel">
                   <StackPanel Margin="0,2">
-                    <Grid ColumnDefinitions="*,Auto" Margin="6,0">
+                    <Grid ColumnDefinitions="*,Auto,Auto" Margin="6,0" Opacity="{Binding TitleOpacity}">
                       <Button Classes="flat" Command="{Binding ToggleCollapsedCommand}" HorizontalAlignment="Stretch"
                               HorizontalContentAlignment="Left" Padding="6,6">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                           <PathIcon Data="{x:Static icons:UiIcons.ChevronDown}" Width="10" Height="10" IsVisible="{Binding IsOpen}" />
                           <PathIcon Data="{x:Static icons:UiIcons.ChevronRight}" Width="10" Height="10" IsVisible="{Binding IsCollapsed}" />
                           <TextBlock Text="{Binding Title}" Foreground="{Binding TitleBrush}" FontWeight="SemiBold" FontSize="13"
-                                     TextTrimming="CharacterEllipsis" MaxWidth="230" />
+                                     TextTrimming="CharacterEllipsis" MaxWidth="210" />
                         </StackPanel>
                       </Button>
-                      <Button Grid.Column="1" Classes="flat" Padding="6,4" IsVisible="{Binding IsQuest}"
-                              Command="{Binding OpenQuestCommand}" ToolTip.Tip="{l:T ShowQuestInTree}">
+                      <Button Grid.Column="1" Classes="flat" Padding="6,4" IsVisible="{Binding CanUntrack}"
+                              Command="{Binding ToggleTrackedCommand}" ToolTip.Tip="{Binding TrackTip}">
+                        <Panel>
+                          <PathIcon Data="{x:Static icons:UiIcons.Eye}" Width="13" Height="13" IsVisible="{Binding IsTracked}" />
+                          <PathIcon Data="{x:Static icons:UiIcons.EyeOff}" Width="13" Height="13" IsVisible="{Binding IsUntracked}" />
+                        </Panel>
+                      </Button>
+                      <Button Grid.Column="2" Classes="flat" Padding="6,4" IsVisible="{Binding CanGoTo}"
+                              Command="{Binding OpenQuestCommand}" ToolTip.Tip="{l:T ShowSource}">
                         <PathIcon Data="{x:Static icons:UiIcons.Goto}" Width="13" Height="13" />
                       </Button>
                     </Grid>

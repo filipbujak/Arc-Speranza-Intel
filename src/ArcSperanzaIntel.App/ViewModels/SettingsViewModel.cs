@@ -213,6 +213,9 @@ public sealed partial class SettingsViewModel : ObservableObject
     private void OpenMetaForge() => MainViewModel.OpenUrl("https://metaforge.app/arc-raiders");
 
     [RelayCommand]
+    private void OpenRepo() => MainViewModel.OpenUrl(AppInfo.RepoUrl);
+
+    [RelayCommand]
     private void OpenGameIcons() => MainViewModel.OpenUrl("https://game-icons.net");
 }
 

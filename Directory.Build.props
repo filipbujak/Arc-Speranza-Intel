@@ -6,8 +6,9 @@
     <TargetFramework>net9.0</TargetFramework>
     <!-- bez runtime 9 odpala się na nowszym (np. tylko .NET 10) -->
     <RollForward>Major</RollForward>
-    <Authors>Filip</Authors>
-    <Company>Prywatny projekt</Company>
+    <Authors>Filip Bujak</Authors>
+    <Company>Filip Bujak</Company>
+    <Copyright>© 2026 Filip Bujak</Copyright>
     <Product>ARC Speranza Intel</Product>
     <Version>1.0.0</Version>
   </PropertyGroup>

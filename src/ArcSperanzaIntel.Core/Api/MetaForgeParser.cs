@@ -114,7 +114,25 @@ public static class MetaForgeParser
                 Workbench = NullIfEmpty(Str(i, "workbench")),
                 AmmoType = NullIfEmpty(Str(i, "ammo_type")),
                 Stats = Stats(i),
+                Components = ComponentStacks(i, "components"),
+                RecycleComponents = ComponentStacks(i, "recycle_components"),
             });
+        }
+        return list;
+    }
+
+    /// <summary>[{quantity, component:{id,name,icon,rarity}}] → lista przedmiotów z ilością.</summary>
+    private static IReadOnlyList<ItemStack> ComponentStacks(JsonElement item, string prop)
+    {
+        var list = new List<ItemStack>();
+        if (!item.TryGetProperty(prop, out var arr) || arr.ValueKind != JsonValueKind.Array) return list;
+        foreach (var c in arr.EnumerateArray())
+        {
+            if (!c.TryGetProperty("component", out var comp) || comp.ValueKind != JsonValueKind.Object) continue;
+            var id = Str(comp, "id");
+            if (id is null) continue;
+            list.Add(new ItemStack(id, (Str(comp, "name") ?? TextFormat.Pretty(id)).Trim(), NullIfEmpty(Str(comp, "icon")),
+                NullIfEmpty(Str(comp, "rarity")), (int)(Num(c, "quantity") ?? 1)));
         }
         return list;
     }
@@ -228,6 +246,68 @@ public static class MetaForgeParser
         Str(e, prop) is { } s && DateTimeOffset.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var d)
             ? d
             : null;
+
+    // ---------------------------------------------------------------- warsztat
+    private const string StationIconBase = "https://static.metaforge.app/arc-raiders/icons/hideout/";
+
+    /// <summary>Ikony stacji ze strony Hideout MetaForge (nazwy plików nie wynikają z id).</summary>
+    private static readonly Dictionary<string, string> StationIcons = new()
+    {
+        ["scrappy"] = "Scrappy.jpg",
+        ["weapon-bench"] = "Gunsmith.webp",
+        ["equipment-bench"] = "GearBench.webp",
+        ["med-station"] = "MedicalLab.webp",
+        ["explosives-bench"] = "ExplosivesStation.webp",
+        ["utility-bench"] = "UtilityStation.webp",
+        ["refiner"] = "Refiner.webp",
+        ["research-station"] = "ResearchStation.webp",
+        ["outpost"] = "Outpost.webp",
+    };
+
+    /// <summary>/hideout: [{id,name,maxLevel,levels:{"1":{requiredItems,unlockRequirements,crafts}}}]</summary>
+    public static IReadOnlyList<Station> ParseHideout(string json)
+    {
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+        if (root.ValueKind == JsonValueKind.Object && root.TryGetProperty("data", out var d)) root = d;
+        var list = new List<Station>();
+        if (root.ValueKind != JsonValueKind.Array) return list;
+        foreach (var s in root.EnumerateArray())
+        {
+            var id = Str(s, "id");
+            var name = Str(s, "name");
+            if (id is null || name is null) continue;
+            var levels = new List<StationLevel>();
+            if (s.TryGetProperty("levels", out var lv) && lv.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var p in lv.EnumerateObject())
+                {
+                    if (!int.TryParse(p.Name, out var n) || p.Value.ValueKind != JsonValueKind.Object) continue;
+                    var req = new List<ItemStack>();
+                    if (p.Value.TryGetProperty("requiredItems", out var ri) && ri.ValueKind == JsonValueKind.Array)
+                        foreach (var r in ri.EnumerateArray())
+                            if (Str(r, "id") is { } rid)
+                                req.Add(new ItemStack(rid, TextFormat.Pretty(rid), null, null, (int)(Num(r, "quantity") ?? 1)));
+                    var cond = new List<StationCondition>();
+                    if (p.Value.TryGetProperty("unlockRequirements", out var ur) && ur.ValueKind == JsonValueKind.Array)
+                        foreach (var r in ur.EnumerateArray())
+                            if (Str(r, "id") is { } cid)
+                                cond.Add(new StationCondition(cid, (int)(Num(r, "quantity") ?? 1)));
+                    levels.Add(new StationLevel(n, req, cond, StrArray(p.Value, "crafts")));
+                }
+            }
+            levels.Sort((a, b) => a.Level.CompareTo(b.Level));
+            list.Add(new Station
+            {
+                Id = id,
+                Name = name.Trim(),
+                MaxLevel = (int)(Num(s, "maxLevel") ?? (levels.Count > 0 ? levels[^1].Level : 1)),
+                Levels = levels,
+                IconUrl = StationIcons.TryGetValue(id, out var icon) ? StationIconBase + icon : null,
+            });
+        }
+        return list;
+    }
 
     // ---------------------------------------------------------------- wydarzenia
     /// <summary>Harmonogram wydarzeń: {data:[{name,map,icon,startTime,endTime}]}, czasy w ms od 1970 (UTC).</summary>

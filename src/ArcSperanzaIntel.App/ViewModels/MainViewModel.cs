@@ -10,7 +10,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace ArcSperanzaIntel.App.ViewModels;
 
-public enum AppTab { Maps, Quests, Items, Shops, Events, Settings }
+public enum AppTab { Maps, Quests, Items, Shops, Workshop, Events, Settings }
 
 /// <summary>Okno główne: zakładki, ładowanie danych, nawigacja między zakładkami, toasty i okna dialogowe.</summary>
 public sealed partial class MainViewModel : ObservableObject
@@ -25,7 +25,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     // ---------------------------------------------------------------- zakładki
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsMapsTab), nameof(IsQuestsTab), nameof(IsItemsTab), nameof(IsShopsTab), nameof(IsEventsTab), nameof(IsSettingsTab))]
+    [NotifyPropertyChangedFor(nameof(IsMapsTab), nameof(IsQuestsTab), nameof(IsItemsTab), nameof(IsShopsTab), nameof(IsWorkshopTab), nameof(IsEventsTab), nameof(IsSettingsTab))]
     private AppTab _tab = AppTab.Maps;
 
     public bool IsMapsTab => Tab == AppTab.Maps;
@@ -33,6 +33,7 @@ public sealed partial class MainViewModel : ObservableObject
     public bool IsItemsTab => Tab == AppTab.Items;
     public bool IsShopsTab => Tab == AppTab.Shops;
     public bool IsEventsTab => Tab == AppTab.Events;
+    public bool IsWorkshopTab => Tab == AppTab.Workshop;
     public bool IsSettingsTab => Tab == AppTab.Settings;
 
     partial void OnTabChanged(AppTab value)
@@ -56,6 +57,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private ItemsViewModel? _items;
     [ObservableProperty] private ShopsViewModel? _shops;
     [ObservableProperty] private EventsViewModel? _events;
+    [ObservableProperty] private WorkshopViewModel? _workshop;
     [ObservableProperty] private SettingsViewModel? _settings;
     [ObservableProperty] private WantedItemsViewModel? _wanted;
 
@@ -78,6 +80,7 @@ public sealed partial class MainViewModel : ObservableObject
             Items = new ItemsViewModel(this);
             Shops = new ShopsViewModel(this);
             Events = new EventsViewModel(this);
+            Workshop = new WorkshopViewModel(this);
             Settings = new SettingsViewModel(this);
 
             IsLoading = false;
@@ -194,6 +197,12 @@ public sealed partial class MainViewModel : ObservableObject
         Maps?.SelectMap(MapCatalog.Get(mapId));
     }
 
+    public void ShowStation(string stationId)
+    {
+        Tab = AppTab.Workshop;
+        Workshop?.Select(stationId);
+    }
+
     public void ShowItem(string itemId)
     {
         Tab = AppTab.Items;
@@ -213,6 +222,7 @@ public sealed partial class MainViewModel : ObservableObject
             KeybindAction.TabItems => AppTab.Items,
             KeybindAction.TabShops => AppTab.Shops,
             KeybindAction.TabEvents => AppTab.Events,
+            KeybindAction.TabWorkshop => AppTab.Workshop,
             KeybindAction.TabSettings => AppTab.Settings,
             _ => Tab,
         };

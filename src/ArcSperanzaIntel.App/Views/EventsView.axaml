@@ -124,7 +124,7 @@
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="vm:EventCardViewModel">
               <Button Classes="eventcard" Command="{Binding OpenMapCommand}" ToolTip.Tip="{l:T OpenMap}">
-                <Border Classes="eventface" Width="300">
+                <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="1.5" Width="300">
                   <Grid ColumnDefinitions="4,Auto,*" RowDefinitions="*,Auto">
                     <Border Grid.RowSpan="2" Background="{Binding AccentBrush}" CornerRadius="3,0,0,3" />
                     <Border Grid.Column="1" Width="52" Height="52" Margin="12,12,0,10" Background="{StaticResource ArcBlack}" CornerRadius="2">
@@ -143,7 +143,7 @@
                                  Height="3" MinHeight="3" Margin="12,0,12,10" Foreground="{Binding AccentBrush}"
                                  Background="{StaticResource ArcLine}" />
                   </Grid>
-                </Border>
+                </c:FlowBorder>
               </Button>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
@@ -171,7 +171,7 @@
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:EventCardViewModel">
                       <Button Classes="eventcard" Command="{Binding OpenMapCommand}" ToolTip.Tip="{Binding HoursText}">
-                        <Border Classes="eventface" Width="230">
+                        <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="1.5" Width="230">
                           <Grid ColumnDefinitions="3,Auto,*">
                             <Border Background="{Binding AccentBrush}" CornerRadius="3,0,0,3" />
                             <Border Grid.Column="1" Width="34" Height="34" Margin="10,8,0,8" Background="{StaticResource ArcBlack}" CornerRadius="2">
@@ -182,7 +182,7 @@
                               <TextBlock Text="{Binding MapName}" Classes="muted small" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                           </Grid>
-                        </Border>
+                        </c:FlowBorder>
                       </Button>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>

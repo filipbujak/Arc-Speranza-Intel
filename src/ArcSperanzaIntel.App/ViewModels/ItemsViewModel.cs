@@ -30,7 +30,28 @@ public sealed partial class ItemsViewModel : ObservableObject
             .OrderBy(r => Palette.RarityRank(r == NoRarity ? null : r))
             .Select(r => new RarityFilterViewModel(r, Palette.Rarity(r == NoRarity ? null : r), this))
             .ToList();
+        main.Services.Workshop.Changed += (_, _) => OnWorkshopChanged();
+        UpdateBlueprintCounter();
         Rebuild();
+    }
+
+    internal Core.Workshop.WorkshopBook Workshop => _main.Services.Workshop;
+
+    // ---------------------------------------------------------------- schematy
+    [ObservableProperty] private bool _onlyMissingBlueprints;
+    [ObservableProperty] private string _blueprintCounter = "";
+
+    partial void OnOnlyMissingBlueprintsChanged(bool value) => Rebuild();
+
+    private void UpdateBlueprintCounter() =>
+        BlueprintCounter = Loc.F("BlueprintCounter", Workshop.FoundCount, Workshop.Blueprints.Count);
+
+    private void OnWorkshopChanged()
+    {
+        foreach (var c in _cards.Values.Where(c => c.IsBlueprint)) c.RefreshFound();
+        UpdateBlueprintCounter();
+        Selected?.RefreshWorkshop();
+        if (OnlyMissingBlueprints) Rebuild();
     }
 
     private UserState State => _main.Services.State;
@@ -99,11 +120,14 @@ public sealed partial class ItemsViewModel : ObservableObject
             (term.Length > 0 || shownTypes.Contains(c.Item.Type)) && // wyszukiwanie przeszukuje wszystkie kategorie
             (activeRarities.Count == 0 || activeRarities.Contains(c.Item.Rarity ?? NoRarity)) &&
             (!OnlyFavorites || favs.Contains(c.Item.Id)) &&
+            (!OnlyMissingBlueprints || (c.IsBlueprint && !Workshop.IsFound(c.Item.Id))) &&
             (term.Length == 0 || TextFormat.ContainsLoose(c.Item.Name, term) || TextFormat.ContainsLoose(c.Item.Subcategory, term)));
 
         Sections.Clear();
         var total = 0;
-        foreach (var g in visible.GroupBy(c => c.Item.Type).OrderBy(g => g.Key))
+        // schematy na końcu listy
+        foreach (var g in visible.GroupBy(c => c.Item.Type)
+                     .OrderBy(g => Services.ItemKinds.IsBlueprintType(g.Key) ? 1 : 0).ThenBy(g => g.Key))
         {
             var cards = g.OrderBy(c => Palette.RarityRank(c.Item.Rarity)).ThenBy(c => c.Item.Name).ToList();
             total += cards.Count;
@@ -171,9 +195,15 @@ public sealed partial class ItemCardViewModel : ObservableObject
         _owner = owner;
         RarityBrush = Palette.Brush(Palette.Rarity(item.Rarity));
         _isFavorite = owner.IsFavorite(item.Id);
+        if (IsBlueprint) _isFound = owner.Workshop.IsFound(item.Id);
     }
 
     public bool IsBlueprint => Services.ItemKinds.IsBlueprintType(Item.Type);
+
+    /// <summary>Schemat oznaczony jako znaleziony (znaczek na karcie).</summary>
+    [ObservableProperty] private bool _isFound;
+
+    internal void RefreshFound() => IsFound = _owner.Workshop.IsFound(Item.Id);
 
     public Item Item { get; }
     public string Name => Item.Name;
@@ -232,6 +262,13 @@ public sealed partial class RarityFilterViewModel(string name, Color color, Item
     partial void OnIsOnChanged(bool value) => owner.FilterChanged();
 }
 
+/// <summary>"Gunsmith → poziom 3 ×5" — klik otwiera stację w Warsztacie.</summary>
+public sealed class StationNeedViewModel(Core.Workshop.StationNeed need, MainViewModel main)
+{
+    public string Text { get; } = Loc.F("StationNeed", need.Station.Name, need.Level, need.Quantity);
+    public IRelayCommand OpenCommand { get; } = new RelayCommand(() => main.ShowStation(need.Station.Id));
+}
+
 /// <summary>Panel szczegółów itemu: opis, statystyki, gdzie potrzebny, kto sprzedaje, ulubione, dodaj do szukanych.</summary>
 public sealed partial class ItemDetailViewModel : ObservableObject
 {
@@ -254,6 +291,9 @@ public sealed partial class ItemDetailViewModel : ObservableObject
             .Select(q => new QuestLinkViewModel(q.Id, $"{q.Name}  (×{q.RequiredItems.First(r => r.ItemId == item.Id).Quantity})",
                 book.IsDone(q.Id), main.ShowQuestInTree))
             .ToList();
+        BuildWorkshopInfo();
+        CraftComponents = item.Components.Select(c => Chip(c, main)).ToList();
+        RecycleComponents = item.RecycleComponents.Select(c => Chip(c, main)).ToList();
         SoldBy = main.Services.Data.Traders
             .SelectMany(t => t.Offers.Where(o => o.ItemId == item.Id).Select(o => $"{t.Name} — {TextFormat.Number(o.Price)} {(t.Currency == TraderCurrency.Seeds ? Loc.T("SeedsWord") : Loc.T("CoinsWord"))}"))
             .ToList();
@@ -278,6 +318,60 @@ public sealed partial class ItemDetailViewModel : ObservableObject
     public bool HasUsedIn => UsedIn.Count > 0;
     public IReadOnlyList<string> SoldBy { get; }
     public bool HasSoldBy => SoldBy.Count > 0;
+
+    // ---------------------------------------------------------------- craft / recykling
+    public IReadOnlyList<ItemChipViewModel> CraftComponents { get; }
+    public bool HasCraftComponents => CraftComponents.Count > 0;
+    public IReadOnlyList<ItemChipViewModel> RecycleComponents { get; }
+    public bool HasRecycleComponents => RecycleComponents.Count > 0;
+
+    private static ItemChipViewModel Chip(ItemStack s, MainViewModel main)
+    {
+        var item = main.Services.Data.FindItem(s.ItemId);
+        return new ItemChipViewModel(s.ItemId, item?.Name ?? s.Name, s.IconUrl ?? item?.IconUrl, s.Rarity ?? item?.Rarity, s.Quantity, main.ShowItem);
+    }
+
+    // ---------------------------------------------------------------- warsztat
+    public ObservableCollection<StationNeedViewModel> NeededInWorkshop { get; } = [];
+    [ObservableProperty] private bool _hasWorkshopNeeds;
+    [ObservableProperty] private string? _craftedAtText;
+    [ObservableProperty] private bool _hasCraftedAt;
+    [ObservableProperty] private string? _blueprintStatusText;
+    [ObservableProperty] private bool _hasBlueprintStatus;
+
+    /// <summary>Dla schematu: znaleziony / nie (zmiana od razu zapisuje).</summary>
+    [ObservableProperty] private bool _isFound;
+    private bool _loadingFound;
+
+    partial void OnIsFoundChanged(bool value)
+    {
+        if (!_loadingFound && IsBlueprint) _main.Services.Workshop.SetFound(Item.Id, value);
+    }
+
+    internal void RefreshWorkshop() => BuildWorkshopInfo();
+
+    private void BuildWorkshopInfo()
+    {
+        var ws = _main.Services.Workshop;
+        NeededInWorkshop.Clear();
+        foreach (var n in ws.NeededFor(Item.Id))
+            NeededInWorkshop.Add(new StationNeedViewModel(n, _main));
+        HasWorkshopNeeds = NeededInWorkshop.Count > 0;
+
+        var at = ws.CraftedAt(Item.Id);
+        CraftedAtText = at is { } a
+            ? (a.Station.IsBasic ? Loc.T("BasicBench") : a.Station.Name) + (a.Level is { } l ? " · " + Loc.F("LevelShort", l) : "")
+            : null;
+        HasCraftedAt = CraftedAtText is not null;
+
+        var bp = ws.BlueprintFor(Item.Id);
+        BlueprintStatusText = bp is null ? null : ws.IsFound(bp.Id) ? Loc.T("BlueprintHave") : Loc.T("BlueprintMissing");
+        HasBlueprintStatus = BlueprintStatusText is not null;
+
+        _loadingFound = true;
+        IsFound = IsBlueprint && ws.IsFound(Item.Id);
+        _loadingFound = false;
+    }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(FavoriteText))]

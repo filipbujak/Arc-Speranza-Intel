@@ -1,3 +1,4 @@
+using ArcSperanzaIntel.Core.Workshop;
 using ArcSperanzaIntel.Core.Localization;
 using ArcSperanzaIntel.Core.Api;
 using ArcSperanzaIntel.Core.Maps;
@@ -33,6 +34,7 @@ public sealed class AppServices : IDisposable
 
     public QuestBook Quests { get; private set; } = null!;
     public WantedItemsService Wanted { get; private set; } = null!;
+    public WorkshopBook Workshop { get; private set; } = null!;
 
     public AppServices()
     {
@@ -62,9 +64,15 @@ public sealed class AppServices : IDisposable
     public void BuildDomain()
     {
         Quests = new QuestBook(Data.Quests, State.Progress);
-        Wanted = new WantedItemsService(Quests, State, Data.FindItem);
+        Workshop = new WorkshopBook(Data.Stations, Data.Items, State);
+        Wanted = new WantedItemsService(Quests, Workshop, State, Data.FindItem);
         Quests.Changed += (_, _) => RequestSave();
         Wanted.Changed += (_, _) => RequestSave();
+        Workshop.Changed += (_, _) =>
+        {
+            RequestSave();
+            Wanted.Invalidate();
+        };
     }
 
     /// <summary>Zapis z opóźnieniem — wiele szybkich zmian = jeden zapis na dysk.</summary>

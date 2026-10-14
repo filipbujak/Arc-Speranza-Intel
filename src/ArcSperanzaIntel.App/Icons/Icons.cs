@@ -11,6 +11,17 @@ public static class UiIcons
     public static Geometry Items { get; } = Parse(UiIconData.Items);
     public static Geometry Shops { get; } = Parse(UiIconData.Shops);
     public static Geometry Events { get; } = Parse(UiIconData.Events);
+    public static Geometry Workshop { get; } = Parse(UiIconData.Workshop);
+    public static Geometry StationScrappy { get; } = Parse(UiIconData.StationScrappy);
+    public static Geometry StationGunsmith { get; } = Parse(UiIconData.StationGunsmith);
+    public static Geometry StationGear { get; } = Parse(UiIconData.StationGear);
+    public static Geometry StationMedical { get; } = Parse(UiIconData.StationMedical);
+    public static Geometry StationExplosives { get; } = Parse(UiIconData.StationExplosives);
+    public static Geometry StationUtility { get; } = Parse(UiIconData.StationUtility);
+    public static Geometry StationRefiner { get; } = Parse(UiIconData.StationRefiner);
+    public static Geometry StationResearch { get; } = Parse(UiIconData.StationResearch);
+    public static Geometry StationOutpost { get; } = Parse(UiIconData.StationOutpost);
+    public static Geometry StationBasic { get; } = Parse(UiIconData.StationBasic);
     public static Geometry Timer { get; } = Parse(UiIconData.Timer);
     public static Geometry Swap { get; } = Parse(UiIconData.Swap);
     public static Geometry Settings { get; } = Parse(UiIconData.Settings);
@@ -99,4 +110,36 @@ public static class MarkerIcons
     }
 
     public static Geometry Pin => For("pin", "");
+}
+
+/// <summary>Ikony i kolory stacji warsztatu (rysowane, bo MetaForge ma tylko zdjęcia).</summary>
+public static class StationIcons
+{
+    public static Geometry For(string stationId) => stationId switch
+    {
+        "scrappy" => UiIcons.StationScrappy,
+        "weapon-bench" => UiIcons.StationGunsmith,
+        "equipment-bench" => UiIcons.StationGear,
+        "med-station" => UiIcons.StationMedical,
+        "explosives-bench" => UiIcons.StationExplosives,
+        "utility-bench" => UiIcons.StationUtility,
+        "refiner" => UiIcons.StationRefiner,
+        "research-station" => UiIcons.StationResearch,
+        "outpost" => UiIcons.StationOutpost,
+        _ => UiIcons.StationBasic,
+    };
+
+    public static Color ColorOf(string stationId) => stationId switch
+    {
+        "scrappy" => Color.Parse("#FFC72C"),
+        "weapon-bench" => Color.Parse("#F0503F"),
+        "equipment-bench" => Color.Parse("#36B5E6"),
+        "med-station" => Color.Parse("#3FD07A"),
+        "explosives-bench" => Color.Parse("#FF7A45"),
+        "utility-bench" => Color.Parse("#B57BFF"),
+        "refiner" => Color.Parse("#4FE3D2"),
+        "research-station" => Color.Parse("#7FA8FF"),
+        "outpost" => Color.Parse("#E0C27A"),
+        _ => Color.Parse("#9298A3"),
+    };
 }

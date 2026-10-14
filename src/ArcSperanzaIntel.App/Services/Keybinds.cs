@@ -10,6 +10,7 @@ public enum KeybindAction
     TabQuests,
     TabItems,
     TabShops,
+    TabWorkshop,
     TabEvents,
     TabSettings,
 }
@@ -24,8 +25,9 @@ public sealed class Keybinds(Dictionary<string, string> store)
         [KeybindAction.TabQuests] = "Ctrl+D2",
         [KeybindAction.TabItems] = "Ctrl+D3",
         [KeybindAction.TabShops] = "Ctrl+D4",
-        [KeybindAction.TabEvents] = "Ctrl+D5",
-        [KeybindAction.TabSettings] = "Ctrl+D6",
+        [KeybindAction.TabWorkshop] = "Ctrl+D5",
+        [KeybindAction.TabEvents] = "Ctrl+D6",
+        [KeybindAction.TabSettings] = "Ctrl+D7",
     };
 
     public static string Describe(KeybindAction a) => a switch
@@ -36,6 +38,7 @@ public sealed class Keybinds(Dictionary<string, string> store)
         KeybindAction.TabItems => Loc.T("KbItems"),
         KeybindAction.TabShops => Loc.T("KbTraders"),
         KeybindAction.TabEvents => Loc.T("KbEvents"),
+        KeybindAction.TabWorkshop => Loc.T("KbWorkshop"),
         KeybindAction.TabSettings => Loc.T("Settings"),
         _ => a.ToString(),
     };

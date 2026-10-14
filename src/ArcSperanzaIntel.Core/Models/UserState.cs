@@ -43,6 +43,19 @@ public sealed class UserState
 
     public HashSet<string> HiddenTraders { get; set; } = [];
 
+    /// <summary>Poziomy stacji warsztatu: id stacji → poziom (brak wpisu = 0, niezbudowana).</summary>
+    public Dictionary<string, int> StationLevels { get; set; } = [];
+
+    /// <summary>Schematy oznaczone jako znalezione (id itemu-schematu).</summary>
+    public HashSet<string> FoundBlueprints { get; set; } = [];
+
+    /// <summary>Panel Szukane: czy pokazywać itemy z questów / ze stacji warsztatu.</summary>
+    public bool TrackQuestItems { get; set; } = true;
+    public bool TrackStationItems { get; set; } = true;
+
+    /// <summary>Grupy w panelu Szukane wyłączone "okiem" (klucz grupy).</summary>
+    public HashSet<string> UntrackedWantedGroups { get; set; } = [];
+
     /// <summary>Filtr mapy w zakładce Wydarzenia ("all" = wszystkie).</summary>
     public string? EventsMapId { get; set; }
 

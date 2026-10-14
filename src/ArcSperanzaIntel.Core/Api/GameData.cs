@@ -14,6 +14,7 @@ public sealed class GameData(IGameDataSource source)
     public IReadOnlyList<Item> Items { get; private set; } = [];
     public IReadOnlyList<Trader> Traders { get; private set; } = [];
     public ErmalStock? Ermal { get; private set; }
+    public IReadOnlyList<Station> Stations { get; private set; } = [];
     public IReadOnlyList<GameEvent> Events { get; private set; } = [];
 
     /// <summary>Kiedy ostatnio udało się wczytać harmonogram wydarzeń.</summary>
@@ -36,7 +37,9 @@ public sealed class GameData(IGameDataSource source)
         var quests = Guard(source.GetQuestsAsync(force, ct), Loc.T("WhatQuests"));
         var items = Guard(source.GetItemsAsync(force, ct), Loc.T("WhatItems"));
         var traders = Guard(source.GetTradersAsync(force, ct), Loc.T("WhatTraders"));
-        await Task.WhenAll(quests, items, traders).ConfigureAwait(false);
+        var hideout = Guard(source.GetHideoutAsync(force, ct), Loc.T("WhatWorkshop"));
+        await Task.WhenAll(quests, items, traders, hideout).ConfigureAwait(false);
+        if (hideout.Result is { } h) Stations = h.Data;
 
         if (quests.Result is { } q) Quests = q.Data;
         if (items.Result is { } i)

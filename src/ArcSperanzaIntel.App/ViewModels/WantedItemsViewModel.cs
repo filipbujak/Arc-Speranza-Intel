@@ -1,3 +1,4 @@
+using ArcSperanzaIntel.Core.Localization;
 using System.Collections.ObjectModel;
 using ArcSperanzaIntel.Core.Quests;
 using Avalonia.Media;
@@ -28,6 +29,27 @@ public sealed partial class WantedItemsViewModel : ObservableObject
     [ObservableProperty] private int _totalItems;
     [ObservableProperty] private bool _isEmpty;
 
+    /// <summary>Przełączniki ogólne: itemy z questów / ze stacji warsztatu.</summary>
+    public bool TrackQuests
+    {
+        get => _main.Services.Wanted.TrackQuests;
+        set
+        {
+            _main.Services.Wanted.TrackQuests = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool TrackStations
+    {
+        get => _main.Services.Wanted.TrackStations;
+        set
+        {
+            _main.Services.Wanted.TrackStations = value;
+            OnPropertyChanged();
+        }
+    }
+
     public bool IsCollapsed => !IsExpanded;
 
     /// <summary>Wysokość treści — animowana w widoku (płynne rozwijanie).</summary>
@@ -51,7 +73,7 @@ public sealed partial class WantedItemsViewModel : ObservableObject
         {
             Groups.Add(new WantedGroupViewModel(g, s.State.CollapsedWantedGroups.Contains(g.Key), this));
         }
-        TotalItems = groups.Sum(g => g.Items.Count);
+        TotalItems = groups.Where(g => g.IsTracked).Sum(g => g.Items.Count);
         IsEmpty = groups.Count == 0;
     }
 
@@ -66,6 +88,8 @@ public sealed partial class WantedItemsViewModel : ObservableObject
     internal void Remove(string itemId) => _main.Services.Wanted.Unmark(itemId);
     internal void OpenItem(string itemId) => _main.ShowItem(itemId);
     internal void OpenQuest(string questId) => _main.ShowQuestInTree(questId);
+    internal void OpenStation(string stationId) => _main.ShowStation(stationId);
+    internal void SetTracked(string key, bool tracked) => _main.Services.Wanted.SetTracked(key, tracked);
 }
 
 public sealed partial class WantedGroupViewModel : ObservableObject
@@ -77,17 +101,35 @@ public sealed partial class WantedGroupViewModel : ObservableObject
         _owner = owner;
         Key = group.Key;
         Title = group.Title;
+        Kind = group.Kind;
         IsManual = group.IsManual;
-        _isCollapsed = collapsed;
+        IsTracked = group.IsTracked;
+        _isCollapsed = collapsed || !group.IsTracked;
         Items = group.Items.Select(i => new WantedItemViewModel(i, group.IsManual, owner)).ToList();
     }
 
     public string Key { get; }
     public string Title { get; }
+    public WantedGroupKind Kind { get; }
     public bool IsManual { get; }
-    public bool IsQuest => !IsManual;
+    public bool IsQuest => Kind == WantedGroupKind.Quest;
+    public bool IsStation => Kind == WantedGroupKind.Station;
+    public bool CanGoTo => !IsManual;
+    public bool IsTracked { get; }
+    public bool IsUntracked => !IsTracked;
+    public bool CanUntrack => !IsManual;
+    public double TitleOpacity => IsTracked ? 1 : 0.45;
+    public string TrackTip => IsTracked ? Loc.T("UntrackGroup") : Loc.T("TrackGroup");
     public IReadOnlyList<WantedItemViewModel> Items { get; }
-    public IBrush TitleBrush => Palette.Brush(IsManual ? Palette.Blue : Palette.Yellow);
+    public IBrush TitleBrush => Palette.Brush(Kind switch
+    {
+        WantedGroupKind.Manual => Palette.Blue,
+        WantedGroupKind.Station => Palette.Green,
+        _ => Palette.Yellow,
+    });
+
+    [RelayCommand]
+    private void ToggleTracked() => _owner.SetTracked(Key, !IsTracked);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsOpen))]
@@ -104,6 +146,7 @@ public sealed partial class WantedGroupViewModel : ObservableObject
     private void OpenQuest()
     {
         if (IsQuest) _owner.OpenQuest(Key);
+        else if (IsStation) _owner.OpenStation(Key[WantedItemsService.StationKeyPrefix.Length..]);
     }
 }
 

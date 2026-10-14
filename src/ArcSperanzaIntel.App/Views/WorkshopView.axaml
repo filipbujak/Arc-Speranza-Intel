@@ -1,0 +1,263 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="using:ArcSperanzaIntel.App.Localization"
+             xmlns:vm="using:ArcSperanzaIntel.App.ViewModels"
+             xmlns:views="using:ArcSperanzaIntel.App.Views"
+             xmlns:icons="using:ArcSperanzaIntel.App.Icons"
+             xmlns:c="using:ArcSperanzaIntel.App.Controls"
+             x:Class="ArcSperanzaIntel.App.Views.WorkshopView"
+             x:DataType="vm:WorkshopViewModel">
+
+  <UserControl.Styles>
+    <Style Selector="Button.station">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="10,5" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+    </Style>
+    <Style Selector="Button.station:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ArcHover}" />
+    </Style>
+    <Style Selector="Button.station.selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#1E1A0C" />
+    </Style>
+    <Style Selector="Button.station.selected">
+      <Setter Property="Foreground" Value="{StaticResource ArcYellow}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.tile">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="0,0,10,10" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid ColumnDefinitions="270,*">
+
+    <!-- ====================================================== STACJE -->
+    <Border Classes="panel" BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,*,Auto">
+        <TextBlock Text="{l:T StationsTitle}" Classes="label" Margin="20,18,16,10" />
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding Stations}" Margin="10,0,10,10">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:StationRowViewModel">
+                <Button Classes="station" Classes.selected="{Binding IsSelected}" Command="{Binding SelectCommand}" Margin="0,1">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Border Width="26" Height="26" CornerRadius="13" Background="{Binding IconBack}" Margin="0,0,10,0" VerticalAlignment="Center">
+                      <PathIcon Data="{Binding Icon}" Width="14" Height="14" Foreground="{Binding IconBrush}" />
+                    </Border>
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <Panel Grid.Column="2" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding LevelText}" Classes="small" Foreground="{StaticResource ArcMuted}" IsVisible="{Binding IsNotMaxed}" />
+                      <Border Background="{StaticResource ArcGreen}" CornerRadius="3" Padding="6,1" IsVisible="{Binding IsMaxed}">
+                        <TextBlock Text="MAX" FontSize="11" FontWeight="Bold" Foreground="#0B0C0E" />
+                      </Border>
+                    </Panel>
+                  </Grid>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+        <StackPanel Grid.Row="2" Margin="18,10,18,18" Spacing="6">
+          <TextBlock Text="{Binding BlueprintCounter}" Classes="small" Foreground="{StaticResource ArcBlue}" FontWeight="SemiBold" />
+          <CheckBox Content="{l:T OnlyMissingBlueprints}" IsChecked="{Binding OnlyMissingBlueprints}" FontSize="13" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ====================================================== SZCZEGÓŁY STACJI -->
+    <Panel Grid.Column="1">
+      <TextBlock Text="{l:T NoWorkshopData}" Classes="muted" Margin="30" IsVisible="{Binding NoStations}" TextWrapping="Wrap" />
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <ContentControl Content="{Binding Detail}" Margin="30,24,30,40">
+          <ContentControl.ContentTemplate>
+            <DataTemplate x:DataType="vm:StationDetailViewModel">
+              <StackPanel Spacing="20" MaxWidth="1100" HorizontalAlignment="Left">
+
+                <!-- nagłówek -->
+                <Grid ColumnDefinitions="Auto,*">
+                  <Border Width="48" Height="48" CornerRadius="24" Background="{StaticResource ArcPanel2}" BorderBrush="{Binding IconBrush}"
+                          BorderThickness="1.5" Margin="0,0,14,0" VerticalAlignment="Center">
+                    <PathIcon Data="{Binding Icon}" Width="24" Height="24" Foreground="{Binding IconBrush}" />
+                  </Border>
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
+                    <TextBlock Text="{Binding Name}" FontFamily="{StaticResource HeadFont}" FontWeight="Bold" FontSize="34" LetterSpacing="2.5" />
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                      <ItemsControl ItemsSource="{Binding Pips}" VerticalAlignment="Center" IsVisible="{Binding HasLevels}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="4" />
+                          </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:LevelPipViewModel">
+                            <Panel Width="28" Height="6">
+                              <Border CornerRadius="3" Background="{StaticResource ArcYellow}" IsVisible="{Binding Filled}" />
+                              <Border CornerRadius="3" Background="{StaticResource ArcLine2}" IsVisible="{Binding Empty}" />
+                            </Panel>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <TextBlock Text="{Binding LevelText}" Classes="muted small" VerticalAlignment="Center" />
+                    </StackPanel>
+                  </StackPanel>
+                </Grid>
+
+                <!-- następny poziom -->
+                <c:FlowBorder Background="{StaticResource ArcPanel}" Radius="10" Padding="22,18" IsVisible="{Binding HasLevels}">
+                  <StackPanel Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding NextTitle}" FontFamily="{StaticResource HeadFont}" FontWeight="SemiBold" FontSize="15"
+                                 LetterSpacing="2" Foreground="{StaticResource ArcYellow}" IsVisible="{Binding HasNext}" />
+                      <TextBlock Text="{l:T StationMaxed}" FontFamily="{StaticResource HeadFont}" FontWeight="SemiBold" FontSize="15"
+                                 LetterSpacing="2" Foreground="{StaticResource ArcGreen}" IsVisible="{Binding IsMaxed}" />
+                      <ToggleButton Grid.Column="1" Classes="chip" IsChecked="{Binding IsTracked, Mode=OneWay}"
+                                    Command="{Binding ToggleTrackedCommand}" IsVisible="{Binding HasNext}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{x:Static icons:UiIcons.Bag}" Width="12" Height="12" />
+                          <TextBlock Text="{Binding TrackText}" />
+                        </StackPanel>
+                      </ToggleButton>
+                    </Grid>
+
+                    <ItemsControl ItemsSource="{Binding NextItems}" IsVisible="{Binding HasNext}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ItemChipViewModel">
+                          <Button Classes="tile" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Name}">
+                            <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="10" Width="250">
+                              <Grid ColumnDefinitions="Auto,*">
+                                <Border Width="50" Height="50" CornerRadius="5" Background="{StaticResource ArcBlack}"
+                                        BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,3">
+                                  <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="100" Margin="4" />
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                  <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" FontSize="14" />
+                                  <TextBlock Text="{Binding QuantityText}" FontWeight="Bold" FontSize="17" Foreground="{StaticResource ArcYellow}" />
+                                </StackPanel>
+                              </Grid>
+                            </c:FlowBorder>
+                          </Button>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ItemsControl ItemsSource="{Binding NextConditions}" IsVisible="{Binding HasNext}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                          <TextBlock Text="{Binding}" Classes="muted small" />
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <Button Classes="primary" Command="{Binding UpgradeCommand}" IsVisible="{Binding HasNext}">
+                        <TextBlock Text="{l:T Upgraded}" FontFamily="{StaticResource HeadFont}" FontWeight="Bold" LetterSpacing="1.5" />
+                      </Button>
+                      <Button Classes="ghost" Content="{l:T LevelDown}" Command="{Binding DowngradeCommand}" IsVisible="{Binding CanDowngrade}" />
+                    </StackPanel>
+                  </StackPanel>
+                </c:FlowBorder>
+
+                <TextBlock Text="{Binding LevelText}" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding IsBasic}" />
+
+                <!-- crafting -->
+                <StackPanel Spacing="10">
+                  <TextBlock Text="{l:T CraftingTitle}" FontFamily="{StaticResource HeadFont}" FontWeight="SemiBold" FontSize="15" LetterSpacing="2" />
+                  <TextBlock Text="{l:T NoCrafts}" Classes="dim small" IsVisible="{Binding NoCrafts}" />
+                  <TextBlock Text="{Binding HiddenText}" Classes="small" Foreground="{StaticResource ArcBlue}" TextWrapping="Wrap"
+                             IsVisible="{Binding HasHidden}" />
+                  <ItemsControl ItemsSource="{Binding Crafts}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:CraftLevelGroupViewModel">
+                        <StackPanel Margin="0,0,0,10" Opacity="{Binding Opacity}">
+                          <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+                            <PathIcon Data="{x:Static icons:UiIcons.Lock}" Width="12" Height="12" Foreground="{StaticResource ArcRed}"
+                                      IsVisible="{Binding IsLocked}" />
+                            <TextBlock Text="{Binding Title}" Classes="label" />
+                          </StackPanel>
+                          <ItemsControl ItemsSource="{Binding Items}">
+                            <ItemsControl.ItemsPanel>
+                              <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                              </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate x:DataType="vm:CraftItemViewModel">
+                                <Button Classes="tile" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tooltip}">
+                                  <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="2" Width="120" Height="132">
+                                    <Grid RowDefinitions="*,Auto">
+                                      <c:RemoteImage Url="{Binding IconUrl}" DecodeWidth="120" Width="64" Height="64" Margin="0,10,0,0" />
+                                      <Border Width="20" Height="20" CornerRadius="10" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                              Margin="6" Background="{StaticResource ArcBlue}" IsVisible="{Binding BlueprintFound}"
+                                              ToolTip.Tip="{Binding BlueprintTip}">
+                                        <TextBlock Text="✓" FontSize="12" FontWeight="Bold" Foreground="#0B0C0E"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                      </Border>
+                                      <Border Width="20" Height="20" CornerRadius="10" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                              Margin="6" BorderBrush="{StaticResource ArcBlue}" BorderThickness="1.5"
+                                              IsVisible="{Binding BlueprintMissing}" ToolTip.Tip="{Binding BlueprintTip}" />
+                                      <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center"
+                                                 MaxLines="2" TextTrimming="CharacterEllipsis" Margin="8,4,8,10" />
+                                    </Grid>
+                                  </c:FlowBorder>
+                                </Button>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+
+                <!-- schematy -->
+                <StackPanel Spacing="10" IsVisible="{Binding HasBlueprints}">
+                  <StackPanel Orientation="Horizontal" Spacing="12">
+                    <TextBlock Text="{l:T BlueprintsTitle}" FontFamily="{StaticResource HeadFont}" FontWeight="SemiBold" FontSize="15" LetterSpacing="2" />
+                    <TextBlock Text="{Binding StationBlueprintCounter}" Classes="small" Foreground="{StaticResource ArcBlue}" VerticalAlignment="Center" />
+                  </StackPanel>
+                  <ItemsControl ItemsSource="{Binding Blueprints}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:BlueprintRowViewModel">
+                        <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="10,8" Width="300" Margin="0,0,10,10">
+                          <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Button Classes="flat" Padding="0" Command="{Binding OpenCommand}">
+                              <Border Width="44" Height="44" CornerRadius="5" ClipToBounds="True" BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,2">
+                                <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="True" DecodeWidth="88" />
+                              </Border>
+                            </Button>
+                            <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="12,0,8,0" VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis" FontSize="13" />
+                            <CheckBox Grid.Column="2" IsChecked="{Binding IsFound}" Content="{l:T Found}" FontSize="12" VerticalAlignment="Center" />
+                          </Grid>
+                        </c:FlowBorder>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </StackPanel>
+            </DataTemplate>
+          </ContentControl.ContentTemplate>
+        </ContentControl>
+      </ScrollViewer>
+
+      <views:WantedItemsPanel DataContext="{Binding WantedPanel}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="14" />
+    </Panel>
+  </Grid>
+</UserControl>

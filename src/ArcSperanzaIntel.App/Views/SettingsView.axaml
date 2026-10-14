@@ -140,6 +140,11 @@
       <StackPanel Spacing="8">
         <TextBlock Text="{l:T AboutTitle}" Classes="label" Foreground="{StaticResource ArcText}" />
         <TextBlock Text="{Binding Version}" FontWeight="SemiBold" />
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="{l:T AuthorLabel}" Classes="muted small" VerticalAlignment="Center" />
+          <Button Classes="flat" Content="Filip Bujak (github.com/filipbujak)" Foreground="{StaticResource ArcYellow}" Padding="4,1"
+                  FontSize="12" Command="{Binding OpenRepoCommand}" />
+        </StackPanel>
         <TextBlock Classes="muted small" TextWrapping="Wrap"
                    Text="{l:T AboutText}" />
         <StackPanel Orientation="Horizontal" Spacing="4">

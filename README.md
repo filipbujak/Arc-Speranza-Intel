@@ -44,6 +44,10 @@ tests/ArcSperanzaIntel.Tests   xUnit
 
 UI texts live in `src/ArcSperanzaIntel.Core/Localization/Texts.cs` (key → Polish, English).
 
+## Author
+
+Made by **Filip Bujak** ([@filipbujak](https://github.com/filipbujak)).
+
 ## Data and credits
 
 - Game data, map tiles, item icons and the event schedule: [MetaForge](https://metaforge.app/arc-raiders) — community data, cached locally (12 h, events 30 min).

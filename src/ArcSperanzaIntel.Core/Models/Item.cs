@@ -16,6 +16,12 @@ public sealed class Item
     public string? AmmoType { get; init; }
     public IReadOnlyList<ItemStat> Stats { get; init; } = [];
 
+    /// <summary>Z czego się craftuje (MetaForge: components).</summary>
+    public IReadOnlyList<ItemStack> Components { get; init; } = [];
+
+    /// <summary>Na co się rozkłada przy recyklingu (MetaForge: recycle_components).</summary>
+    public IReadOnlyList<ItemStack> RecycleComponents { get; init; } = [];
+
     public override string ToString() => Name;
 }
 
