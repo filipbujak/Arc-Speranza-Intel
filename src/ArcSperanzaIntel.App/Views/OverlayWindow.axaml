@@ -22,12 +22,7 @@
       <!-- pasek: chwyć i przeciągnij -->
       <Border x:Name="DragBar" Background="#14FFFFFF" Padding="12,8" Cursor="SizeAll">
         <Grid ColumnDefinitions="Auto,*,Auto">
-          <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center" Margin="0,0,10,0">
-            <Border Width="4" Height="12" Background="{StaticResource ArcRed}" />
-            <Border Width="4" Height="15" Background="{StaticResource ArcYellow}" />
-            <Border Width="4" Height="12" Background="{StaticResource ArcGreen}" />
-            <Border Width="4" Height="9" Background="{StaticResource ArcBlue}" />
-          </StackPanel>
+          <c:AppLogo Height="18" VerticalAlignment="Center" Margin="0,0,10,0" />
           <TextBlock Grid.Column="1" Text="{Binding Title}" FontFamily="{StaticResource HeadFont}" FontWeight="Bold"
                      FontSize="15" LetterSpacing="2" VerticalAlignment="Center" />
           <TextBlock Grid.Column="2" Text="{Binding CountText}" Foreground="{StaticResource ArcYellow}" FontWeight="Bold"
