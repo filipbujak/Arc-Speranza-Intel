@@ -130,25 +130,24 @@
                 <ItemsControl ItemsSource="{Binding Offers}">
                   <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                      <WrapPanel Orientation="Horizontal" />
+                      <WrapPanel Orientation="Horizontal" ItemWidth="140" ItemHeight="186" />
                     </ItemsPanelTemplate>
                   </ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:OfferCardViewModel">
                       <Button Classes="offer" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tooltip}">
-                        <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="1.5" IsActive="{Binding IsHighlighted}"
-                                      Width="132" Height="150">
-                          <Grid RowDefinitions="*,Auto,Auto,3">
-                            <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="128" Width="66" Height="66" Margin="0,10,0,0" />
+                        <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="4" IsActive="{Binding IsHighlighted}"
+                                      Width="132" Height="178">
+                          <Grid RowDefinitions="Auto,*,Auto">
+                            <c:ItemTile Height="112" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="224" />
                             <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center"
-                                       MaxLines="2" TextTrimming="CharacterEllipsis" Margin="8,4,8,2" />
-                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Margin="0,0,0,7">
+                                       MaxLines="2" TextTrimming="CharacterEllipsis" Margin="4,4,4,2" VerticalAlignment="Center" />
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Margin="0,0,0,3">
                               <c:RemoteImage Url="{Binding CurrencyIconUrl}" DecodeWidth="32" Width="16" Height="16"
                                              ToolTip.Tip="{Binding CurrencyTip}" VerticalAlignment="Center" />
                               <TextBlock Text="{Binding PriceText}" FontWeight="Bold" Foreground="{Binding PriceBrush}" FontSize="13"
                                          VerticalAlignment="Center" />
                             </StackPanel>
-                            <Border Grid.Row="3" Background="{Binding RarityBrush}" CornerRadius="0,0,6,6" />
                           </Grid>
                         </c:FlowBorder>
                       </Button>
@@ -201,9 +200,7 @@
                           <Button Classes="offer" Margin="0" Command="{Binding OpenCommand}" HorizontalAlignment="Stretch"
                                   HorizontalContentAlignment="Stretch">
                             <Grid ColumnDefinitions="Auto,*" Margin="10">
-                              <Border Width="56" Height="56" Background="{StaticResource ArcBlack}" CornerRadius="2">
-                                <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="112" Margin="4" />
-                              </Border>
+                              <c:ItemTile Width="72" Height="72" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="144" />
                               <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" Spacing="3">
                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"
                                            TextTrimming="CharacterEllipsis" />
@@ -216,7 +213,7 @@
                               </StackPanel>
                             </Grid>
                           </Button>
-                          <Border Height="3" Background="{Binding RarityBrush}" />
+                          <Border Height="1" Background="{StaticResource ArcLine}" />
                           <Button Classes="flat" Command="{Binding ToggleExpandedCommand}" HorizontalAlignment="Stretch"
                                   HorizontalContentAlignment="Left" Padding="10,6" CornerRadius="0">
                             <StackPanel Orientation="Horizontal" Spacing="6">
@@ -229,14 +226,11 @@
                               <DataTemplate x:DataType="vm:ErmalAcceptedViewModel">
                                 <Button Classes="result" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tip}" Padding="4,3">
                                   <Grid ColumnDefinitions="Auto,*,Auto">
-                                    <Border Width="26" Height="26" Background="{StaticResource ArcBlack}" CornerRadius="2"
-                                            BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,2">
-                                      <Panel>
-                                        <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="52" Margin="2" IsVisible="{Binding HasIcon}" />
-                                        <PathIcon Data="{x:Static icons:UiIcons.Items}" Width="12" Height="12" IsVisible="{Binding NoIcon}"
-                                                  Foreground="{StaticResource ArcMuted}" />
-                                      </Panel>
-                                    </Border>
+                                    <Panel Width="32" Height="32">
+                                      <c:ItemTile Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="64" />
+                                      <PathIcon Data="{x:Static icons:UiIcons.Items}" Width="12" Height="12" IsVisible="{Binding NoIcon}"
+                                                Foreground="{StaticResource ArcMuted}" />
+                                    </Panel>
                                     <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" Margin="8,0" VerticalAlignment="Center"
                                                TextTrimming="CharacterEllipsis" />
                                     <TextBlock Grid.Column="2" Text="{Binding ValueText}" FontSize="12" FontWeight="SemiBold"
@@ -291,10 +285,7 @@
                               <DataTemplate x:DataType="vm:ErmalAcceptedViewModel">
                                 <Button Classes="result" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tip}" Padding="4,3">
                                   <Grid ColumnDefinitions="Auto,*,Auto">
-                                    <Border Width="26" Height="26" Background="{StaticResource ArcBlack}" CornerRadius="2"
-                                            BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,2">
-                                      <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="52" Margin="2" />
-                                    </Border>
+                                    <c:ItemTile Width="32" Height="32" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="64" />
                                     <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" Margin="8,0" VerticalAlignment="Center"
                                                TextTrimming="CharacterEllipsis" />
                                     <TextBlock Grid.Column="2" Text="{Binding ValueText}" FontSize="12" FontWeight="SemiBold"

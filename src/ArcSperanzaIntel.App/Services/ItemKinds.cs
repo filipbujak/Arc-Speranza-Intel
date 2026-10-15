@@ -15,6 +15,6 @@ public static class ItemKinds
     {
         if (string.IsNullOrEmpty(itemId)) return false;
         if (Lookup(itemId) is { } item) return IsBlueprintType(item.Type);
-        return itemId.EndsWith("-blueprint", StringComparison.Ordinal) || itemId.EndsWith("-recipe", StringComparison.Ordinal);
+        return itemId.EndsWith("-blueprint", StringComparison.Ordinal);
     }
 }

@@ -9,6 +9,18 @@
              x:Class="ArcSperanzaIntel.App.Views.ItemsView"
              x:DataType="vm:ItemsViewModel">
 
+  <UserControl.Resources>
+    <DataTemplate x:Key="ChipRow" x:DataType="vm:ItemChipViewModel">
+      <Button Classes="flat" Command="{Binding OpenCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="4,3">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <c:ItemTile Width="40" Height="40" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="80" />
+          <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="{StaticResource ArcText}" Margin="10,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+          <TextBlock Grid.Column="2" Text="{Binding QuantityText}" Foreground="{StaticResource ArcYellow}" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </Grid>
+      </Button>
+    </DataTemplate>
+  </UserControl.Resources>
+
   <UserControl.Styles>
     <Style Selector="Button.itemcard">
       <Setter Property="Background" Value="Transparent" />
@@ -118,19 +130,18 @@
                 <ItemsControl ItemsSource="{Binding Items}">
                   <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                      <WrapPanel Orientation="Horizontal" />
+                      <WrapPanel Orientation="Horizontal" ItemWidth="132" ItemHeight="168" />
                     </ItemsPanelTemplate>
                   </ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:ItemCardViewModel">
                       <Button Classes="itemcard" Command="{Binding SelectCommand}" ToolTip.Tip="{Binding Name}">
-                        <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="1.5" IsActive="{Binding IsSelected}"
-                                      Width="116" Height="138">
-                          <Grid RowDefinitions="*,Auto,3">
-                            <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="128" Width="70" Height="70" Margin="0,10,0,0" />
+                        <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="4" IsActive="{Binding IsSelected}"
+                                      Width="124" Height="160">
+                          <Grid RowDefinitions="Auto,*">
+                            <c:ItemTile Height="112" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="224" />
                             <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center"
-                                       MaxLines="2" TextTrimming="CharacterEllipsis" Margin="8,4,8,8" />
-                            <Border Grid.Row="2" Background="{Binding RarityBrush}" CornerRadius="0,0,6,6" />
+                                       MaxLines="2" TextTrimming="CharacterEllipsis" Margin="4,4,4,0" VerticalAlignment="Center" />
                             <TextBlock Text="★" Foreground="{StaticResource ArcYellow}" HorizontalAlignment="Right" VerticalAlignment="Top"
                                        Margin="0,4,7,0" IsVisible="{Binding IsFavorite}" />
                             <Border Width="18" Height="18" CornerRadius="9" Background="{StaticResource ArcBlue}" HorizontalAlignment="Left"
@@ -167,9 +178,7 @@
                     <PathIcon Data="{x:Static icons:UiIcons.Close}" Width="12" Height="12" />
                   </Button>
                 </Grid>
-                <Border Height="150" Background="{StaticResource ArcBlack}" BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,3" CornerRadius="3">
-                  <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="300" Margin="16" />
-                </Border>
+                <c:ItemTile Height="180" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="360" />
                 <TextBlock Text="{Binding Name}" Classes="h1" TextWrapping="Wrap" />
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <Border Background="{Binding RarityBrush}" CornerRadius="2" Padding="7,2">
@@ -208,40 +217,38 @@
 
                 <StackPanel Spacing="2" IsVisible="{Binding HasCraftComponents}">
                   <TextBlock Text="{l:T CraftNeeds}" Classes="label" Margin="0,8,0,2" />
-                  <ItemsControl ItemsSource="{Binding CraftComponents}">
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="vm:ItemChipViewModel">
-                        <Button Classes="flat" Command="{Binding OpenCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="4,3">
-                          <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border Width="32" Height="32" CornerRadius="4" Background="{StaticResource ArcBlack}" BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,2">
-                              <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="64" Margin="3" />
-                            </Border>
-                            <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="{StaticResource ArcText}" Margin="10,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Grid.Column="2" Text="{Binding QuantityText}" Foreground="{StaticResource ArcYellow}" FontWeight="SemiBold" VerticalAlignment="Center" />
-                          </Grid>
-                        </Button>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
+                  <ItemsControl ItemsSource="{Binding CraftComponents}" ItemTemplate="{StaticResource ChipRow}" />
                 </StackPanel>
 
                 <StackPanel Spacing="2" IsVisible="{Binding HasRecycleComponents}">
                   <TextBlock Text="{l:T RecyclesInto}" Classes="label" Margin="0,8,0,2" />
-                  <ItemsControl ItemsSource="{Binding RecycleComponents}">
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="vm:ItemChipViewModel">
-                        <Button Classes="flat" Command="{Binding OpenCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="4,3">
-                          <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border Width="32" Height="32" CornerRadius="4" Background="{StaticResource ArcBlack}" BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,2">
-                              <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="64" Margin="3" />
-                            </Border>
-                            <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="{StaticResource ArcText}" Margin="10,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Grid.Column="2" Text="{Binding QuantityText}" Foreground="{StaticResource ArcYellow}" FontWeight="SemiBold" VerticalAlignment="Center" />
-                          </Grid>
-                        </Button>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
+                  <ItemsControl ItemsSource="{Binding RecycleComponents}" ItemTemplate="{StaticResource ChipRow}" />
+                </StackPanel>
+
+
+                <StackPanel Spacing="2" IsVisible="{Binding HasSalvageComponents}">
+                  <TextBlock Text="{l:T SalvageTitle}" Classes="label" Margin="0,8,0,2" />
+                  <ItemsControl ItemsSource="{Binding SalvageComponents}" ItemTemplate="{StaticResource ChipRow}" />
+                </StackPanel>
+
+                <StackPanel Spacing="2" IsVisible="{Binding HasRecycleFrom}">
+                  <TextBlock Text="{l:T RecycleFromTitle}" Classes="label" Margin="0,8,0,2" />
+                  <ItemsControl ItemsSource="{Binding RecycleFrom}" ItemTemplate="{StaticResource ChipRow}" />
+                </StackPanel>
+
+                <StackPanel Spacing="2" IsVisible="{Binding HasUpgradesTo}">
+                  <TextBlock Text="{l:T UpgradesToTitle}" Classes="label" Margin="0,8,0,2" />
+                  <ItemsControl ItemsSource="{Binding UpgradesTo}" ItemTemplate="{StaticResource ChipRow}" />
+                </StackPanel>
+
+                <StackPanel Spacing="2" IsVisible="{Binding HasUpgradeCost}">
+                  <TextBlock Text="{l:T UpgradeCostTitle}" Classes="label" Margin="0,8,0,2" />
+                  <ItemsControl ItemsSource="{Binding UpgradeCost}" ItemTemplate="{StaticResource ChipRow}" />
+                </StackPanel>
+
+                <StackPanel Spacing="2" IsVisible="{Binding HasUpgradedFrom}">
+                  <TextBlock Text="{l:T UpgradedFromTitle}" Classes="label" Margin="0,8,0,2" />
+                  <ItemsControl ItemsSource="{Binding UpgradedFrom}" ItemTemplate="{StaticResource ChipRow}" />
                 </StackPanel>
 
                 <StackPanel Spacing="2" IsVisible="{Binding HasWorkshopNeeds}">

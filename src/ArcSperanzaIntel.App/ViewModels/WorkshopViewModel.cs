@@ -125,6 +125,7 @@ public sealed partial class StationDetailViewModel : ObservableObject
     public ObservableCollection<string> NextConditions { get; } = [];
     public ObservableCollection<CraftLevelGroupViewModel> Crafts { get; } = [];
     public ObservableCollection<BlueprintRowViewModel> Blueprints { get; } = [];
+    public ObservableCollection<UpgradeChainViewModel> Upgrades { get; } = [];
 
     [ObservableProperty] private string _levelText = "";
     [ObservableProperty] private string _nextTitle = "";
@@ -137,6 +138,7 @@ public sealed partial class StationDetailViewModel : ObservableObject
     [ObservableProperty] private bool _hasHidden;
     [ObservableProperty] private bool _noCrafts;
     [ObservableProperty] private bool _hasBlueprints;
+    [ObservableProperty] private bool _hasUpgrades;
     [ObservableProperty] private string _stationBlueprintCounter = "";
     [ObservableProperty] private bool _isTracked;
     [ObservableProperty] private string _trackText = "";
@@ -150,7 +152,7 @@ public sealed partial class StationDetailViewModel : ObservableObject
         for (var i = 1; i <= Station.MaxLevel; i++) Pips.Add(new LevelPipViewModel(i <= level));
         LevelText = Station.IsBasic ? Loc.T("BasicBenchInfo") : Loc.F("StationLevelOf", level, Station.MaxLevel);
         IsMaxed = book.IsMaxed(Station);
-        CanDowngrade = !Station.IsBasic && level > 0;
+        CanDowngrade = !Station.IsBasic && level > Station.MinLevel;
 
         NextItems.Clear();
         NextConditions.Clear();
@@ -170,20 +172,28 @@ public sealed partial class StationDetailViewModel : ObservableObject
 
         Crafts.Clear();
         // przedmiot ze schematem pojawia się dopiero po oznaczeniu schematu jako znalezionego
-        var craftable = book.CraftsAt(Station.Id)
-            .Where(c => book.BlueprintFor(c.Item.Id) is not { } bp || book.IsFound(bp.Id))
-            .ToList();
-        HiddenByBlueprint = book.CraftsAt(Station.Id).Count - craftable.Count;
+        var all = book.CraftsAt(Station.Id);
+        var craftable = all.Where(c => !book.IsLockedByBlueprint(c)).ToList();
+        HiddenByBlueprint = all.Count - craftable.Count;
         HiddenText = Loc.F("HiddenByBlueprint", HiddenByBlueprint);
         HasHidden = HiddenByBlueprint > 0;
         foreach (var g in craftable.GroupBy(c => c.Level))
         {
             var unlocked = Station.IsBasic || g.Key is null || g.Key <= level;
-            var title = g.Key is null ? Loc.T("CraftLevelUnknown") : Loc.F("CraftLevel", g.Key);
-            Crafts.Add(new CraftLevelGroupViewModel(title, unlocked, g.Select(c => new CraftItemViewModel(c.Item, book, _owner)).ToList()));
+            var title = g.Key is null ? Loc.T("CraftAnyLevel") : Loc.F("CraftLevel", g.Key);
+            Crafts.Add(new CraftLevelGroupViewModel(title, unlocked, g.Select(c => new CraftItemViewModel(c, book, _owner)).ToList()));
         }
         HasCrafts = Crafts.Count > 0;
         NoCrafts = !HasCrafts && HiddenByBlueprint == 0;
+
+        // ulepszenia broni (I → II → III → IV) dla tego, co da się tu craftować
+        Upgrades.Clear();
+        foreach (var c in craftable)
+        {
+            var chain = book.UpgradeChain(c.Item.Id);
+            if (chain.Count > 0) Upgrades.Add(new UpgradeChainViewModel(c.Item, chain, _owner));
+        }
+        HasUpgrades = Upgrades.Count > 0;
 
         RebuildBlueprints();
         RefreshTracking();
@@ -193,8 +203,10 @@ public sealed partial class StationDetailViewModel : ObservableObject
     {
         var book = _owner.Book;
         var all = book.CraftsAt(Station.Id)
-            .Select(c => book.BlueprintFor(c.Item.Id))
-            .Where(b => b is not null)
+            .SelectMany(c => c.BlueprintIds.Count > 0
+                ? c.BlueprintIds.Select(id => ItemKinds.Lookup(id))
+                : new[] { book.BlueprintFor(c.Item.Id) })
+            .Where(b => b is not null && WorkshopBook.IsBlueprint(b))
             .Select(b => b!)
             .DistinctBy(b => b.Id)
             .OrderBy(b => b.Name)
@@ -252,22 +264,24 @@ public sealed partial class CraftItemViewModel : ObservableObject
     private readonly Item _item;
     private readonly WorkshopViewModel _owner;
 
-    public CraftItemViewModel(Item item, WorkshopBook book, WorkshopViewModel owner)
+    public CraftItemViewModel(StationCraft craft, WorkshopBook book, WorkshopViewModel owner)
     {
-        _item = item;
+        _item = craft.Item;
         _owner = owner;
-        var bp = book.BlueprintFor(item.Id);
+        var bp = craft.BlueprintIds.Select(id => ItemKinds.Lookup(id)).FirstOrDefault(b => b is not null) ?? book.BlueprintFor(_item.Id);
         HasBlueprint = bp is not null;
         BlueprintFound = bp is not null && book.IsFound(bp.Id);
         BlueprintTip = bp is null ? "" : BlueprintFound ? Loc.T("BlueprintHave") : Loc.T("BlueprintMissing");
-        var parts = item.Components.Select(c => $"{c.Quantity}× {ItemKinds.Lookup(c.ItemId)?.Name ?? c.Name}").ToList();
-        Tooltip = parts.Count == 0 ? item.Name : item.Name + "\n" + Loc.T("CraftNeeds") + ": " + string.Join(", ", parts);
+        var ingredients = craft.Ingredients.Count > 0 ? craft.Ingredients : _item.Components;
+        var parts = ingredients.Select(c => $"{c.Quantity}× {ItemKinds.Lookup(c.ItemId)?.Name ?? c.Name}").ToList();
+        Tooltip = parts.Count == 0 ? _item.Name : _item.Name + "\n" + Loc.T("CraftNeeds") + ": " + string.Join(", ", parts);
     }
 
     public string Tooltip { get; }
 
     public string Name => _item.Name;
     public string? IconUrl => _item.IconUrl;
+    public bool IsBlueprint => WorkshopBook.IsBlueprint(_item);
     public IBrush RarityBrush => Palette.Brush(Palette.Rarity(_item.Rarity));
     public bool HasBlueprint { get; }
     public bool BlueprintFound { get; }
@@ -276,6 +290,26 @@ public sealed partial class CraftItemViewModel : ObservableObject
 
     [RelayCommand]
     private void Open() => _owner.OpenItem(_item.Id);
+}
+
+/// <summary>Łańcuch ulepszeń broni: Bettina I → II → III → IV, z kosztem każdego kroku.</summary>
+public sealed class UpgradeChainViewModel(Item start, IReadOnlyList<UpgradeStep> steps, WorkshopViewModel owner)
+{
+    public string Name { get; } = start.Name;
+    public string? IconUrl { get; } = start.IconUrl;
+    public IBrush RarityBrush { get; } = Palette.Brush(Palette.Rarity(start.Rarity));
+    public IReadOnlyList<UpgradeStepViewModel> Steps { get; } = steps.Select(s => new UpgradeStepViewModel(s, owner)).ToList();
+    public CommunityToolkit.Mvvm.Input.IRelayCommand OpenCommand { get; } = new RelayCommand(() => owner.OpenItem(start.Id));
+}
+
+public sealed class UpgradeStepViewModel(UpgradeStep step, WorkshopViewModel owner)
+{
+    public string Name { get; } = step.To.Name;
+    public string? IconUrl { get; } = step.To.IconUrl;
+    public IBrush RarityBrush { get; } = Palette.Brush(Palette.Rarity(step.To.Rarity));
+    public string CostText { get; } = string.Join(", ", step.Cost.Select(c => $"{c.Quantity}× {ItemKinds.Lookup(c.ItemId)?.Name ?? c.Name}"));
+    public string Tooltip => Name + "\n" + Loc.T("UpgradeCost") + ": " + CostText;
+    public CommunityToolkit.Mvvm.Input.IRelayCommand OpenCommand { get; } = new RelayCommand(() => owner.OpenItem(step.To.Id));
 }
 
 /// <summary>Schemat do odhaczenia jako znaleziony.</summary>

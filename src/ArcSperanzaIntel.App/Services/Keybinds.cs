@@ -6,6 +6,7 @@ namespace ArcSperanzaIntel.App.Services;
 public enum KeybindAction
 {
     ToggleWindow,
+    ToggleOverlay,
     TabMaps,
     TabQuests,
     TabItems,
@@ -21,6 +22,7 @@ public sealed class Keybinds(Dictionary<string, string> store)
     public static readonly IReadOnlyDictionary<KeybindAction, string> Defaults = new Dictionary<KeybindAction, string>
     {
         [KeybindAction.ToggleWindow] = "Ctrl+F",
+        [KeybindAction.ToggleOverlay] = "Ctrl+Shift+O",
         [KeybindAction.TabMaps] = "Ctrl+D1",
         [KeybindAction.TabQuests] = "Ctrl+D2",
         [KeybindAction.TabItems] = "Ctrl+D3",
@@ -33,6 +35,7 @@ public sealed class Keybinds(Dictionary<string, string> store)
     public static string Describe(KeybindAction a) => a switch
     {
         KeybindAction.ToggleWindow => Loc.T("KbToggle"),
+        KeybindAction.ToggleOverlay => Loc.T("KbOverlay"),
         KeybindAction.TabMaps => Loc.T("KbMaps"),
         KeybindAction.TabQuests => Loc.T("KbQuests"),
         KeybindAction.TabItems => Loc.T("KbItems"),
@@ -75,11 +78,14 @@ public sealed class Keybinds(Dictionary<string, string> store)
     {
         foreach (var a in Enum.GetValues<KeybindAction>())
         {
-            if (a == KeybindAction.ToggleWindow) continue;
+            if (IsGlobal(a)) continue;
             if (Get(a) is { } g && g.Matches(e)) return a;
         }
         return null;
     }
+
+    /// <summary>Skróty działające w całym Windows (także w grze), rejestrowane przez RegisterHotKey.</summary>
+    public static bool IsGlobal(KeybindAction a) => a is KeybindAction.ToggleWindow or KeybindAction.ToggleOverlay;
 
     /// <summary>Czytelny opis skrótu, np. "Ctrl+1" zamiast "Ctrl+D1".</summary>
     public static string Pretty(KeyGesture? g)

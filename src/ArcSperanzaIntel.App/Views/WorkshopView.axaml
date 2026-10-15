@@ -135,12 +135,10 @@
                       <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:ItemChipViewModel">
                           <Button Classes="tile" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Name}">
-                            <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="10" Width="250">
+                            <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="8" Width="260">
                               <Grid ColumnDefinitions="Auto,*">
-                                <Border Width="50" Height="50" CornerRadius="5" Background="{StaticResource ArcBlack}"
-                                        BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,3">
-                                  <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="100" Margin="4" />
-                                </Border>
+                                <c:ItemTile Width="64" Height="64" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}"
+                                            IsBlueprint="{Binding IsBlueprint}" DecodeWidth="128" />
                                 <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
                                   <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" FontSize="14" />
                                   <TextBlock Text="{Binding QuantityText}" FontWeight="Bold" FontSize="17" Foreground="{StaticResource ArcYellow}" />
@@ -187,17 +185,18 @@
                             <TextBlock Text="{Binding Title}" Classes="label" />
                           </StackPanel>
                           <ItemsControl ItemsSource="{Binding Items}">
-                            <ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemsPanel>
                               <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal" />
+                                <WrapPanel Orientation="Horizontal" ItemWidth="142" ItemHeight="168" />
                               </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                               <DataTemplate x:DataType="vm:CraftItemViewModel">
                                 <Button Classes="tile" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tooltip}">
-                                  <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="2" Width="120" Height="132">
-                                    <Grid RowDefinitions="*,Auto">
-                                      <c:RemoteImage Url="{Binding IconUrl}" DecodeWidth="120" Width="64" Height="64" Margin="0,10,0,0" />
+                                  <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="4" Width="132" Height="158">
+                                    <Grid RowDefinitions="Auto,*">
+                                      <c:ItemTile Height="112" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}"
+                                                  IsBlueprint="{Binding IsBlueprint}" DecodeWidth="224" />
                                       <Border Width="20" Height="20" CornerRadius="10" HorizontalAlignment="Right" VerticalAlignment="Top"
                                               Margin="6" Background="{StaticResource ArcBlue}" IsVisible="{Binding BlueprintFound}"
                                               ToolTip.Tip="{Binding BlueprintTip}">
@@ -208,7 +207,7 @@
                                               Margin="6" BorderBrush="{StaticResource ArcBlue}" BorderThickness="1.5"
                                               IsVisible="{Binding BlueprintMissing}" ToolTip.Tip="{Binding BlueprintTip}" />
                                       <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center"
-                                                 MaxLines="2" TextTrimming="CharacterEllipsis" Margin="8,4,8,10" />
+                                                 MaxLines="2" TextTrimming="CharacterEllipsis" Margin="4,5,4,0" VerticalAlignment="Center" />
                                     </Grid>
                                   </c:FlowBorder>
                                 </Button>
@@ -216,6 +215,47 @@
                             </ItemsControl.ItemTemplate>
                           </ItemsControl>
                         </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+
+                <!-- ulepszenia broni -->
+                <StackPanel Spacing="10" IsVisible="{Binding HasUpgrades}">
+                  <TextBlock Text="{l:T UpgradesTitle}" FontFamily="{StaticResource HeadFont}" FontWeight="SemiBold" FontSize="15" LetterSpacing="2" />
+                  <ItemsControl ItemsSource="{Binding Upgrades}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:UpgradeChainViewModel">
+                        <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="10" Margin="0,0,0,10">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button Classes="tile" Margin="0" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Name}">
+                              <StackPanel Width="84" Spacing="4">
+                                <c:ItemTile Width="84" Height="84" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" DecodeWidth="168" />
+                                <TextBlock Text="{Binding Name}" FontSize="11" TextAlignment="Center" TextTrimming="CharacterEllipsis" />
+                              </StackPanel>
+                            </Button>
+                            <ItemsControl ItemsSource="{Binding Steps}">
+                              <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                  <StackPanel Orientation="Horizontal" Spacing="8" />
+                                </ItemsPanelTemplate>
+                              </ItemsControl.ItemsPanel>
+                              <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:UpgradeStepViewModel">
+                                  <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="→" FontSize="20" Foreground="{StaticResource ArcYellow}" VerticalAlignment="Center" Margin="0,0,0,18" />
+                                    <Button Classes="tile" Margin="0" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tooltip}">
+                                      <StackPanel Width="84" Spacing="4">
+                                        <c:ItemTile Width="84" Height="84" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" DecodeWidth="168" />
+                                        <TextBlock Text="{Binding Name}" FontSize="11" TextAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                      </StackPanel>
+                                    </Button>
+                                  </StackPanel>
+                                </DataTemplate>
+                              </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                          </StackPanel>
+                        </c:FlowBorder>
                       </DataTemplate>
                     </ItemsControl.ItemTemplate>
                   </ItemsControl>
@@ -230,17 +270,15 @@
                   <ItemsControl ItemsSource="{Binding Blueprints}">
                     <ItemsControl.ItemsPanel>
                       <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
+                        <WrapPanel Orientation="Horizontal" ItemWidth="320" />
                       </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                       <DataTemplate x:DataType="vm:BlueprintRowViewModel">
-                        <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="10,8" Width="300" Margin="0,0,10,10">
+                        <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="8" Width="310" Margin="0,0,10,10">
                           <Grid ColumnDefinitions="Auto,*,Auto">
                             <Button Classes="flat" Padding="0" Command="{Binding OpenCommand}">
-                              <Border Width="44" Height="44" CornerRadius="5" ClipToBounds="True" BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,2">
-                                <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="True" DecodeWidth="88" />
-                              </Border>
+                              <c:ItemTile Width="56" Height="56" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="True" DecodeWidth="112" />
                             </Button>
                             <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="12,0,8,0" VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis" FontSize="13" />

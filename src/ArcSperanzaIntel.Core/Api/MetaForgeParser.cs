@@ -72,13 +72,14 @@ public static class MetaForgeParser
     private static IReadOnlyList<ItemStack> Stacks(JsonElement parent, string prop)
     {
         var list = new List<ItemStack>();
-        if (!parent.TryGetProperty(prop, out var arr) || arr.ValueKind != JsonValueKind.Array) return list;
+        if (parent.ValueKind != JsonValueKind.Object || !parent.TryGetProperty(prop, out var arr) || arr.ValueKind != JsonValueKind.Array) return list;
         foreach (var s in arr.EnumerateArray())
         {
+            if (s.ValueKind != JsonValueKind.Object) continue;
             var itemId = Str(s, "item_id");
             JsonElement item = default;
-            var hasItem = s.TryGetProperty("item", out item) && item.ValueKind == JsonValueKind.Object;
-            itemId ??= hasItem ? Str(item, "id") : null;
+            var hasItem = (s.TryGetProperty("item", out item) || s.TryGetProperty("component", out item)) && item.ValueKind == JsonValueKind.Object;
+            itemId ??= hasItem ? Str(item, "id") : Str(s, "id");
             if (itemId is null) continue;
             list.Add(new ItemStack(
                 itemId,
@@ -116,6 +117,10 @@ public static class MetaForgeParser
                 Stats = Stats(i),
                 Components = ComponentStacks(i, "components"),
                 RecycleComponents = ComponentStacks(i, "recycle_components"),
+                RecycleFrom = Stacks(i, "recycle_from"),
+                Recipes = Recipes(i),
+                BlueprintUnlocks = BlueprintUnlocks(i),
+                Operations = Operations(i),
             });
         }
         return list;
@@ -133,6 +138,56 @@ public static class MetaForgeParser
             if (id is null) continue;
             list.Add(new ItemStack(id, (Str(comp, "name") ?? TextFormat.Pretty(id)).Trim(), NullIfEmpty(Str(comp, "icon")),
                 NullIfEmpty(Str(comp, "rarity")), (int)(Num(c, "quantity") ?? 1)));
+        }
+        return list;
+    }
+
+    private static bool TryRelationships(JsonElement item, string prop, out JsonElement arr)
+    {
+        arr = default;
+        return item.TryGetProperty("relationships", out var rel) && rel.ValueKind == JsonValueKind.Object
+            && rel.TryGetProperty(prop, out arr) && arr.ValueKind == JsonValueKind.Array;
+    }
+
+    /// <summary>relationships.recipes: [{station, outputQuantity, ingredients:[{item,quantity}], blueprints:[{id}]}]</summary>
+    private static IReadOnlyList<ItemRecipe> Recipes(JsonElement item)
+    {
+        var list = new List<ItemRecipe>();
+        if (!TryRelationships(item, "recipes", out var arr)) return list;
+        foreach (var r in arr.EnumerateArray())
+        {
+            if (r.ValueKind != JsonValueKind.Object || NullIfEmpty(Str(r, "station")) is not { } station) continue;
+            var blueprints = new List<string>();
+            if (r.TryGetProperty("blueprints", out var bps) && bps.ValueKind == JsonValueKind.Array)
+                foreach (var b in bps.EnumerateArray())
+                    if ((b.ValueKind == JsonValueKind.String ? b.GetString() : Str(b, "id")) is { } bid) blueprints.Add(bid);
+            list.Add(new ItemRecipe(station.Trim(), Stacks(r, "ingredients"), blueprints, (int)(Num(r, "outputQuantity") ?? 1)));
+        }
+        return list;
+    }
+
+    /// <summary>relationships.blueprintUnlocks: [{id,name,...}] — co odblokowuje schemat.</summary>
+    private static IReadOnlyList<string> BlueprintUnlocks(JsonElement item)
+    {
+        var list = new List<string>();
+        if (!TryRelationships(item, "blueprintUnlocks", out var arr)) return list;
+        foreach (var b in arr.EnumerateArray())
+            if ((b.ValueKind == JsonValueKind.String ? b.GetString() : Str(b, "id")) is { } id && !list.Contains(id)) list.Add(id);
+        return list;
+    }
+
+    private static readonly HashSet<string> KeptOperations =
+        [ItemOperation.Salvage, ItemOperation.UpgradeKind, ItemOperation.Repair, ItemOperation.FieldCrafting];
+
+    /// <summary>relationships.operations bez produkcji rund (round-production to setki wpisów, niepotrzebne).</summary>
+    private static IReadOnlyList<ItemOperation> Operations(JsonElement item)
+    {
+        var list = new List<ItemOperation>();
+        if (!TryRelationships(item, "operations", out var arr)) return list;
+        foreach (var o in arr.EnumerateArray())
+        {
+            if (Str(o, "kind") is not { } kind || !KeptOperations.Contains(kind)) continue;
+            list.Add(new ItemOperation(kind, Stacks(o, "inputs"), Stacks(o, "outputs")));
         }
         return list;
     }
@@ -297,17 +352,29 @@ public static class MetaForgeParser
                 }
             }
             levels.Sort((a, b) => a.Level.CompareTo(b.Level));
+            var maxLevel = (int)(Num(s, "maxLevel") ?? (levels.Count > 0 ? levels[^1].Level : 1));
+            // MetaForge dokleja puste poziomy na końcu (np. Scrappy 6, a w grze maks. 5) — ucinamy je
+            while (levels.Count > 1 && IsEmptyLevel(levels[^1]))
+            {
+                levels.RemoveAt(levels.Count - 1);
+                maxLevel = Math.Min(maxLevel, levels[^1].Level);
+            }
+            // pusty poziom 1 = stacja dostępna od startu (Scrappy, Outpost)
+            var minLevel = levels.Count > 0 && levels[0].Level == 1 && IsEmptyLevel(levels[0]) ? 1 : 0;
             list.Add(new Station
             {
                 Id = id,
                 Name = name.Trim(),
-                MaxLevel = (int)(Num(s, "maxLevel") ?? (levels.Count > 0 ? levels[^1].Level : 1)),
+                MaxLevel = maxLevel,
+                MinLevel = Math.Min(minLevel, maxLevel),
                 Levels = levels,
                 IconUrl = StationIcons.TryGetValue(id, out var icon) ? StationIconBase + icon : null,
             });
         }
         return list;
     }
+
+    private static bool IsEmptyLevel(StationLevel l) => l.RequiredItems.Count == 0 && l.Conditions.Count == 0 && l.Crafts.Count == 0;
 
     // ---------------------------------------------------------------- wydarzenia
     /// <summary>Harmonogram wydarzeń: {data:[{name,map,icon,startTime,endTime}]}, czasy w ms od 1970 (UTC).</summary>

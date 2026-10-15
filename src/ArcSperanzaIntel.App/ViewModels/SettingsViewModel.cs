@@ -18,6 +18,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         _alwaysOnTop = main.Services.State.AlwaysOnTop;
         DataFolder = main.Services.Paths.DataDir;
         CacheFolder = main.Services.Paths.CacheDir;
+        OverlayOpacity = Math.Round(Math.Clamp(main.Services.State.Overlay.Opacity, 0.2, 1) * 100);
     }
 
     private Services.Keybinds Binds => _main.Services.Keybinds;
@@ -106,6 +107,26 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 
     [ObservableProperty] private bool _alwaysOnTop;
+
+    // ---------------------------------------------------------------- overlay
+    /// <summary>Przezroczystość overlaya w procentach (20–100).</summary>
+    [ObservableProperty] private double _overlayOpacity;
+
+    partial void OnOverlayOpacityChanged(double value)
+    {
+        _main.Services.Overlay?.SetOpacity(value / 100);
+        OverlayOpacityText = $"{Math.Round(value)}%";
+    }
+
+    [ObservableProperty] private string _overlayOpacityText = "";
+
+    public string OverlayHotkeyText => Loc.F("OverlayHelp", GestureText(KeybindAction.ToggleOverlay));
+
+    [RelayCommand]
+    private void ToggleOverlay() => _main.Services.Overlay?.Toggle();
+
+    [RelayCommand]
+    private void ResetOverlayPosition() => _main.Services.Overlay?.ResetPosition();
     [ObservableProperty] private bool _isRefreshing;
 
     partial void OnAlwaysOnTopChanged(bool value) => _main.Services.SetAlwaysOnTop(value);
@@ -120,6 +141,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         Capturing = row;
         row.IsCapturing = true;
         _main.Services.Hotkey.Unregister(); // żeby stary skrót globalny nie przechwycił klawiszy
+        _main.Services.OverlayHotkey.Unregister();
     }
 
     /// <summary>Klawisz naciśnięty w trakcie przypisywania. Esc = anuluj, Backspace = usuń skrót.</summary>
@@ -140,7 +162,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
 
         var gesture = e.Key == Key.Back ? null : new KeyGesture(e.Key, e.KeyModifiers);
-        if (gesture is not null && row.Action == KeybindAction.ToggleWindow && e.KeyModifiers == KeyModifiers.None &&
+        if (gesture is not null && Services.Keybinds.IsGlobal(row.Action) && e.KeyModifiers == KeyModifiers.None &&
             e.Key is not (>= Key.F1 and <= Key.F24))
         {
             _main.Toast(Loc.T("GlobalNeedsModifier"), ToastKind.Error);
@@ -151,6 +173,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         Binds.Set(row.Action, gesture);
         _main.Services.RequestSave();
         row.Refresh();
+        OnPropertyChanged(nameof(OverlayHotkeyText));
         await _main.RegisterHotkeyAsync();
         _main.Toast($"{Services.Keybinds.Describe(row.Action)}: {Services.Keybinds.Pretty(gesture)}", ToastKind.Ok);
         return true;
@@ -228,7 +251,7 @@ public sealed partial class KeybindRowViewModel : ObservableObject
         Action = action;
         _owner = owner;
         Description = Keybinds.Describe(action);
-        IsGlobal = action == KeybindAction.ToggleWindow;
+        IsGlobal = Services.Keybinds.IsGlobal(action);
         _gestureText = owner.GestureText(action);
     }
 

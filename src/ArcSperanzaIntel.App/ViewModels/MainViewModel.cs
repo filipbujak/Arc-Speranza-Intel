@@ -156,6 +156,8 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var error = await Services.Hotkey.RegisterAsync(Services.Keybinds.Get(KeybindAction.ToggleWindow));
         if (error is not null) Toast(error, ToastKind.Error);
+        var overlayError = await Services.OverlayHotkey.RegisterAsync(Services.Keybinds.Get(KeybindAction.ToggleOverlay));
+        if (overlayError is not null) Toast(Loc.T("KbOverlay") + ": " + overlayError, ToastKind.Error);
     }
 
     /// <summary>Po zmianie postępu questów odświeżamy wszystkie zależne widoki.</summary>

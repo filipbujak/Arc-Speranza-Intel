@@ -75,10 +75,7 @@
                         <DataTemplate x:DataType="vm:WantedItemViewModel">
                           <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,2">
                             <Button Classes="flat" Padding="0" Command="{Binding OpenCommand}" ToolTip.Tip="{l:T ShowInItems}">
-                              <Border Width="36" Height="36" Background="{StaticResource ArcBlack}" BorderBrush="{Binding RarityBrush}"
-                                      BorderThickness="0,0,0,2" CornerRadius="2">
-                                <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="72" Margin="3" />
-                              </Border>
+                              <c:ItemTile Width="42" Height="42" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="88" />
                             </Button>
                             <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,6,0"
                                        TextTrimming="CharacterEllipsis" FontSize="13" />

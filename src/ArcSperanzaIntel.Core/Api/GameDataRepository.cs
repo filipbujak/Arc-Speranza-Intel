@@ -30,7 +30,7 @@ public sealed class GameDataRepository(MetaForgeHttp http, JsonFileCache cache, 
         LoadAsync("quests", forceRefresh, c => http.GetAllPagesAsync("arc-raiders/quests", c), MetaForgeParser.ParseQuests, ct);
 
     public Task<DataResult<IReadOnlyList<Item>>> GetItemsAsync(bool forceRefresh, CancellationToken ct) =>
-        LoadAsync("items-v2", forceRefresh, c => http.GetAllPagesAsync("arc-raiders/items?includeComponents=true", c), MetaForgeParser.ParseItems, ct);
+        LoadAsync("items-v3", forceRefresh, c => http.GetAllPagesAsync("arc-raiders/items?includeComponents=true", c), MetaForgeParser.ParseItems, ct);
 
     public Task<DataResult<TradersData>> GetTradersAsync(bool forceRefresh, CancellationToken ct) =>
         LoadAsync("traders", forceRefresh, c => http.GetStringAsync("arc-raiders/traders", c), MetaForgeParser.ParseTraders, ct);

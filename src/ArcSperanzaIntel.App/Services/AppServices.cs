@@ -29,6 +29,12 @@ public sealed class AppServices : IDisposable
     public ImageCache Images { get; }
     public Keybinds Keybinds { get; private set; }
     public GlobalHotkey Hotkey { get; } = new();
+
+    /// <summary>Drugi skrót globalny: pokaż / schowaj overlay szukanych.</summary>
+    public GlobalHotkey OverlayHotkey { get; } = new();
+
+    /// <summary>Overlay z szukanymi przedmiotami (tworzony po załadowaniu danych).</summary>
+    public OverlayService? Overlay { get; private set; }
     public UpdateService Updates { get; } = new();
     public QuestMapIndex MapIndex { get; } = new(MapCatalog.All);
 
@@ -66,6 +72,8 @@ public sealed class AppServices : IDisposable
         Quests = new QuestBook(Data.Quests, State.Progress);
         Workshop = new WorkshopBook(Data.Stations, Data.Items, State);
         Wanted = new WantedItemsService(Quests, Workshop, State, Data.FindItem);
+        Overlay?.Dispose();
+        Overlay = new OverlayService(this);
         Quests.Changed += (_, _) => RequestSave();
         Wanted.Changed += (_, _) => RequestSave();
         Workshop.Changed += (_, _) =>
@@ -111,6 +119,7 @@ public sealed class AppServices : IDisposable
         window.Topmost = State.AlwaysOnTop;
         window.Closing += (_, _) => FlushSave();
         Hotkey.Pressed += () => Dispatcher.UIThread.Post(ToggleWindow);
+        OverlayHotkey.Pressed += () => Dispatcher.UIThread.Post(() => Overlay?.Toggle());
     }
 
     private void SaveWindowPlacement(Window w)
@@ -168,7 +177,9 @@ public sealed class AppServices : IDisposable
 
     private void Restart()
     {
-        Hotkey.Dispose(); // zwalniamy skrót globalny, zanim nowy proces spróbuje go zarejestrować
+        Hotkey.Dispose(); // zwalniamy skróty globalne, zanim nowy proces spróbuje je zarejestrować
+        OverlayHotkey.Dispose();
+        Overlay?.Dispose();
         var exe = Environment.ProcessPath;
         if (exe is not null)
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(exe) { UseShellExecute = true });
@@ -179,6 +190,8 @@ public sealed class AppServices : IDisposable
     {
         FlushSave();
         Hotkey.Dispose();
+        OverlayHotkey.Dispose();
+        Overlay?.Dispose();
         Images.Dispose();
         Http.Dispose();
     }

@@ -17,10 +17,12 @@ Pobierz `ArcSperanzaIntel-win-Setup.exe` z [Releases](../../releases). Instaluje
 - **Maps** — all 7 maps (MetaForge tiles), floors (Stella Montis, Spaceport tunnels, Blue Gate underground), category filters, favourites, your own pins with notes, quest markers coloured by quest state.
 - **Quests** — one big graph; click a quest for subtasks, required items and rewards, "go to map"; completing all subtasks completes the quest.
 - **Wanted items** — a collapsible panel grouped by quest, plus your own "Marked By Me" list.
-- **Items** — wiki of every item by category with search and filters.
+- **Items** — wiki of every item by category with search and filters; crafting ingredients, what it recycles / salvages into, what it is recycled from, weapon upgrades.
+- **Workshop** — station levels, what the next level needs (goes to Wanted), crafts per level, weapon upgrade chains, blueprints you have found.
+- **Overlay** — a small always-on-top window with your wanted items over the game (Ctrl+Shift+O, borderless mode). Plain window: it does not read the game or the screen.
 - **Traders** — every trader's stock with prices (coins, or seeds for Celeste) and Ermal's weekly rotation with accepted items and their values.
 - **Events** — what's live now and what's coming, per map.
-- **Settings** — editable shortcuts, a global show/hide hotkey (Ctrl+F), always-on-top, language, updates, reset.
+- **Settings** — editable shortcuts, global hotkeys (Ctrl+F window, Ctrl+Shift+O overlay), overlay opacity, always-on-top, language, updates, reset.
 
 ## Build from source
 

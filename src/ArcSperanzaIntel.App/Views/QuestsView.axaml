@@ -233,10 +233,7 @@
                           <DataTemplate x:DataType="vm:ItemChipViewModel">
                             <Button Classes="row" Command="{Binding OpenCommand}" Padding="4">
                               <Grid ColumnDefinitions="Auto,*,Auto">
-                                <Border Width="40" Height="40" Background="{StaticResource ArcBlack}" BorderBrush="{Binding RarityBrush}"
-                                        BorderThickness="0,0,0,2" CornerRadius="2">
-                                  <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="80" Margin="3" />
-                                </Border>
+                                <c:ItemTile Width="46" Height="46" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="96" />
                                 <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Grid.Column="2" Text="{Binding QuantityText}" Foreground="{StaticResource ArcYellow}" FontWeight="Bold"
                                            VerticalAlignment="Center" Margin="0,0,6,0" />
@@ -255,10 +252,7 @@
                           <DataTemplate x:DataType="vm:ItemChipViewModel">
                             <Button Classes="row" Command="{Binding OpenCommand}" Padding="4">
                               <Grid ColumnDefinitions="Auto,*,Auto">
-                                <Border Width="34" Height="34" Background="{StaticResource ArcBlack}" BorderBrush="{Binding RarityBrush}"
-                                        BorderThickness="0,0,0,2" CornerRadius="2">
-                                  <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="68" Margin="3" />
-                                </Border>
+                                <c:ItemTile Width="40" Height="40" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="84" />
                                 <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Grid.Column="2" Text="{Binding QuantityText}" Classes="muted" VerticalAlignment="Center" Margin="0,0,6,0" />
                               </Grid>
@@ -281,9 +275,7 @@
                           <DataTemplate x:DataType="vm:ItemChipViewModel">
                             <Button Classes="flat" Padding="0" Margin="0,0,6,6" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Name}">
                               <Panel Width="54" Height="54">
-                                <Border Background="{StaticResource ArcBlack}" BorderBrush="{Binding RarityBrush}" BorderThickness="0,0,0,2" CornerRadius="2">
-                                  <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="108" Margin="5" />
-                                </Border>
+                                <c:ItemTile Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="124" />
                                 <TextBlock Text="{Binding QuantityText}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right"
                                            VerticalAlignment="Bottom" Margin="0,0,4,3" />
                               </Panel>

@@ -9,6 +9,9 @@ public sealed class Station
     public required string Id { get; init; }
     public required string Name { get; init; }
     public int MaxLevel { get; init; }
+
+    /// <summary>Poziom startowy: 1, gdy pierwszy poziom nic nie wymaga (stacja dostępna od początku, np. Scrappy), inaczej 0.</summary>
+    public int MinLevel { get; init; }
     public IReadOnlyList<StationLevel> Levels { get; init; } = [];
     public string? IconUrl { get; init; }
 

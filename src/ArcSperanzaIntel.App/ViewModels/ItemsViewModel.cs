@@ -292,8 +292,23 @@ public sealed partial class ItemDetailViewModel : ObservableObject
                 book.IsDone(q.Id), main.ShowQuestInTree))
             .ToList();
         BuildWorkshopInfo();
-        CraftComponents = item.Components.Select(c => Chip(c, main)).ToList();
+        var ingredients = item.Recipes.FirstOrDefault(r => r.Ingredients.Count > 0)?.Ingredients ?? item.Components;
+        CraftComponents = ingredients.Select(c => Chip(c, main)).ToList();
         RecycleComponents = item.RecycleComponents.Select(c => Chip(c, main)).ToList();
+        SalvageComponents = item.SalvageComponents.Select(c => Chip(c, main)).ToList();
+        RecycleFrom = item.RecycleFrom.Select(c => Chip(c, main)).ToList();
+        var ws = main.Services.Workshop;
+        var upgradesTo = new List<ItemChipViewModel>();
+        if (ws.UpgradeOf(item.Id) is { } up)
+        {
+            upgradesTo.Add(Chip(new ItemStack(up.To.Id, up.To.Name, up.To.IconUrl, up.To.Rarity, 1), main));
+            UpgradeCost = up.Cost.Select(c => Chip(c, main)).ToList();
+        }
+        UpgradesTo = upgradesTo;
+        var upgradedFrom = new List<ItemChipViewModel>();
+        if (ws.UpgradedFrom(item.Id) is { } from)
+            upgradedFrom.Add(Chip(new ItemStack(from.From.Id, from.From.Name, from.From.IconUrl, from.From.Rarity, 1), main));
+        UpgradedFrom = upgradedFrom;
         SoldBy = main.Services.Data.Traders
             .SelectMany(t => t.Offers.Where(o => o.ItemId == item.Id).Select(o => $"{t.Name} — {TextFormat.Number(o.Price)} {(t.Currency == TraderCurrency.Seeds ? Loc.T("SeedsWord") : Loc.T("CoinsWord"))}"))
             .ToList();
@@ -311,7 +326,9 @@ public sealed partial class ItemDetailViewModel : ObservableObject
     public bool HasFlavor => Item.FlavorText is not null;
     public string ValueText => Item.Value is { } v ? TextFormat.Number(v) : "—";
     public string? Workbench => Item.Workbench;
-    public bool HasWorkbench => Item.Workbench is not null;
+    /// <summary>Surowy tekst "workbench" z MetaForge pokazujemy tylko, gdy nie wiemy lepiej (CraftedAt).</summary>
+    public bool HasWorkbench => Item.Workbench is not null && _main.Services.Workshop.CraftedAt(Item.Id) is null
+        && _main.Services.Workshop.UpgradedFrom(Item.Id) is null;
     public IReadOnlyList<ItemStat> Stats => Item.Stats;
     public bool HasStats => Item.Stats.Count > 0;
     public IReadOnlyList<QuestLinkViewModel> UsedIn { get; }
@@ -324,6 +341,17 @@ public sealed partial class ItemDetailViewModel : ObservableObject
     public bool HasCraftComponents => CraftComponents.Count > 0;
     public IReadOnlyList<ItemChipViewModel> RecycleComponents { get; }
     public bool HasRecycleComponents => RecycleComponents.Count > 0;
+    public IReadOnlyList<ItemChipViewModel> SalvageComponents { get; }
+    public bool HasSalvageComponents => SalvageComponents.Count > 0;
+    public IReadOnlyList<ItemChipViewModel> RecycleFrom { get; }
+    public bool HasRecycleFrom => RecycleFrom.Count > 0;
+    /// <summary>Następny tier broni.</summary>
+    public IReadOnlyList<ItemChipViewModel> UpgradesTo { get; }
+    public IReadOnlyList<ItemChipViewModel> UpgradeCost { get; } = [];
+    public bool HasUpgradeCost => UpgradeCost.Count > 0;
+    public bool HasUpgradesTo => UpgradesTo.Count > 0;
+    public IReadOnlyList<ItemChipViewModel> UpgradedFrom { get; }
+    public bool HasUpgradedFrom => UpgradedFrom.Count > 0;
 
     private static ItemChipViewModel Chip(ItemStack s, MainViewModel main)
     {

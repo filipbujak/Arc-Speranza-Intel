@@ -43,7 +43,7 @@ public sealed class UserState
 
     public HashSet<string> HiddenTraders { get; set; } = [];
 
-    /// <summary>Poziomy stacji warsztatu: id stacji → poziom (brak wpisu = 0, niezbudowana).</summary>
+    /// <summary>Poziomy stacji warsztatu: id stacji → poziom (brak wpisu = poziom startowy stacji).</summary>
     public Dictionary<string, int> StationLevels { get; set; } = [];
 
     /// <summary>Schematy oznaczone jako znalezione (id itemu-schematu).</summary>
@@ -63,6 +63,21 @@ public sealed class UserState
     public string? EventsMode { get; set; }
 
     public WindowPlacement? Window { get; set; }
+
+    /// <summary>Overlay z szukanymi przedmiotami (okienko na grę).</summary>
+    public OverlayState Overlay { get; set; } = new();
+}
+
+/// <summary>Ustawienia overlaya: pozycja, rozmiar, przezroczystość.</summary>
+public sealed class OverlayState
+{
+    public int? X { get; set; }
+    public int? Y { get; set; }
+    public double Width { get; set; } = 300;
+    public double Height { get; set; } = 420;
+
+    /// <summary>Nieprzezroczystość tła i treści: 0.2–1.</summary>
+    public double Opacity { get; set; } = 0.85;
 }
 
 public sealed class QuestProgress
