@@ -178,6 +178,9 @@ public sealed partial class OfferCardViewModel(TraderOffer offer, string? curren
     public string? IconUrl { get; } = offer.IconUrl;
     public string PriceText { get; } = TextFormat.Number(offer.Price);
     public string? CurrencyIconUrl { get; } = currencyIconUrl;
+
+    /// <summary>Ikona nasion ma dużo pustego miejsca wokół — rysujemy ją większą niż monety.</summary>
+    public double CurrencyIconSize { get; } = seeds ? 30 : 22;
     public bool IsBlueprint { get; } = ItemKinds.IsBlueprintType(offer.Type) || ItemKinds.IsBlueprint(offer.ItemId);
     public IBrush PriceBrush { get; } = Palette.Brush(seeds ? Palette.Green : Palette.Yellow);
     public string CurrencyTip { get; } = seeds ? Loc.T("SeedsTip") : Loc.T("CoinsTip");
@@ -215,6 +218,12 @@ public sealed partial class OfferSearchResultViewModel : ObservableObject
             ErmalOfferViewModel e => e.IsBlueprint,
             _ => false,
         };
+        RarityBrush = target switch
+        {
+            OfferCardViewModel o => o.RarityBrush,
+            ErmalOfferViewModel e => e.RarityBrush,
+            _ => Palette.Brush(Palette.Rarity(null)),
+        };
         _target = target;
         _owner = owner;
         Name = name;
@@ -231,6 +240,7 @@ public sealed partial class OfferSearchResultViewModel : ObservableObject
     public string? IconUrl { get; }
     public string? CurrencyIconUrl { get; }
     public bool IsBlueprint { get; }
+    public IBrush RarityBrush { get; }
 
     [RelayCommand]
     private void Go() => _owner.GoTo(_target);

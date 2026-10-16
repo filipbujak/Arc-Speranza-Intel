@@ -24,16 +24,35 @@ public static class Palette
         return b;
     }
 
+    // kolory rzadkości z gry (te same co na ARC Raiders Wiki)
+    private static readonly Color CommonColor = Color.Parse("#8A8F98");
+    private static readonly Color UncommonColor = Color.Parse("#26BF57");
+    private static readonly Color RareColor = Color.Parse("#00A9F2");
+    private static readonly Color EpicColor = Color.Parse("#CC3099");
+    private static readonly Color LegendaryColor = Color.Parse("#FFC600");
+    private static readonly Color AmplifiedColor = Color.Parse("#E88629");
+    private static readonly Color NoRarityColor = Color.Parse("#4A515D");
+
     public static Color Rarity(string? rarity) => rarity?.ToLowerInvariant() switch
     {
-        "common" => Color.Parse("#8E949E"),
-        "uncommon" => Color.Parse("#45C46A"),
-        "rare" => Color.Parse("#3E9BE8"),
-        "epic" => Color.Parse("#B05CE8"),
-        "legendary" => Color.Parse("#F2B230"),
-        "amplified" => Color.Parse("#F0503F"),
-        _ => Color.Parse("#4A515D"),
+        "common" => CommonColor,
+        "uncommon" => UncommonColor,
+        "rare" => RareColor,
+        "epic" => EpicColor,
+        "legendary" => LegendaryColor,
+        "amplified" => AmplifiedColor,
+        _ => NoRarityColor,
     };
+
+    /// <summary>Rzadkość z koloru (kafelki dostają tylko RarityBrush).</summary>
+    public static Controls.RarityTier TierOf(Color c) =>
+        c == CommonColor ? Controls.RarityTier.Common
+        : c == UncommonColor ? Controls.RarityTier.Uncommon
+        : c == RareColor ? Controls.RarityTier.Rare
+        : c == EpicColor ? Controls.RarityTier.Epic
+        : c == LegendaryColor ? Controls.RarityTier.Legendary
+        : c == AmplifiedColor ? Controls.RarityTier.Amplified
+        : Controls.RarityTier.None;
 
     public static int RarityRank(string? rarity) => rarity?.ToLowerInvariant() switch
     {

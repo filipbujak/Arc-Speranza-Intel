@@ -9,25 +9,6 @@
              x:DataType="vm:WorkshopViewModel">
 
   <UserControl.Styles>
-    <Style Selector="Button.station">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="HorizontalAlignment" Value="Stretch" />
-      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-      <Setter Property="Padding" Value="10,5" />
-      <Setter Property="CornerRadius" Value="6" />
-      <Setter Property="Foreground" Value="{StaticResource ArcText}" />
-    </Style>
-    <Style Selector="Button.station:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{StaticResource ArcHover}" />
-    </Style>
-    <Style Selector="Button.station.selected /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="#1E1A0C" />
-    </Style>
-    <Style Selector="Button.station.selected">
-      <Setter Property="Foreground" Value="{StaticResource ArcYellow}" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
     <Style Selector="Button.tile">
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="BorderThickness" Value="0" />
@@ -41,18 +22,19 @@
     <!-- ====================================================== STACJE -->
     <Border Classes="panel" BorderThickness="0,0,1,0">
       <Grid RowDefinitions="Auto,*,Auto">
-        <TextBlock Text="{l:T StationsTitle}" Classes="label" Margin="20,18,16,10" />
+        <TextBlock Text="{l:T StationsTitle}" Classes="label" Margin="16,14,16,6" />
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
-          <ItemsControl ItemsSource="{Binding Stations}" Margin="10,0,10,10">
+          <ItemsControl ItemsSource="{Binding Stations}" Margin="0,0,0,10">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:StationRowViewModel">
-                <Button Classes="station" Classes.selected="{Binding IsSelected}" Command="{Binding SelectCommand}" Margin="0,1">
-                  <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Border Width="26" Height="26" CornerRadius="13" Background="{Binding IconBack}" Margin="0,0,10,0" VerticalAlignment="Center">
-                      <PathIcon Data="{Binding Icon}" Width="14" Height="14" Foreground="{Binding IconBrush}" />
+                <Button Classes="navrow" Classes.active="{Binding IsSelected}" Command="{Binding SelectCommand}">
+                  <Grid ColumnDefinitions="3,Auto,*,Auto">
+                    <Border Classes="navbar" IsVisible="{Binding IsSelected}" />
+                    <Border Grid.Column="1" Width="24" Height="24" CornerRadius="12" Background="{Binding IconBack}" Margin="9,0,0,0" VerticalAlignment="Center">
+                      <PathIcon Data="{Binding Icon}" Width="13" Height="13" Foreground="{Binding IconBrush}" />
                     </Border>
-                    <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                    <Panel Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock Grid.Column="2" Text="{Binding Name}" FontWeight="Medium" Margin="10,0,8,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <Panel Grid.Column="3" VerticalAlignment="Center">
                       <TextBlock Text="{Binding LevelText}" Classes="small" Foreground="{StaticResource ArcMuted}" IsVisible="{Binding IsNotMaxed}" />
                       <Border Background="{StaticResource ArcGreen}" CornerRadius="3" Padding="6,1" IsVisible="{Binding IsMaxed}">
                         <TextBlock Text="MAX" FontSize="11" FontWeight="Bold" Foreground="#0B0C0E" />
@@ -196,7 +178,7 @@
                                   <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="4" Width="132" Height="158">
                                     <Grid RowDefinitions="Auto,*">
                                       <c:ItemTile Height="112" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}"
-                                                  IsBlueprint="{Binding IsBlueprint}" DecodeWidth="224" />
+                                                  IsBlueprint="{Binding IsBlueprint}" IsDesign="{Binding IsDesign}" DecodeWidth="224" />
                                       <Border Width="20" Height="20" CornerRadius="10" HorizontalAlignment="Right" VerticalAlignment="Top"
                                               Margin="6" Background="{StaticResource ArcBlue}" IsVisible="{Binding BlueprintFound}"
                                               ToolTip.Tip="{Binding BlueprintTip}">

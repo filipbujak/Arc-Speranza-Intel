@@ -84,15 +84,13 @@
               <DataTemplate x:DataType="vm:OfferSearchResultViewModel">
                 <Button Classes="result" Command="{Binding GoCommand}">
                   <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Border Width="34" Height="34" Background="{StaticResource ArcBlack}" CornerRadius="2">
-                      <c:RemoteImage Url="{Binding IconUrl}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="68" Margin="3" />
-                    </Border>
+                    <c:ItemTile Width="38" Height="38" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" DecodeWidth="76" />
                     <StackPanel Grid.Column="1" Margin="10,0" VerticalAlignment="Center">
                       <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
                       <TextBlock Text="{Binding Trader}" Classes="dim small" />
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                      <c:RemoteImage Url="{Binding CurrencyIconUrl}" DecodeWidth="32" Width="16" Height="16" />
+                      <c:RemoteImage Url="{Binding CurrencyIconUrl}" DecodeWidth="48" Width="22" Height="22" />
                       <TextBlock Text="{Binding PriceText}" Foreground="{StaticResource ArcText}" FontWeight="SemiBold" />
                     </StackPanel>
                   </Grid>
@@ -143,7 +141,7 @@
                             <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center"
                                        MaxLines="2" TextTrimming="CharacterEllipsis" Margin="4,4,4,2" VerticalAlignment="Center" />
                             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Margin="0,0,0,3">
-                              <c:RemoteImage Url="{Binding CurrencyIconUrl}" DecodeWidth="32" Width="16" Height="16"
+                              <c:RemoteImage Url="{Binding CurrencyIconUrl}" DecodeWidth="64" Width="{Binding CurrencyIconSize}" Height="{Binding CurrencyIconSize}"
                                              ToolTip.Tip="{Binding CurrencyTip}" VerticalAlignment="Center" />
                               <TextBlock Text="{Binding PriceText}" FontWeight="Bold" Foreground="{Binding PriceBrush}" FontSize="13"
                                          VerticalAlignment="Center" />
@@ -206,7 +204,7 @@
                                            TextTrimming="CharacterEllipsis" />
                                 <TextBlock Text="{Binding TypeText}" Classes="dim small" />
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                  <c:RemoteImage Url="{Binding CoinsIconUrl}" DecodeWidth="32" Width="16" Height="16"
+                                  <c:RemoteImage Url="{Binding CoinsIconUrl}" DecodeWidth="48" Width="22" Height="22"
                                                  ToolTip.Tip="{l:T ErmalCostTip}" />
                                   <TextBlock Text="{Binding CostText}" FontWeight="Bold" Foreground="{StaticResource ArcYellow}" />
                                 </StackPanel>
@@ -262,7 +260,7 @@
                             <Grid ColumnDefinitions="*,Auto">
                               <TextBlock Text="{Binding Name}" Classes="h2" />
                               <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                                <c:RemoteImage Url="{Binding CoinsIconUrl}" DecodeWidth="32" Width="16" Height="16" />
+                                <c:RemoteImage Url="{Binding CoinsIconUrl}" DecodeWidth="48" Width="22" Height="22" />
                                 <TextBlock Text="{Binding CostText}" FontWeight="Bold" Foreground="{StaticResource ArcYellow}" />
                               </StackPanel>
                             </Grid>

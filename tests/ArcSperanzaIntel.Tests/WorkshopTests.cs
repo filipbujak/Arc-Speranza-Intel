@@ -129,6 +129,8 @@ public class RelationshipsTests
            "recycle_from":[{"item":{"id":"tire","name":"Tire"},"quantity":2}]},
           {"id":"looting-mk-3-survivor","name":"Looting Mk. 3 (Survivor)","item_type":"Augment","workbench":null,
            "relationships":{"recipes":[{"station":"Gear Bench Level 3","outputQuantity":1,"ingredients":[],"blueprints":[]}]}},
+          {"id":"anvil","name":"Anvil","item_type":"Weapon"},
+          {"id":"anvil-recipe","name":"Anvil Blueprint","item_type":"Blueprint"},
           {"id":"looting-mk-3-survivor-blueprint","name":"Looting Mk. 3 (Survivor) Blueprint","item_type":"Blueprint",
            "relationships":{"blueprintUnlocks":[{"id":"looting-mk-3-survivor"}]}}
         ]
@@ -201,6 +203,7 @@ public class RelationshipsTests
         Assert.Contains(book.CraftsAt("equipment-bench"), c => c.Item.Id == "looting-mk-3-survivor" && c.Level == 3);
         Assert.Equal("looting-mk-3-survivor-blueprint", book.BlueprintFor("looting-mk-3-survivor")!.Id);
         Assert.Null(book.CraftedBy("rubber-parts-recipe"));
+        Assert.Equal("anvil-recipe", book.BlueprintFor("anvil")!.Id); // schemat o id "-recipe"
         Assert.DoesNotContain(book.Blueprints, b => b.Id == "rubber-parts-recipe");
         Assert.Equal("tire", items.Single(i => i.Id == "rubber-parts-recipe").RecycleFrom.Single().ItemId);
     }

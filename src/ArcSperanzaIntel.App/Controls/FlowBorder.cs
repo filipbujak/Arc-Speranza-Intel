@@ -41,7 +41,8 @@ public sealed class FlowBorder : Decorator
     private const double Period = 220;     // długość jednego pełnego cyklu kolorów w px
     private const double Speed = 0.09;     // px na ms
 
-    private readonly Stopwatch _clock = Stopwatch.StartNew();
+    private static readonly Stopwatch Clock = Stopwatch.StartNew(); // jeden zegar dla wszystkich kart
+    private IPen? _idlePen;
     private bool _frameRequested;
 
     static FlowBorder()
@@ -60,6 +61,7 @@ public sealed class FlowBorder : Decorator
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
+        if (change.Property == IdleBrushProperty || change.Property == ThicknessProperty) _idlePen = null;
         if (change.Property == IsPointerOverProperty || change.Property == IsActiveProperty)
         {
             InvalidateVisual();
@@ -88,19 +90,24 @@ public sealed class FlowBorder : Decorator
         var rect = new Rect(Bounds.Size).Deflate(t / 2);
         if (rect.Width <= 0 || rect.Height <= 0) return;
 
-        IBrush? stroke = IdleBrush;
+        IPen? pen;
         if (Flowing)
         {
-            var offset = _clock.Elapsed.TotalMilliseconds * Speed % Period;
-            stroke = new LinearGradientBrush
+            var offset = Clock.Elapsed.TotalMilliseconds * Speed % Period;
+            var stroke = new LinearGradientBrush
             {
                 GradientStops = ArcStops(),
                 SpreadMethod = GradientSpreadMethod.Repeat,
                 StartPoint = new RelativePoint(offset, offset * 0.35, RelativeUnit.Absolute),
                 EndPoint = new RelativePoint(offset + Period, (offset + Period) * 0.35, RelativeUnit.Absolute),
             };
+            pen = new Pen(stroke, t);
         }
-        var pen = stroke is null ? null : new Pen(stroke, t);
+        else
+        {
+            // zwykła ramka: ten sam obiekt przy każdym rysowaniu (setki kart = mniej śmieci dla GC)
+            pen = _idlePen ??= IdleBrush is null ? null : new Pen(IdleBrush, t);
+        }
         ctx.DrawRectangle(Background, pen, rect, Radius, Radius);
     }
 }

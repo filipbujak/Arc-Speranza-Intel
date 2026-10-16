@@ -103,7 +103,10 @@ public sealed partial class WorkshopBook
             .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
         foreach (var bp in items.Where(IsBlueprint).Where(b => !_craftedBy.ContainsKey(b.Id)))
         {
-            if (bp.Id.EndsWith("-blueprint", StringComparison.Ordinal) && _items.TryGetValue(bp.Id[..^"-blueprint".Length], out var t))
+            // MetaForge nazywa część schematów "x-recipe" (np. anvil-recipe); Link sprawdza, że to naprawdę schemat
+            var suffix = bp.Id.EndsWith("-blueprint", StringComparison.Ordinal) ? "-blueprint"
+                : bp.Id.EndsWith("-recipe", StringComparison.Ordinal) ? "-recipe" : null;
+            if (suffix is not null && _items.TryGetValue(bp.Id[..^suffix.Length], out var t))
             {
                 Link(bp, t);
                 continue;

@@ -110,3 +110,32 @@ public class QuestMapIndexTests
         Assert.Contains(index.MapsFor(dam), m => m.Id == "dam");
     }
 }
+
+public class QuestGraphLayoutTests
+{
+    [Fact]
+    public void Layout_keeps_children_below_parents_and_cards_apart()
+    {
+        // rozgałęzienie + łączenie + osobne drzewo
+        var parents = new Dictionary<string, List<string>>
+        {
+            ["a"] = [], ["b"] = ["a"], ["c"] = ["a"], ["d"] = ["a"], ["e"] = ["b", "c"], ["f"] = ["e"],
+            ["g"] = ["f", "a"], ["x"] = [], ["y"] = ["x"],
+        };
+        var quests = parents.Keys.Select(id => new ArcSperanzaIntel.Core.Models.Quest { Id = id, Name = id, Trader = "T" }).ToList();
+        var layout = ArcSperanzaIntel.Core.Quests.QuestGraphLayout.Build(quests, parents);
+
+        foreach (var (child, ps) in parents)
+        foreach (var p in ps)
+            Assert.True(layout[child].Y > layout[p].Y, $"{child} pod {p}");
+
+        var all = parents.Keys.Select(id => layout[id]).ToList();
+        for (var i = 0; i < all.Count; i++)
+        for (var j = i + 1; j < all.Count; j++)
+        {
+            var overlap = Math.Abs(all[i].X - all[j].X) < ArcSperanzaIntel.Core.Quests.QuestGraphLayout.NodeWidth &&
+                          Math.Abs(all[i].Y - all[j].Y) < ArcSperanzaIntel.Core.Quests.QuestGraphLayout.NodeHeight;
+            Assert.False(overlap, "karty nachodzą na siebie");
+        }
+    }
+}

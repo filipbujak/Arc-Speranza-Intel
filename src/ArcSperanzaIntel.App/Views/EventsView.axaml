@@ -8,25 +8,6 @@
              x:DataType="vm:EventsViewModel">
 
   <UserControl.Styles>
-    <Style Selector="Button.mapfilter">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderThickness" Value="0,0,0,0" />
-      <Setter Property="HorizontalAlignment" Value="Stretch" />
-      <Setter Property="HorizontalContentAlignment" Value="Left" />
-      <Setter Property="Padding" Value="12,8" />
-      <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
-      <Setter Property="CornerRadius" Value="2" />
-    </Style>
-    <Style Selector="Button.mapfilter:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
-    </Style>
-    <Style Selector="Button.mapfilter.active /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{StaticResource ArcYellowSoft}" />
-    </Style>
-    <Style Selector="Button.mapfilter.active">
-      <Setter Property="Foreground" Value="{StaticResource ArcYellow}" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
     <Style Selector="Button.eventcard">
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="BorderThickness" Value="0" />
@@ -54,28 +35,34 @@
           <TextBlock Text="{l:T EventsTitle}" Classes="label" />
         </StackPanel>
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
-          <StackPanel Margin="8,0,8,8" Spacing="4">
-            <TextBlock Text="{l:T MapsFilterTitle}" Classes="label" Margin="8,4,0,2" />
+          <StackPanel Margin="0,0,0,8" Spacing="2">
+            <TextBlock Text="{l:T MapsFilterTitle}" Classes="label" Margin="16,4,0,4" />
             <ItemsControl ItemsSource="{Binding MapFilters}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:EventMapFilterViewModel">
-                  <Button Classes="mapfilter" Classes.active="{Binding IsActive}" Command="{Binding SelectCommand}" Content="{Binding Name}" />
+                  <Button Classes="navrow" Classes.active="{Binding IsActive}" Command="{Binding SelectCommand}">
+                    <Grid ColumnDefinitions="3,*">
+                      <Border Classes="navbar" IsVisible="{Binding IsActive}" />
+                      <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Medium" Margin="9,0,0,0" VerticalAlignment="Center" />
+                    </Grid>
+                  </Button>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <TextBlock Text="{l:T ModesTitle}" Classes="label" Margin="8,14,0,2" />
+            <TextBlock Text="{l:T ModesTitle}" Classes="label" Margin="16,14,0,4" />
             <ItemsControl ItemsSource="{Binding ModeFilters}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:EventModeFilterViewModel">
-                  <Button Classes="mapfilter" Classes.active="{Binding IsActive}" Command="{Binding SelectCommand}" Padding="10,6">
-                    <Grid ColumnDefinitions="Auto,*">
-                      <Border Width="28" Height="28" Margin="0,0,10,0" Background="{StaticResource ArcBlack}" CornerRadius="2"
+                  <Button Classes="navrow" Classes.active="{Binding IsActive}" Command="{Binding SelectCommand}">
+                    <Grid ColumnDefinitions="3,Auto,*">
+                      <Border Classes="navbar" IsVisible="{Binding IsActive}" />
+                      <Border Grid.Column="1" Width="28" Height="28" Margin="9,0,0,0" Background="{StaticResource ArcBlack}" CornerRadius="4"
                               IsVisible="{Binding HasIcon}" VerticalAlignment="Center">
                         <c:RemoteImage Url="{Binding IconUrl}" DecodeWidth="56" Margin="2" />
                       </Border>
-                      <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                      <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="9,0,0,0">
+                        <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
                         <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding HasInfo}">
                           <Ellipse Width="6" Height="6" Fill="{StaticResource ArcRed}" IsVisible="{Binding IsLive}" VerticalAlignment="Center" />
                           <TextBlock Text="{Binding Info}" Classes="dim small" TextTrimming="CharacterEllipsis" />

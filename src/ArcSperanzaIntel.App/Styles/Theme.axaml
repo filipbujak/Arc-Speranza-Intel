@@ -185,6 +185,12 @@
     <Setter Property="BorderBrush" Value="{StaticResource ArcYellow}" />
     <Setter Property="Foreground" Value="{StaticResource ArcYellow}" />
   </Style>
+  <!-- nieaktywny (np. Wstecz, gdy nie ma dokąd wrócić): bez szarego kółka Fluenta, tylko przygaszona ikona -->
+  <Style Selector="Button.tab:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Foreground" Value="#454B55" />
+  </Style>
   <!-- okrągły przycisk (ustawienia, koło zębate) -->
   <Style Selector="Button.tab.round">
     <Setter Property="Width" Value="38" />
@@ -242,5 +248,36 @@
 
   <Style Selector="ScrollViewer">
     <Setter Property="AllowAutoHide" Value="True" />
+  </Style>
+
+  <!-- ============================================================ WIERSZ LISTY WYBORU
+       Jeden wygląd dla wyboru mapy, stacji warsztatu i filtrów wydarzeń: przezroczysty wiersz na całą
+       szerokość panelu, szare tło po najechaniu, wybrany = jaśniejsze tło + żółty pasek po lewej (Border.navbar). -->
+  <Style Selector="Button.navrow">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Padding" Value="12,7" />
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
+  </Style>
+  <Style Selector="Button.navrow:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+  </Style>
+  <Style Selector="Button.navrow.active">
+    <Setter Property="Background" Value="{StaticResource ArcRaised}" />
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+  </Style>
+  <Style Selector="Button.navrow.active /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ArcRaised}" />
+  </Style>
+  <!-- pasek w kolumnie o stałej szerokości 3 (Grid ColumnDefinitions="3,*…"), tekst z marginesem 9 -->
+  <Style Selector="Border.navbar">
+    <Setter Property="Margin" Value="-12,-7,0,-7" />
+    <Setter Property="Background" Value="{StaticResource ArcYellow}" />
   </Style>
 </Styles>

@@ -59,7 +59,50 @@ public sealed partial class ItemsViewModel : ObservableObject
 
     public IReadOnlyList<CategoryFilterViewModel> Categories { get; }
     public IReadOnlyList<RarityFilterViewModel> Rarities { get; }
-    public ObservableCollection<ItemSectionViewModel> Sections { get; } = [];
+    /// <summary>Sekcje (kategorie) po filtrach — źródło dla <see cref="Rows"/>.</summary>
+    private readonly List<ItemSectionViewModel> _sections = [];
+
+    /// <summary>
+    /// Płaska lista wierszy do wirtualizacji: nagłówek sekcji, potem wiersze po <see cref="Columns"/> kart.
+    /// Widok tworzy kontrolki tylko dla wierszy na ekranie (zamiast 1000+ kart naraz).
+    /// </summary>
+    public ObservableCollection<object> Rows { get; } = [];
+
+    private int _columns = 6;
+
+    /// <summary>Ile kart mieści się w wierszu — ustawia widok przy zmianie szerokości.</summary>
+    public int Columns
+    {
+        get => _columns;
+        set
+        {
+            value = Math.Max(1, value);
+            if (value == _columns) return;
+            _columns = value;
+            BuildRows();
+        }
+    }
+
+    private void BuildRows()
+    {
+        var rows = new List<object>();
+        foreach (var sec in _sections)
+        {
+            rows.Add(sec);
+            for (var i = 0; i < sec.Items.Count; i += _columns)
+                rows.Add(new ItemRowViewModel(sec.Items.Skip(i).Take(_columns).ToList()));
+        }
+        Rows.Clear();
+        foreach (var r in rows) Rows.Add(r);
+    }
+
+    /// <summary>Indeks wiersza z daną kartą (do przewinięcia) albo -1.</summary>
+    public int RowIndexOf(ItemCardViewModel card)
+    {
+        for (var i = 0; i < Rows.Count; i++)
+            if (Rows[i] is ItemRowViewModel r && r.Items.Contains(card)) return i;
+        return -1;
+    }
 
     [ObservableProperty] private string _searchText = "";
     [ObservableProperty] private bool _onlyFavorites;
@@ -123,7 +166,7 @@ public sealed partial class ItemsViewModel : ObservableObject
             (!OnlyMissingBlueprints || (c.IsBlueprint && !Workshop.IsFound(c.Item.Id))) &&
             (term.Length == 0 || TextFormat.ContainsLoose(c.Item.Name, term) || TextFormat.ContainsLoose(c.Item.Subcategory, term)));
 
-        Sections.Clear();
+        _sections.Clear();
         var total = 0;
         // schematy na końcu listy
         foreach (var g in visible.GroupBy(c => c.Item.Type)
@@ -131,9 +174,10 @@ public sealed partial class ItemsViewModel : ObservableObject
         {
             var cards = g.OrderBy(c => Palette.RarityRank(c.Item.Rarity)).ThenBy(c => c.Item.Name).ToList();
             total += cards.Count;
-            Sections.Add(new ItemSectionViewModel(g.Key.ToUpperInvariant(), cards));
+            _sections.Add(new ItemSectionViewModel(g.Key.ToUpperInvariant(), cards));
         }
         CountText = Loc.F("ItemCount", total);
+        BuildRows();
     }
 
     public void Select(ItemCardViewModel card)
@@ -147,7 +191,7 @@ public sealed partial class ItemsViewModel : ObservableObject
     public void Focus(string itemId)
     {
         if (!_cards.TryGetValue(itemId, out var card)) return;
-        var visible = Sections.Any(s => s.Items.Contains(card));
+        var visible = _sections.Any(s => s.Items.Contains(card));
         if (!visible)
         {
             SearchText = card.Item.Name;
@@ -178,6 +222,12 @@ public sealed partial class ItemsViewModel : ObservableObject
     }
 }
 
+/// <summary>Jeden wiersz kart w siatce itemów.</summary>
+public sealed class ItemRowViewModel(IReadOnlyList<ItemCardViewModel> items)
+{
+    public IReadOnlyList<ItemCardViewModel> Items { get; } = items;
+}
+
 public sealed class ItemSectionViewModel(string title, IReadOnlyList<ItemCardViewModel> items)
 {
     public string Title { get; } = title;
@@ -199,6 +249,7 @@ public sealed partial class ItemCardViewModel : ObservableObject
     }
 
     public bool IsBlueprint => Services.ItemKinds.IsBlueprintType(Item.Type);
+    public bool IsDesign => Services.ItemKinds.IsDesignType(Item.Type);
 
     /// <summary>Schemat oznaczony jako znaleziony (znaczek na karcie).</summary>
     [ObservableProperty] private bool _isFound;
@@ -276,6 +327,7 @@ public sealed partial class ItemDetailViewModel : ObservableObject
     private readonly MainViewModel _main;
 
     public bool IsBlueprint => Services.ItemKinds.IsBlueprintType(Item.Type);
+    public bool IsDesign => Services.ItemKinds.IsDesignType(Item.Type);
 
     public ItemDetailViewModel(Item item, ItemsViewModel owner, MainViewModel main)
     {

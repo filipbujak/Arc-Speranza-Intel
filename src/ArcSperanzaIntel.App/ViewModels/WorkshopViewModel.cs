@@ -282,6 +282,7 @@ public sealed partial class CraftItemViewModel : ObservableObject
     public string Name => _item.Name;
     public string? IconUrl => _item.IconUrl;
     public bool IsBlueprint => WorkshopBook.IsBlueprint(_item);
+    public bool IsDesign => ItemKinds.IsDesignType(_item.Type);
     public IBrush RarityBrush => Palette.Brush(Palette.Rarity(_item.Rarity));
     public bool HasBlueprint { get; }
     public bool BlueprintFound { get; }

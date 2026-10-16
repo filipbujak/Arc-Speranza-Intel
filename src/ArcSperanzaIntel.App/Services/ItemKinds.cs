@@ -11,6 +11,10 @@ public static class ItemKinds
     public static bool IsBlueprintType(string? type) =>
         string.Equals(type, "Blueprint", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>Projekt mebla do kryjówki — w grze kafelek z wzorem krzyżyków.</summary>
+    public static bool IsDesignType(string? type) =>
+        string.Equals(type, "Design", StringComparison.OrdinalIgnoreCase);
+
     public static bool IsBlueprint(string? itemId)
     {
         if (string.IsNullOrEmpty(itemId)) return false;

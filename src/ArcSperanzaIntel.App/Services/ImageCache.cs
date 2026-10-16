@@ -21,7 +21,10 @@ public sealed class ImageCache : IDisposable
     private readonly ConcurrentQueue<string> _order = new();
     private readonly ConcurrentDictionary<string, DateTime> _failedAt = new();
     private static readonly TimeSpan RetryAfter = TimeSpan.FromMinutes(2);
-    private const int MemoryLimit = 900;
+    private const int MemoryLimit = 1500;
+    // budżet pamięci na zdekodowane obrazy: kafelek mapy 512×512 to ~1 MB, ikona ~50 KB
+    private const long MemoryBudgetBytes = 320L * 1024 * 1024;
+    private long _memoryBytes;
 
     public ImageCache(string directory)
     {
@@ -150,16 +153,24 @@ public sealed class ImageCache : IDisposable
 
     private void Remember(string url, Bitmap? bmp)
     {
-        _memory[url] = bmp;
-        _order.Enqueue(url);
-        // Prosty limit pamięci: wyrzucamy najstarsze wpisy (bez Dispose — mogą być jeszcze rysowane).
-        while (_memory.Count > MemoryLimit && _order.TryDequeue(out var old))
-            _memory.TryRemove(old, out _);
+        if (bmp is null) return;
+        if (_memory.TryAdd(url, bmp))
+        {
+            _order.Enqueue(url);
+            Interlocked.Add(ref _memoryBytes, SizeOf(bmp));
+        }
+        // limit pamięci: wyrzucamy najstarsze wpisy (bez Dispose — mogą być jeszcze rysowane, zwolni je GC)
+        while ((_memory.Count > MemoryLimit || Interlocked.Read(ref _memoryBytes) > MemoryBudgetBytes) && _order.TryDequeue(out var old))
+            if (_memory.TryRemove(old, out var gone) && gone is not null)
+                Interlocked.Add(ref _memoryBytes, -SizeOf(gone));
     }
+
+    private static long SizeOf(Bitmap b) => (long)b.PixelSize.Width * b.PixelSize.Height * 4;
 
     public void ClearDisk()
     {
         _memory.Clear();
+        Interlocked.Exchange(ref _memoryBytes, 0);
         try
         {
             if (Directory.Exists(_dir)) Directory.Delete(_dir, recursive: true);

@@ -306,15 +306,22 @@ public sealed class MapCanvas : Control
 
     private void DrawLayer(DrawingContext ctx, MapDefinition map, MapFloor? layer, int tz, Size size)
     {
-        DrawTiles(ctx, map, layer, 2, size);              // zgrubny podkład, zanim dojdą dokładne kafelki
+        // zgrubny podkład tylko wtedy, gdy brakuje jeszcze dokładnych kafelków (mniej rysowania przy przesuwaniu)
+        if (tz != 2 && DrawTiles(ctx, map, layer, tz, size, dryRun: true))
+        {
+            DrawTiles(ctx, map, layer, tz, size);
+            return;
+        }
+        DrawTiles(ctx, map, layer, 2, size);
         if (tz != 2) DrawTiles(ctx, map, layer, tz, size);
     }
 
-    private void DrawTiles(DrawingContext ctx, MapDefinition map, MapFloor? layer, int tz, Size size)
+    /// <summary>Rysuje kafelki widocznego obszaru. dryRun = tylko sprawdza, czy wszystkie są już w pamięci.</summary>
+    private bool DrawTiles(DrawingContext ctx, MapDefinition map, MapFloor? layer, int tz, Size size, bool dryRun = false)
     {
         var ts = (double)map.TileSize;
         var images = ImageCache.Shared;
-        if (images is null) return;
+        if (images is null) return false;
         var f = Math.Pow(2, Zoom - tz);
         var (cx, cy) = map.Transform.ToPixel(Center, tz);
 
@@ -324,13 +331,13 @@ public sealed class MapCanvas : Control
         var maxX = Math.Min(Math.Max(bx1, bx2), cx + size.Width / 2 / f);
         var minY = Math.Max(Math.Min(by1, by2), cy - size.Height / 2 / f);
         var maxY = Math.Min(Math.Max(by1, by2), cy + size.Height / 2 / f);
-        if (maxX <= minX || maxY <= minY) return;
+        if (maxX <= minX || maxY <= minY) return true;
 
         var tx1 = Math.Max(0, (int)Math.Floor(minX / ts));
         var tx2 = (int)Math.Floor((maxX - 0.001) / ts);
         var ty1 = Math.Max(0, (int)Math.Floor(minY / ts));
         var ty2 = (int)Math.Floor((maxY - 0.001) / ts);
-        if ((tx2 - tx1 + 1) * (ty2 - ty1 + 1) > 400) return; // bezpiecznik
+        if ((tx2 - tx1 + 1) * (ty2 - ty1 + 1) > 400) return false; // bezpiecznik
 
         var tileSize = ts * f;
         for (var tx = tx1; tx <= tx2; tx++)
@@ -338,12 +345,21 @@ public sealed class MapCanvas : Control
         {
             var url = map.TileUrl(tz, tx, ty, layer);
             var bmp = images.Peek(url);
+            if (dryRun)
+            {
+                if (bmp is null && !images.IsKnownMissing(url)) return false;
+                continue;
+            }
             if (bmp is null)
             {
                 if (!images.IsKnownMissing(url) && _requestedTiles.Add(url))
                 {
-                    _ = images.GetAsync(url).ContinueWith(_ => Dispatcher.UIThread.Post(InvalidateVisual),
-                        TaskScheduler.Default);
+                    // po wczytaniu zwalniamy wpis, żeby kafelek wyrzucony z pamięci dało się wczytać ponownie
+                    _ = images.GetAsync(url).ContinueWith(_ => Dispatcher.UIThread.Post(() =>
+                    {
+                        _requestedTiles.Remove(url);
+                        InvalidateVisual();
+                    }), TaskScheduler.Default);
                 }
                 continue;
             }
@@ -351,6 +367,7 @@ public sealed class MapCanvas : Control
             var y = (ty * ts - cy) * f + size.Height / 2;
             ctx.DrawImage(bmp, new Rect(bmp.Size), new Rect(x, y, tileSize + 0.6, tileSize + 0.6));
         }
+        return true;
     }
 
     private void DrawMarkers(DrawingContext ctx, MapDefinition map, Size size)
