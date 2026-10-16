@@ -39,6 +39,87 @@ public sealed partial class MainViewModel : ObservableObject
     partial void OnTabChanged(AppTab value)
     {
         if (value == AppTab.Events) _ = Events?.TickAsync();
+        RecordPage();
+    }
+
+    // ---------------------------------------------------------------- historia (Wstecz / Dalej)
+    /// <summary>Strona aplikacji: zakładka + to, co w niej otwarte (mapa, quest, item, stacja).</summary>
+    public sealed record Page(AppTab Tab, string? MapId, string? QuestId, string? ItemId, string? StationId);
+
+    private readonly NavigationHistory<Page> _history = new();
+    private bool _restoring;
+
+    [ObservableProperty] private bool _canGoBack;
+    [ObservableProperty] private bool _canGoForward;
+
+    private Page Current() => Tab switch
+    {
+        AppTab.Maps => new Page(Tab, Maps?.SelectedMap.Id, null, null, null),
+        AppTab.Quests => new Page(Tab, null, Quests?.Selected?.Quest.Id, null, null),
+        AppTab.Items => new Page(Tab, null, null, Items?.Selected?.Item.Id, null),
+        AppTab.Workshop => new Page(Tab, null, null, null, Workshop?.Detail?.Station.Id),
+        _ => new Page(Tab, null, null, null, null),
+    };
+
+    private void RecordPage()
+    {
+        if (_restoring || IsLoading) return;
+        _history.Record(Current());
+        UpdateHistoryButtons();
+    }
+
+    private void UpdateHistoryButtons()
+    {
+        CanGoBack = _history.CanGoBack;
+        CanGoForward = _history.CanGoForward;
+    }
+
+    /// <summary>Śledzi wybór w zakładkach — każda zmiana to nowa strona w historii.</summary>
+    private void WatchPages()
+    {
+        void On(System.ComponentModel.INotifyPropertyChanged? vm, string property)
+        {
+            if (vm is not null)
+                vm.PropertyChanged += (_, e) => { if (e.PropertyName == property) RecordPage(); };
+        }
+        On(Maps, nameof(MapsViewModel.SelectedMap));
+        On(Quests, nameof(QuestsViewModel.Selected));
+        On(Items, nameof(ItemsViewModel.Selected));
+        On(Workshop, nameof(WorkshopViewModel.Detail));
+        RecordPage();
+    }
+
+    [RelayCommand]
+    private void GoBack() => Restore(_history.Back());
+
+    [RelayCommand]
+    private void GoForward() => Restore(_history.Forward());
+
+    private void Restore(Page? page)
+    {
+        if (page is null) return;
+        _restoring = true;
+        try
+        {
+            Tab = page.Tab;
+            if (page.MapId is { } m) Maps?.SelectMap(MapCatalog.Get(m));
+            if (page.Tab == AppTab.Quests)
+            {
+                if (page.QuestId is { } q) Quests?.Focus(q);
+                else Quests?.ClearSelection();
+            }
+            if (page.Tab == AppTab.Items)
+            {
+                if (page.ItemId is { } i) Items?.Focus(i);
+                else Items?.CloseDetail();
+            }
+            if (page.StationId is { } st) Workshop?.Select(st);
+        }
+        finally
+        {
+            _restoring = false;
+        }
+        UpdateHistoryButtons();
     }
 
     [RelayCommand]
@@ -84,6 +165,7 @@ public sealed partial class MainViewModel : ObservableObject
             Settings = new SettingsViewModel(this);
 
             IsLoading = false;
+            WatchPages();
             StatusText = Services.Data.SourceInfo;
             await Maps.LoadCurrentMapAsync();
             await RegisterHotkeyAsync();

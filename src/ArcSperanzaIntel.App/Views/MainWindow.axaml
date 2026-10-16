@@ -83,12 +83,24 @@
           </Button>
         </StackPanel>
 
-        <Button Grid.Column="2" Classes="tab round" Classes.active="{Binding IsSettingsTab}" HorizontalAlignment="Right" Margin="0,0,14,0"
-                Command="{Binding SelectTabCommand}" CommandParameter="Settings" ToolTip.Tip="{l:T Settings}">
-          <Panel>
-            <PathIcon Data="{x:Static icons:UiIcons.Settings}" Width="18" Height="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
-          </Panel>
-        </Button>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,14,0">
+          <Button Classes="tab round" Command="{Binding GoBackCommand}" IsEnabled="{Binding CanGoBack}" ToolTip.Tip="{l:T NavBack}">
+            <Panel>
+              <PathIcon Data="{x:Static icons:UiIcons.Back}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Panel>
+          </Button>
+          <Button Classes="tab round" Command="{Binding GoForwardCommand}" IsEnabled="{Binding CanGoForward}" ToolTip.Tip="{l:T NavForward}">
+            <Panel>
+              <PathIcon Data="{x:Static icons:UiIcons.Forward}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Panel>
+          </Button>
+          <Button Classes="tab round" Classes.active="{Binding IsSettingsTab}" Margin="8,0,0,0"
+                  Command="{Binding SelectTabCommand}" CommandParameter="Settings" ToolTip.Tip="{l:T Settings}">
+            <Panel>
+              <PathIcon Data="{x:Static icons:UiIcons.Settings}" Width="18" Height="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Panel>
+          </Button>
+        </StackPanel>
       </Grid>
     </Border>
 

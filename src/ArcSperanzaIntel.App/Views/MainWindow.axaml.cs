@@ -12,6 +12,8 @@ public partial class MainWindow : Window
         InitializeComponent();
         // tunelowanie: skróty działają niezależnie od tego, która kontrolka ma fokus
         AddHandler(KeyDownEvent, OnKeyDownTunnel, RoutingStrategies.Tunnel);
+        // boczne przyciski myszy (mouse4 = wstecz, mouse5 = dalej), jak w przeglądarce
+        AddHandler(PointerPressedEvent, OnPointerPressedTunnel, RoutingStrategies.Tunnel);
     }
 
     private MainViewModel? Vm => DataContext as MainViewModel;
@@ -43,7 +45,31 @@ public partial class MainWindow : Window
             return;
         }
 
+        // Alt+← / Alt+→ — wstecz / dalej
+        if (e.KeyModifiers == KeyModifiers.Alt && e.Key is Key.Left or Key.Right)
+        {
+            (e.Key == Key.Left ? vm.GoBackCommand : vm.GoForwardCommand).Execute(null);
+            e.Handled = true;
+            return;
+        }
+
         if (vm.HandleKey(e)) e.Handled = true;
+    }
+
+    private void OnPointerPressedTunnel(object? sender, PointerPressedEventArgs e)
+    {
+        if (Vm is not { Dialog: null } vm) return;
+        var props = e.GetCurrentPoint(this).Properties;
+        if (props.IsXButton1Pressed)
+        {
+            vm.GoBackCommand.Execute(null);
+            e.Handled = true;
+        }
+        else if (props.IsXButton2Pressed)
+        {
+            vm.GoForwardCommand.Execute(null);
+            e.Handled = true;
+        }
     }
 
     protected override void OnDataContextChanged(EventArgs e)

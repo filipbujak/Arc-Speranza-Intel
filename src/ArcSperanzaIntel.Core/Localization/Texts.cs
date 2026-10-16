@@ -248,6 +248,8 @@ public static class Texts
         ["OverlayShowHide"] = ("Pokaż / schowaj overlay", "Show / hide overlay"),
         ["OverlayResetPosition"] = ("Przywróć pozycję", "Reset position"),
         ["OverlayNote"] = ("Działa w trybie okna bez ramek (borderless / windowed fullscreen). W pełnym ekranie (exclusive) gra zasłoni overlay. Overlay nie czyta gry ani ekranu — to zwykłe okno Windows.", "Works in borderless / windowed fullscreen. In exclusive fullscreen the game covers it. The overlay does not read the game or the screen — it is a plain Windows window."),
+        ["NavBack"] = ("Wstecz (mouse4, Alt+←)", "Back (mouse4, Alt+←)"),
+        ["NavForward"] = ("Dalej (mouse5, Alt+→)", "Forward (mouse5, Alt+→)"),
         ["CraftAnyLevel"] = ("DOSTĘPNE OD RAZU", "AVAILABLE RIGHT AWAY"),
         ["UpgradesTitle"] = ("ULEPSZENIA BRONI", "WEAPON UPGRADES"),
         ["UpgradeCost"] = ("Koszt ulepszenia", "Upgrade cost"),

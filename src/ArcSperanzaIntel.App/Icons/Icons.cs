@@ -25,6 +25,8 @@ public static class UiIcons
     public static Geometry Timer { get; } = Parse(UiIconData.Timer);
     public static Geometry Swap { get; } = Parse(UiIconData.Swap);
     public static Geometry Settings { get; } = Parse(UiIconData.Settings);
+    public static Geometry Back { get; } = Parse(UiIconData.Back);
+    public static Geometry Forward { get; } = Parse(UiIconData.Forward);
     public static Geometry Search { get; } = Parse(UiIconData.Search);
     public static Geometry Star { get; } = Parse(UiIconData.Star);
     public static Geometry StarOutline { get; } = Parse(UiIconData.StarOutline);
