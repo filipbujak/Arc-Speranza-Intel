@@ -18,6 +18,26 @@ public static class Palette
 
     private static readonly Dictionary<Color, IBrush> Brushes = [];
 
+    private static readonly Dictionary<Color, IBrush> Glows = [];
+
+    /// <summary>Miękka poświata od góry w danym kolorze (panel szczegółów itemu).</summary>
+    public static IBrush Glow(Color c)
+    {
+        if (!Glows.TryGetValue(c, out var b))
+            Glows[c] = b = new RadialGradientBrush
+            {
+                Center = new Avalonia.RelativePoint(0.5, 0, Avalonia.RelativeUnit.Relative),
+                GradientOrigin = new Avalonia.RelativePoint(0.5, 0, Avalonia.RelativeUnit.Relative),
+                Radius = 0.85,
+                GradientStops =
+                {
+                    new GradientStop(Color.FromArgb(0x40, c.R, c.G, c.B), 0),
+                    new GradientStop(Color.FromArgb(0x00, c.R, c.G, c.B), 1),
+                },
+            };
+        return b;
+    }
+
     public static IBrush Brush(Color c)
     {
         if (!Brushes.TryGetValue(c, out var b)) Brushes[c] = b = new SolidColorBrush(c);

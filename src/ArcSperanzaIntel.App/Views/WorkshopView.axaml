@@ -13,7 +13,7 @@
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Padding" Value="0" />
-      <Setter Property="Margin" Value="0,0,10,10" />
+      <Setter Property="Margin" Value="0,5,10,5" />
     </Style>
   </UserControl.Styles>
 
@@ -116,7 +116,7 @@
                       </ItemsControl.ItemsPanel>
                       <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:ItemChipViewModel">
-                          <Button Classes="tile" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Name}">
+                          <Button Classes="tile" Command="{Binding OpenCommand}">
                             <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="8" Width="260">
                               <Grid ColumnDefinitions="Auto,*">
                                 <c:ItemTile Width="64" Height="64" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}"
@@ -169,15 +169,15 @@
                           <ItemsControl ItemsSource="{Binding Items}">
                                     <ItemsControl.ItemsPanel>
                               <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal" ItemWidth="142" ItemHeight="168" />
+                                <WrapPanel Orientation="Horizontal" ItemWidth="142" ItemHeight="172" />
                               </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                               <DataTemplate x:DataType="vm:CraftItemViewModel">
-                                <Button Classes="tile" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tooltip}">
-                                  <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="4" Width="132" Height="158">
+                                <Button Classes="tile" Command="{Binding OpenCommand}">
+                                  <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="4" Width="132" Height="162">
                                     <Grid RowDefinitions="Auto,*">
-                                      <c:ItemTile Height="112" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}"
+                                      <c:ItemTile Width="116" Height="116" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}"
                                                   IsBlueprint="{Binding IsBlueprint}" IsDesign="{Binding IsDesign}" DecodeWidth="224" />
                                       <Border Width="20" Height="20" CornerRadius="10" HorizontalAlignment="Right" VerticalAlignment="Top"
                                               Margin="6" Background="{StaticResource ArcBlue}" IsVisible="{Binding BlueprintFound}"
@@ -210,7 +210,7 @@
                       <DataTemplate x:DataType="vm:UpgradeChainViewModel">
                         <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="10" Margin="0,0,0,10">
                           <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button Classes="tile" Margin="0" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Name}">
+                            <Button Classes="tile" Margin="0" Command="{Binding OpenCommand}">
                               <StackPanel Width="84" Spacing="4">
                                 <c:ItemTile Width="84" Height="84" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" DecodeWidth="168" />
                                 <TextBlock Text="{Binding Name}" FontSize="11" TextAlignment="Center" TextTrimming="CharacterEllipsis" />
@@ -226,7 +226,7 @@
                                 <DataTemplate x:DataType="vm:UpgradeStepViewModel">
                                   <StackPanel Orientation="Horizontal" Spacing="8">
                                     <TextBlock Text="→" FontSize="20" Foreground="{StaticResource ArcYellow}" VerticalAlignment="Center" Margin="0,0,0,18" />
-                                    <Button Classes="tile" Margin="0" Command="{Binding OpenCommand}" ToolTip.Tip="{Binding Tooltip}">
+                                    <Button Classes="tile" Margin="0" Command="{Binding OpenCommand}">
                                       <StackPanel Width="84" Spacing="4">
                                         <c:ItemTile Width="84" Height="84" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" DecodeWidth="168" />
                                         <TextBlock Text="{Binding Name}" FontSize="11" TextAlignment="Center" TextTrimming="CharacterEllipsis" />

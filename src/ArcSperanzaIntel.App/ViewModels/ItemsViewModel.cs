@@ -335,6 +335,7 @@ public sealed partial class ItemDetailViewModel : ObservableObject
         _owner = owner;
         _main = main;
         RarityBrush = Palette.Brush(Palette.Rarity(item.Rarity));
+        RarityGlow = Palette.Glow(Palette.Rarity(item.Rarity));
         _isFavorite = owner.IsFavorite(item.Id);
         _isMarked = main.Services.Wanted.IsMarked(item.Id);
 
@@ -371,6 +372,9 @@ public sealed partial class ItemDetailViewModel : ObservableObject
     public string? IconUrl => Item.IconUrl;
     public string Rarity => Item.Rarity ?? "—";
     public IBrush RarityBrush { get; }
+
+    /// <summary>Poświata w kolorze rzadkości za górą panelu szczegółów.</summary>
+    public IBrush RarityGlow { get; }
     public string TypeLine => Item.Subcategory is null ? Item.Type : $"{Item.Type} · {Item.Subcategory}";
     public string? Description => Item.Description;
     public bool HasDescription => Item.Description is not null;

@@ -10,7 +10,10 @@
         Title="ARC Speranza Intel"
         Icon="/Assets/app.ico"
         Width="1500" Height="920" MinWidth="960" MinHeight="640"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
 
   <Window.Styles>
     <!-- wąskie okno: zakładki same ikony (podpis w dymku), przy bardzo wąskim także bez napisu przy logo -->
@@ -23,17 +26,40 @@
     <Style Selector="Window.narrow TextBlock.logotext">
       <Setter Property="IsVisible" Value="False" />
     </Style>
+    <!-- przyciski okna w naszym pasku (─ ▢ ✕) zamiast paska Windows -->
+    <Style Selector="Button.winbtn">
+      <Setter Property="Width" Value="46" />
+      <Setter Property="Height" Value="52" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Foreground" Value="{StaticResource ArcMuted}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.winbtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ArcHover}" />
+      <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+    </Style>
+    <Style Selector="Button.winbtn.close:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#C42B1C" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.winbtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ArcLine2}" />
+    </Style>
     <Style Selector="Button.tab">
       <Setter Property="VerticalContentAlignment" Value="Stretch" />
       <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     </Style>
   </Window.Styles>
 
-  <Grid RowDefinitions="52,*,26">
+  <Grid x:Name="RootGrid" RowDefinitions="52,*,26">
 
-    <!-- ====================================================== GÓRNY PASEK -->
-    <Border Grid.Row="0" Classes="panel" BorderThickness="0,0,0,1">
-      <Grid ColumnDefinitions="Auto,*,Auto">
+    <!-- ====================================================== GÓRNY PASEK (= pasek okna: przeciąganie, dwuklik) -->
+    <Border x:Name="TitleBar" Grid.Row="0" Classes="panel" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto">
         <StackPanel x:Name="LogoPanel" Orientation="Horizontal" Spacing="10" Margin="18,0" VerticalAlignment="Center">
           <c:AppLogo Height="24" VerticalAlignment="Center" />
           <TextBlock Classes="logotext" Text="ARC" FontFamily="{StaticResource HeadFont}" FontWeight="Bold" FontSize="20" LetterSpacing="2"
@@ -93,7 +119,7 @@
           </Button>
         </StackPanel>
 
-        <StackPanel x:Name="RightPanel" Grid.Column="2" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,14,0">
+        <StackPanel x:Name="RightPanel" Grid.Column="2" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
           <Button Classes="tab round" Command="{Binding GoBackCommand}" IsEnabled="{Binding CanGoBack}" ToolTip.Tip="{l:T NavBack}">
             <Panel>
               <PathIcon Data="{x:Static icons:UiIcons.Back}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -111,11 +137,25 @@
             </Panel>
           </Button>
         </StackPanel>
+
+        <StackPanel x:Name="WindowButtons" Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Top">
+          <Button Classes="winbtn" Click="OnMinimize" ToolTip.Tip="{l:T WinMinimize}">
+            <Path Data="M0,5 L10,5" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1.2" Width="10" Height="10" />
+          </Button>
+          <Button Classes="winbtn" Click="OnMaximize" ToolTip.Tip="{l:T WinMaximize}">
+            <Path x:Name="MaxIcon" Data="M0.6,0.6 L9.4,0.6 L9.4,9.4 L0.6,9.4 Z" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1.2"
+                  Width="10" Height="10" />
+          </Button>
+          <Button Classes="winbtn close" Click="OnClose" ToolTip.Tip="{l:T WinClose}">
+            <Path Data="M0,0 L10,10 M10,0 L0,10" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1.2" Width="10" Height="10" />
+          </Button>
+        </StackPanel>
       </Grid>
     </Border>
 
     <!-- ====================================================== ZAKŁADKI -->
-    <Panel Grid.Row="1">
+    <c:Backdrop Grid.Row="1" />
+    <Panel Grid.Row="1" x:Name="TabHost" ClipToBounds="True">
       <Panel IsVisible="{Binding IsMapsTab}">
         <views:MapsView DataContext="{Binding Maps}" />
       </Panel>

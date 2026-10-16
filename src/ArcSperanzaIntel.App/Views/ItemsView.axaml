@@ -26,7 +26,7 @@
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Padding" Value="0" />
-      <Setter Property="Margin" Value="0,0,8,8" />
+      <Setter Property="Margin" Value="0,4,8,4" />
     </Style>
     <Style Selector="Border.cardface">
       <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
@@ -134,7 +134,7 @@
               </StackPanel>
             </DataTemplate>
             <DataTemplate DataType="{x:Type vm:ItemRowViewModel}" x:DataType="vm:ItemRowViewModel">
-              <ItemsControl ItemsSource="{Binding Items}" Height="168">
+              <ItemsControl ItemsSource="{Binding Items}" Height="172">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal" />
@@ -142,11 +142,11 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="vm:ItemCardViewModel">
-                <Button Classes="itemcard" Command="{Binding SelectCommand}" ToolTip.Tip="{Binding Name}">
+                <Button Classes="itemcard" Command="{Binding SelectCommand}">
                   <c:FlowBorder Background="{StaticResource ArcPanel2}" Radius="8" Padding="4" IsActive="{Binding IsSelected}"
-                                Width="124" Height="160">
+                                Width="124" Height="164">
                     <Grid RowDefinitions="Auto,*">
-                      <c:ItemTile Height="112" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" IsDesign="{Binding IsDesign}" DecodeWidth="224" />
+                      <c:ItemTile Width="116" Height="116" Url="{Binding IconUrl}" Accent="{Binding RarityBrush}" IsBlueprint="{Binding IsBlueprint}" IsDesign="{Binding IsDesign}" DecodeWidth="224" />
                       <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center"
                                  MaxLines="2" TextTrimming="CharacterEllipsis" Margin="4,4,4,0" VerticalAlignment="Center" />
                       <TextBlock Text="★" Foreground="{StaticResource ArcYellow}" HorizontalAlignment="Right" VerticalAlignment="Top"
@@ -175,6 +175,8 @@
       <ContentControl Content="{Binding Selected}">
         <ContentControl.ContentTemplate>
           <DataTemplate x:DataType="vm:ItemDetailViewModel">
+            <Panel>
+            <Border Height="380" VerticalAlignment="Top" Background="{Binding RarityGlow}" IsHitTestVisible="False" />
             <ScrollViewer HorizontalScrollBarVisibility="Disabled">
               <StackPanel Margin="18,16" Spacing="10">
                 <Grid ColumnDefinitions="*,Auto">
@@ -312,6 +314,7 @@
                 </StackPanel>
               </StackPanel>
             </ScrollViewer>
+            </Panel>
           </DataTemplate>
         </ContentControl.ContentTemplate>
       </ContentControl>

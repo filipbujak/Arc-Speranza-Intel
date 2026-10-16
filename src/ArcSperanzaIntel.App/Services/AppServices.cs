@@ -117,6 +117,14 @@ public sealed class AppServices : IDisposable
             if (w.Maximized) window.WindowState = WindowState.Maximized;
         }
         window.Topmost = State.AlwaysOnTop;
+        // zapamiętujemy ostatni stan sprzed minimalizacji — skrót przywraca dokładnie to,
+        // co przywróciłoby kliknięcie na pasku zadań (a nie stan zapisany przy ostatnim zapisie)
+        _restoreState = window.WindowState;
+        window.PropertyChanged += (_, e) =>
+        {
+            if (e.Property == Window.WindowStateProperty && e.NewValue is WindowState s && s != WindowState.Minimized)
+                _restoreState = s;
+        };
         window.Closing += (_, _) => FlushSave();
         Hotkey.Pressed += () => Dispatcher.UIThread.Post(ToggleWindow);
         OverlayHotkey.Pressed += () => Dispatcher.UIThread.Post(() => Overlay?.Toggle());
@@ -132,6 +140,8 @@ public sealed class AppServices : IDisposable
             : new WindowPlacement(w.Position.X, w.Position.Y, w.Width, w.Height, max);
     }
 
+    private WindowState _restoreState = WindowState.Normal;
+
     /// <summary>Globalny skrót: schowaj, jeśli okno jest z przodu; w przeciwnym razie wyciągnij na wierzch.</summary>
     public void ToggleWindow()
     {
@@ -142,7 +152,7 @@ public sealed class AppServices : IDisposable
             return;
         }
         if (_window.WindowState == WindowState.Minimized)
-            _window.WindowState = State.Window?.Maximized == true ? WindowState.Maximized : WindowState.Normal;
+            _window.WindowState = _restoreState;
         _window.Show();
         _window.Activate();
         // chwilowe "zawsze na wierzchu" wyciąga okno nad grę w trybie okna bez ramek

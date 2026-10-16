@@ -298,7 +298,8 @@ public sealed partial class ErmalOfferViewModel : ObservableObject, IHighlightab
         IsBlueprint = ItemKinds.IsBlueprintType(offer.Item?.Type) || ItemKinds.IsBlueprint(offer.Item?.Id);
         RarityBrush = Palette.Brush(Palette.Rarity(offer.Item?.Rarity));
         TypeText = offer.Item?.Type ?? "";
-        CostText = TextFormat.Number(offer.Cost);
+        // koszt 0 = stała wymiana (konkretne przedmioty), a nie wartość w monetach
+        CostText = offer.Cost > 0 ? TextFormat.Number(offer.Cost) : Loc.T("ErmalTrade");
         CoinsIconUrl = owner.CoinsIconUrl;
         Accepted = offer.Accepted
             .OrderByDescending(a => a.IsCategory).ThenByDescending(a => a.Value)
@@ -326,7 +327,8 @@ public sealed partial class ErmalOfferViewModel : ObservableObject, IHighlightab
     [NotifyPropertyChangedFor(nameof(BorderThickness))]
     private bool _isHighlighted;
 
-    [ObservableProperty] private bool _isExpanded;
+    /// <summary>Lista przedmiotów do oddania widoczna od razu.</summary>
+    [ObservableProperty] private bool _isExpanded = true;
 
     public Avalonia.Thickness BorderThickness => new(IsHighlighted ? 3 : 1);
 
@@ -346,7 +348,7 @@ public sealed partial class ErmalServiceViewModel : ObservableObject
     {
         Name = s.Name;
         Description = s.Description ?? "";
-        CostText = TextFormat.Number(s.Cost);
+        CostText = s.Cost > 0 ? TextFormat.Number(s.Cost) : Loc.T("ErmalTrade");
         CoinsIconUrl = owner.CoinsIconUrl;
         Accepted = s.Accepted
             .OrderByDescending(a => a.IsCategory).ThenByDescending(a => a.Value)
@@ -371,13 +373,16 @@ public sealed partial class ErmalServiceViewModel : ObservableObject
 /// <summary>Jeden przedmiot, który Ermal przyjmuje, z wartością.</summary>
 public sealed partial class ErmalAcceptedViewModel(ErmalItem item, ShopsViewModel owner) : ObservableObject
 {
-    public string Name { get; } = item.Name + (item.Amount is > 1 ? $" ×{item.Amount}" : "");
-    public string? IconUrl { get; } = item.IconUrl;
+    // MetaForge czasem nie podaje ikony / wartości / rzadkości — dobieramy je z bazy itemów
+    private readonly Item? _known = item.IsCategory ? null : ItemKinds.Lookup(item.Id);
+
+    public string Name => item.Name + (item.Amount is > 1 ? $" ×{item.Amount}" : "");
+    public string? IconUrl => item.IconUrl ?? _known?.IconUrl;
     public bool HasIcon => IconUrl is not null;
     public bool IsBlueprint { get; } = !item.IsCategory && (ItemKinds.IsBlueprintType(item.Type) || ItemKinds.IsBlueprint(item.Id));
     public bool NoIcon => IconUrl is null;
-    public string ValueText { get; } = TextFormat.Number(item.Value);
-    public IBrush RarityBrush { get; } = Palette.Brush(Palette.Rarity(item.Rarity));
+    public string ValueText => (item.Value > 0 ? item.Value : _known?.Value ?? 0) is var v and > 0 ? TextFormat.Number(v) : "";
+    public IBrush RarityBrush => Palette.Brush(Palette.Rarity(item.Rarity ?? _known?.Rarity));
     public string Tip { get; } = item.IsCategory ? Loc.T("AnyOfCategory") : item.Type ?? item.Name;
 
     [RelayCommand]
