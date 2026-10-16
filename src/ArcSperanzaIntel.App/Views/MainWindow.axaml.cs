@@ -1,3 +1,4 @@
+using Avalonia;
 using ArcSperanzaIntel.App.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -14,9 +15,33 @@ public partial class MainWindow : Window
         AddHandler(KeyDownEvent, OnKeyDownTunnel, RoutingStrategies.Tunnel);
         // boczne przyciski myszy (mouse4 = wstecz, mouse5 = dalej), jak w przeglądarce
         AddHandler(PointerPressedEvent, OnPointerPressedTunnel, RoutingStrategies.Tunnel);
+        SizeChanged += (_, _) => UpdateHeaderMode();
+        Opened += (_, _) => UpdateHeaderMode();
     }
 
     private MainViewModel? Vm => DataContext as MainViewModel;
+
+    private double _fullTabsWidth;
+
+    /// <summary>
+    /// Pasek zakładek nie mieści się w wąskim oknie — wtedy zostają same ikony (klasa "compact"),
+    /// a przy jeszcze węższym znika też napis przy logo ("narrow").
+    /// </summary>
+    private void UpdateHeaderMode()
+    {
+        if (Bounds.Width <= 0) return;
+        if (!Classes.Contains("compact"))
+        {
+            TabsPanel.Measure(Size.Infinity);
+            _fullTabsWidth = Math.Max(_fullTabsWidth, TabsPanel.DesiredSize.Width);
+        }
+        LogoPanel.Measure(Size.Infinity);
+        RightPanel.Measure(Size.Infinity);
+        var available = Bounds.Width - LogoPanel.DesiredSize.Width - RightPanel.DesiredSize.Width - 48;
+        var compact = _fullTabsWidth > available;
+        Classes.Set("compact", compact);
+        Classes.Set("narrow", compact && Bounds.Width < 1180);
+    }
 
     private async void OnKeyDownTunnel(object? sender, KeyEventArgs e)
     {

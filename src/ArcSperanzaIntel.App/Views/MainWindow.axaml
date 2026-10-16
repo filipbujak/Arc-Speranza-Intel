@@ -9,10 +9,20 @@
         x:DataType="vm:MainViewModel"
         Title="ARC Speranza Intel"
         Icon="/Assets/app.ico"
-        Width="1500" Height="920" MinWidth="1100" MinHeight="680"
+        Width="1500" Height="920" MinWidth="960" MinHeight="640"
         WindowStartupLocation="CenterScreen">
 
   <Window.Styles>
+    <!-- wąskie okno: zakładki same ikony (podpis w dymku), przy bardzo wąskim także bez napisu przy logo -->
+    <Style Selector="Window.compact TextBlock.tablabel">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="Window.compact Button.tab">
+      <Setter Property="Padding" Value="11,0" />
+    </Style>
+    <Style Selector="Window.narrow TextBlock.logotext">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
     <Style Selector="Button.tab">
       <Setter Property="VerticalContentAlignment" Value="Stretch" />
       <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -23,67 +33,67 @@
 
     <!-- ====================================================== GÓRNY PASEK -->
     <Border Grid.Row="0" Classes="panel" BorderThickness="0,0,0,1">
-      <Grid ColumnDefinitions="260,*,260">
-        <StackPanel Orientation="Horizontal" Spacing="10" Margin="18,0" VerticalAlignment="Center">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel x:Name="LogoPanel" Orientation="Horizontal" Spacing="10" Margin="18,0" VerticalAlignment="Center">
           <c:AppLogo Height="24" VerticalAlignment="Center" />
-          <TextBlock Text="ARC" FontFamily="{StaticResource HeadFont}" FontWeight="Bold" FontSize="20" LetterSpacing="2"
+          <TextBlock Classes="logotext" Text="ARC" FontFamily="{StaticResource HeadFont}" FontWeight="Bold" FontSize="20" LetterSpacing="2"
                      VerticalAlignment="Center" />
-          <TextBlock Text="SPERANZA INTEL" FontFamily="{StaticResource HeadFont}" FontWeight="SemiBold" FontSize="20" LetterSpacing="2"
+          <TextBlock Classes="logotext" Text="SPERANZA INTEL" FontFamily="{StaticResource HeadFont}" FontWeight="SemiBold" FontSize="20" LetterSpacing="2"
                      Foreground="{StaticResource ArcYellow}" VerticalAlignment="Center" />
         </StackPanel>
 
-        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-          <Button Classes="tab" Classes.active="{Binding IsMapsTab}" Command="{Binding SelectTabCommand}" CommandParameter="Maps">
+        <StackPanel x:Name="TabsPanel" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+          <Button Classes="tab" ToolTip.Tip="{l:T TabMaps}" Classes.active="{Binding IsMapsTab}" Command="{Binding SelectTabCommand}" CommandParameter="Maps">
             <Panel>
               <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <PathIcon Data="{x:Static icons:UiIcons.Map}" Width="16" Height="16" />
-                <TextBlock Text="{l:T TabMaps}" VerticalAlignment="Center" LetterSpacing="1.5" />
+                <TextBlock Classes="tablabel" Text="{l:T TabMaps}" VerticalAlignment="Center" LetterSpacing="1.5" />
               </StackPanel>
             </Panel>
           </Button>
-          <Button Classes="tab" Classes.active="{Binding IsQuestsTab}" Command="{Binding SelectTabCommand}" CommandParameter="Quests">
+          <Button Classes="tab" ToolTip.Tip="{l:T TabQuests}" Classes.active="{Binding IsQuestsTab}" Command="{Binding SelectTabCommand}" CommandParameter="Quests">
             <Panel>
               <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <PathIcon Data="{x:Static icons:UiIcons.Quests}" Width="16" Height="16" />
-                <TextBlock Text="{l:T TabQuests}" VerticalAlignment="Center" LetterSpacing="1.5" />
+                <TextBlock Classes="tablabel" Text="{l:T TabQuests}" VerticalAlignment="Center" LetterSpacing="1.5" />
               </StackPanel>
             </Panel>
           </Button>
-          <Button Classes="tab" Classes.active="{Binding IsItemsTab}" Command="{Binding SelectTabCommand}" CommandParameter="Items">
+          <Button Classes="tab" ToolTip.Tip="{l:T TabItems}" Classes.active="{Binding IsItemsTab}" Command="{Binding SelectTabCommand}" CommandParameter="Items">
             <Panel>
               <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <PathIcon Data="{x:Static icons:UiIcons.Items}" Width="16" Height="16" />
-                <TextBlock Text="{l:T TabItems}" VerticalAlignment="Center" LetterSpacing="1.5" />
+                <TextBlock Classes="tablabel" Text="{l:T TabItems}" VerticalAlignment="Center" LetterSpacing="1.5" />
               </StackPanel>
             </Panel>
           </Button>
-          <Button Classes="tab" Classes.active="{Binding IsShopsTab}" Command="{Binding SelectTabCommand}" CommandParameter="Shops">
+          <Button Classes="tab" ToolTip.Tip="{l:T TabTraders}" Classes.active="{Binding IsShopsTab}" Command="{Binding SelectTabCommand}" CommandParameter="Shops">
             <Panel>
               <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <PathIcon Data="{x:Static icons:UiIcons.Shops}" Width="16" Height="16" />
-                <TextBlock Text="{l:T TabTraders}" VerticalAlignment="Center" LetterSpacing="1.5" />
+                <TextBlock Classes="tablabel" Text="{l:T TabTraders}" VerticalAlignment="Center" LetterSpacing="1.5" />
               </StackPanel>
             </Panel>
           </Button>
-          <Button Classes="tab" Classes.active="{Binding IsWorkshopTab}" Command="{Binding SelectTabCommand}" CommandParameter="Workshop">
+          <Button Classes="tab" ToolTip.Tip="{l:T TabWorkshop}" Classes.active="{Binding IsWorkshopTab}" Command="{Binding SelectTabCommand}" CommandParameter="Workshop">
             <Panel>
               <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <PathIcon Data="{x:Static icons:UiIcons.Workshop}" Width="16" Height="16" />
-                <TextBlock Text="{l:T TabWorkshop}" VerticalAlignment="Center" LetterSpacing="1.5" />
+                <TextBlock Classes="tablabel" Text="{l:T TabWorkshop}" VerticalAlignment="Center" LetterSpacing="1.5" />
               </StackPanel>
             </Panel>
           </Button>
-          <Button Classes="tab" Classes.active="{Binding IsEventsTab}" Command="{Binding SelectTabCommand}" CommandParameter="Events">
+          <Button Classes="tab" ToolTip.Tip="{l:T EventsTitle}" Classes.active="{Binding IsEventsTab}" Command="{Binding SelectTabCommand}" CommandParameter="Events">
             <Panel>
               <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <PathIcon Data="{x:Static icons:UiIcons.Events}" Width="16" Height="16" />
-                <TextBlock Text="{l:T EventsTitle}" VerticalAlignment="Center" LetterSpacing="1.5" />
+                <TextBlock Classes="tablabel" Text="{l:T EventsTitle}" VerticalAlignment="Center" LetterSpacing="1.5" />
               </StackPanel>
             </Panel>
           </Button>
         </StackPanel>
 
-        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,14,0">
+        <StackPanel x:Name="RightPanel" Grid.Column="2" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,14,0">
           <Button Classes="tab round" Command="{Binding GoBackCommand}" IsEnabled="{Binding CanGoBack}" ToolTip.Tip="{l:T NavBack}">
             <Panel>
               <PathIcon Data="{x:Static icons:UiIcons.Back}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
