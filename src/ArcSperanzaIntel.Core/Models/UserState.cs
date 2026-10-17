@@ -62,6 +62,9 @@ public sealed class UserState
     /// <summary>Filtr rodzaju wydarzenia (nazwa, np. "Night Raid"); null = wszystkie.</summary>
     public string? EventsMode { get; set; }
 
+    /// <summary>Region harmonogramu wydarzeń; null = automatycznie ze strefy czasowej.</summary>
+    public string? EventRegion { get; set; }
+
     public WindowPlacement? Window { get; set; }
 
     /// <summary>Overlay z szukanymi przedmiotami (okienko na grę).</summary>

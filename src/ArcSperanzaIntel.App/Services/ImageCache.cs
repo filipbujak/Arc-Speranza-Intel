@@ -33,7 +33,7 @@ public sealed class ImageCache : IDisposable
         _http.DefaultRequestHeaders.UserAgent.ParseAdd("ArcSperanzaIntel/1.0 (+https://metaforge.app/arc-raiders)");
         // bez AVIF — Skia (Avalonia) go nie dekoduje; prosimy o WebP/PNG/JPEG
         _http.DefaultRequestHeaders.Accept.ParseAdd("image/webp,image/png,image/jpeg;q=0.9,image/*;q=0.5");
-        _http.DefaultRequestHeaders.Referrer = new Uri("https://metaforge.app/");
+        // bez podszywania się pod stronę MetaForge (Referer) — przedstawiamy się uczciwie User-Agentem
         Shared = this;
     }
 

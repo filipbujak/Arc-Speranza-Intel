@@ -26,6 +26,7 @@ public sealed class AppServices : IDisposable
     public MetaForgeHttp Http { get; }
     public JsonFileCache ApiCache { get; }
     public GameData Data { get; }
+    public GameDataRepository Repository { get; }
     public ImageCache Images { get; }
     public Keybinds Keybinds { get; private set; }
     public GlobalHotkey Hotkey { get; } = new();
@@ -56,7 +57,8 @@ public sealed class AppServices : IDisposable
         };
         Http = new MetaForgeHttp();
         ApiCache = new JsonFileCache(Paths.ApiCacheDir);
-        Data = new GameData(new GameDataRepository(Http, ApiCache));
+        Repository = new GameDataRepository(Http, ApiCache) { EventRegion = EventRegions.Resolve(State.EventRegion) };
+        Data = new GameData(Repository);
         Images = new ImageCache(Paths.ImageCacheDir);
         Keybinds = new Keybinds(State.Keybinds);
         Data.MarkersLoaded += (_, mapId) => MapIndex.AddMarkers(Data.MarkersOf(mapId));

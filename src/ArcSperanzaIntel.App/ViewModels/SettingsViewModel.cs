@@ -106,6 +106,33 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
     }
 
+    // ---------------------------------------------------------------- region wydarzeń
+    private IReadOnlyList<EventRegionOptionViewModel>? _eventRegions;
+
+    /// <summary>„Automatycznie” + potwierdzone regiony MetaForge.</summary>
+    public IReadOnlyList<EventRegionOptionViewModel> EventRegions => _eventRegions ??= BuildEventRegions();
+
+    private IReadOnlyList<EventRegionOptionViewModel> BuildEventRegions()
+    {
+        var stored = _main.Services.State.EventRegion;
+        var detected = Core.Api.EventRegions.Detect(TimeZoneInfo.Local);
+        var auto = new EventRegionOptionViewModel(null, Loc.F("EventRegionAuto", EventRegionOptionViewModel.NameOf(detected)),
+            !Core.Api.EventRegions.IsKnown(stored), SelectEventRegion);
+        return [auto, .. Core.Api.EventRegions.All.Select(r =>
+            new EventRegionOptionViewModel(r, EventRegionOptionViewModel.NameOf(r), stored == r, SelectEventRegion))];
+    }
+
+    private void SelectEventRegion(string? region)
+    {
+        var services = _main.Services;
+        if (services.State.EventRegion == region) return;
+        services.State.EventRegion = region;
+        services.RequestSave();
+        services.Repository.EventRegion = Core.Api.EventRegions.Resolve(region);
+        foreach (var option in EventRegions) option.IsSelected = option.Value == region;
+        if (_main.Events is { } events) _ = events.RegionChangedAsync();
+    }
+
     [ObservableProperty] private bool _alwaysOnTop;
 
     // ---------------------------------------------------------------- overlay
@@ -273,4 +300,25 @@ public sealed partial class KeybindRowViewModel : ObservableObject
 
     [RelayCommand]
     private void StartCapture() => _owner.StartCapture(this);
+}
+
+/// <summary>Jedna opcja regionu wydarzeń (RadioButton w ustawieniach).</summary>
+public sealed partial class EventRegionOptionViewModel(string? value, string label, bool selected, Action<string?> select) : ObservableObject
+{
+    public string? Value { get; } = value;
+    public string Label { get; } = label;
+
+    [ObservableProperty] private bool _isSelected = selected;
+
+    partial void OnIsSelectedChanged(bool value)
+    {
+        if (value) select(Value);
+    }
+
+    public static string NameOf(string region) => region switch
+    {
+        Core.Api.EventRegions.NorthAmerica => Loc.T("EventRegionNorthAmerica"),
+        Core.Api.EventRegions.Oceania => Loc.T("EventRegionOceania"),
+        _ => Loc.T("EventRegionEurope"),
+    };
 }

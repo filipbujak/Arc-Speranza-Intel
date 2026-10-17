@@ -26,6 +26,9 @@ public sealed class GameDataRepository(MetaForgeHttp http, JsonFileCache cache, 
 {
     private readonly TimeSpan _maxAge = maxAge ?? TimeSpan.FromHours(12);
 
+    /// <summary>Region harmonogramu wydarzeń (patrz <see cref="EventRegions"/>).</summary>
+    public string EventRegion { get; set; } = EventRegions.Europe;
+
     public Task<DataResult<IReadOnlyList<Quest>>> GetQuestsAsync(bool forceRefresh, CancellationToken ct) =>
         LoadAsync("quests", forceRefresh, c => http.GetAllPagesAsync("arc-raiders/quests", c), MetaForgeParser.ParseQuests, ct);
 
@@ -40,7 +43,7 @@ public sealed class GameDataRepository(MetaForgeHttp http, JsonFileCache cache, 
 
     /// <summary>Harmonogram wydarzeń (ok. 1,5 doby do przodu) — krótki cache, bo szybko się dezaktualizuje.</summary>
     public Task<DataResult<IReadOnlyList<GameEvent>>> GetEventsAsync(bool forceRefresh, CancellationToken ct) =>
-        LoadAsync("events", forceRefresh, c => http.GetStringAsync("arc-raiders/events-schedule?region=europe", c),
+        LoadAsync("events-" + EventRegion, forceRefresh, c => http.GetStringAsync("arc-raiders/events-schedule?region=" + Uri.EscapeDataString(EventRegion), c),
             json => MetaForgeParser.ParseEvents(json, MapCatalog.IdForEventMap), ct, TimeSpan.FromMinutes(30));
 
     public Task<DataResult<IReadOnlyList<MapMarker>>> GetMarkersAsync(string mapId, bool forceRefresh, CancellationToken ct) =>

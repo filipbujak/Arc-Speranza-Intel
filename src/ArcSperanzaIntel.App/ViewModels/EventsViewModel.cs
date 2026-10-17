@@ -141,6 +141,13 @@ public sealed partial class EventsViewModel : ObservableObject
     [RelayCommand]
     private Task Refresh() => ReloadAsync(force: true);
 
+    /// <summary>Po zmianie regionu w ustawieniach: inny harmonogram (osobny cache na region).</summary>
+    public Task RegionChangedAsync()
+    {
+        _lastFetch = DateTimeOffset.UtcNow;
+        return ReloadAsync(force: false);
+    }
+
     private async Task ReloadAsync(bool force)
     {
         IsRefreshing = true;

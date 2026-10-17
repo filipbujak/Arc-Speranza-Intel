@@ -60,6 +60,28 @@
         </Border>
       </StackPanel>
 
+      <!-- region wydarzeń -->
+      <StackPanel Spacing="10">
+        <TextBlock Text="{l:T EventRegionTitle}" Classes="label" Foreground="{StaticResource ArcText}" />
+        <Border Classes="card" Padding="16,12">
+          <StackPanel Spacing="10">
+            <ItemsControl ItemsSource="{Binding EventRegions}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:EventRegionOptionViewModel">
+                  <RadioButton GroupName="eventregion" IsChecked="{Binding IsSelected}" Content="{Binding Label}" Margin="0,0,18,4" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="{l:T EventRegionHelp}" Classes="muted small" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
       <!-- okno -->
       <StackPanel Spacing="10">
         <TextBlock Text="{l:T WindowTitle}" Classes="label" Foreground="{StaticResource ArcText}" />
