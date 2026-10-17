@@ -133,6 +133,34 @@
 
         <!-- grupy filtrów -->
         <ScrollViewer Grid.Row="4" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel>
+          <!-- strefy lootu: klik podświetla kontenery danej strefy -->
+          <StackPanel Margin="16,6,12,6" Spacing="6" IsVisible="{Binding HasLootZones}">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{l:T LootZonesTitle}" Classes="label" Foreground="{StaticResource ArcText}" VerticalAlignment="Center" />
+              <Button Grid.Column="1" Classes="flat" Content="{l:T LootZonesClear}" Command="{Binding ClearLootZonesCommand}"
+                      IsVisible="{Binding HasActiveZones}" Padding="6,2" FontSize="12" />
+            </Grid>
+            <ItemsControl ItemsSource="{Binding LootZoneFilters}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:LootZoneChipViewModel">
+                  <Button Classes="zonechip" Classes.active="{Binding IsActive}" Command="{Binding ClickCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Ellipse Width="8" Height="8" Fill="{Binding ColorBrush}" VerticalAlignment="Center" />
+                      <TextBlock Text="{Binding Name}" FontSize="12" VerticalAlignment="Center" />
+                      <TextBlock Text="{Binding CountText}" Classes="dim small" VerticalAlignment="Center" IsVisible="{Binding HasCount}" />
+                    </StackPanel>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="{l:T LootZonesHint}" Classes="muted small" TextWrapping="Wrap" />
+          </StackPanel>
           <ItemsControl ItemsSource="{Binding FilterGroups}" Margin="8,0,8,16">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:FilterGroupViewModel">
@@ -181,6 +209,7 @@
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
+          </StackPanel>
         </ScrollViewer>
       </Grid>
     </Border>

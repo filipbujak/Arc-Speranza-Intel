@@ -14,6 +14,9 @@ public sealed class Item
     public int? Value { get; init; }
     public string? Workbench { get; init; }
     public string? AmmoType { get; init; }
+
+    /// <summary>Strefy lootu, w których przedmiot wypada (np. Industrial, Medical) — z pola loot_area.</summary>
+    public IReadOnlyList<string> LootAreas { get; init; } = [];
     public IReadOnlyList<ItemStat> Stats { get; init; } = [];
 
     /// <summary>Z czego się craftuje (MetaForge: components).</summary>

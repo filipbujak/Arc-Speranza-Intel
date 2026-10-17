@@ -27,6 +27,16 @@ public sealed partial class OverlayViewModel : ObservableObject
     [ObservableProperty] private string _countText = "";
     [ObservableProperty] private double _panelOpacity;
 
+    /// <summary>Odblokowany = można przesuwać i zmieniać rozmiar (żółta ramka + znacznik). Domyślnie zablokowany.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FrameBrush), nameof(FrameThickness))]
+    private bool _isUnlocked;
+
+    public string UnlockedText => Loc.T("OverlayUnlocked");
+    public IBrush FrameBrush => IsUnlocked ? Palette.Brush(Palette.Yellow) : DimFrame;
+    public Avalonia.Thickness FrameThickness => new(IsUnlocked ? 2 : 1);
+    private static readonly IBrush DimFrame = new SolidColorBrush(Color.Parse("#40FFC72C"));
+
     public string Title => Loc.T("OverlayTitle");
     public string EmptyText => Loc.T("OverlayEmpty");
 

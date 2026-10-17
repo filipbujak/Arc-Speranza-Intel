@@ -7,6 +7,7 @@ public enum KeybindAction
 {
     ToggleWindow,
     ToggleOverlay,
+    LockOverlay,
     TabMaps,
     TabQuests,
     TabItems,
@@ -23,6 +24,7 @@ public sealed class Keybinds(Dictionary<string, string> store)
     {
         [KeybindAction.ToggleWindow] = "Ctrl+F",
         [KeybindAction.ToggleOverlay] = "Ctrl+Shift+O",
+        [KeybindAction.LockOverlay] = "Ctrl+Shift+L",
         [KeybindAction.TabMaps] = "Ctrl+D1",
         [KeybindAction.TabQuests] = "Ctrl+D2",
         [KeybindAction.TabItems] = "Ctrl+D3",
@@ -36,6 +38,7 @@ public sealed class Keybinds(Dictionary<string, string> store)
     {
         KeybindAction.ToggleWindow => Loc.T("KbToggle"),
         KeybindAction.ToggleOverlay => Loc.T("KbOverlay"),
+        KeybindAction.LockOverlay => Loc.T("KbOverlayLock"),
         KeybindAction.TabMaps => Loc.T("KbMaps"),
         KeybindAction.TabQuests => Loc.T("KbQuests"),
         KeybindAction.TabItems => Loc.T("KbItems"),
@@ -85,7 +88,7 @@ public sealed class Keybinds(Dictionary<string, string> store)
     }
 
     /// <summary>Skróty działające w całym Windows (także w grze), rejestrowane przez RegisterHotKey.</summary>
-    public static bool IsGlobal(KeybindAction a) => a is KeybindAction.ToggleWindow or KeybindAction.ToggleOverlay;
+    public static bool IsGlobal(KeybindAction a) => a is KeybindAction.ToggleWindow or KeybindAction.ToggleOverlay or KeybindAction.LockOverlay;
 
     /// <summary>Czytelny opis skrótu, np. "Ctrl+1" zamiast "Ctrl+D1".</summary>
     public static string Pretty(KeyGesture? g)

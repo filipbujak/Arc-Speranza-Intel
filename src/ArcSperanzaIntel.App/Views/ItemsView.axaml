@@ -216,6 +216,28 @@
                   </StackPanel>
                 </Grid>
 
+                <!-- gdzie szukać: strefy lootu z MetaForge, klik = kontenery tej strefy na mapie -->
+                <StackPanel Spacing="4" IsVisible="{Binding HasLootZones}">
+                  <TextBlock Text="{l:T WhereToLook}" Classes="label" Margin="0,4,0,0" />
+                  <ItemsControl ItemsSource="{Binding LootZones}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:LootZoneChipViewModel">
+                        <Button Classes="zonechip" Command="{Binding ClickCommand}" ToolTip.Tip="{l:T WhereToLookHint}">
+                          <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Ellipse Width="8" Height="8" Fill="{Binding ColorBrush}" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Name}" FontSize="12" VerticalAlignment="Center" />
+                          </StackPanel>
+                        </Button>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+
                 <StackPanel Spacing="2" IsVisible="{Binding HasCraftedAt}">
                   <TextBlock Text="{l:T CraftedAt}" Classes="label" Margin="0,4,0,2" />
                   <TextBlock Text="{Binding CraftedAtText}" FontWeight="SemiBold" />

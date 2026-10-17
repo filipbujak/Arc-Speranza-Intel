@@ -350,6 +350,7 @@ public sealed partial class ItemDetailViewModel : ObservableObject
         RecycleComponents = item.RecycleComponents.Select(c => Chip(c, main)).ToList();
         SalvageComponents = item.SalvageComponents.Select(c => Chip(c, main)).ToList();
         RecycleFrom = item.RecycleFrom.Select(c => Chip(c, main)).ToList();
+        LootZones = item.LootAreas.Select(z => new LootZoneChipViewModel(z, null, false, main.ShowLootZoneOnMap)).ToList();
         var ws = main.Services.Workshop;
         var upgradesTo = new List<ItemChipViewModel>();
         if (ws.UpgradeOf(item.Id) is { } up)
@@ -399,6 +400,10 @@ public sealed partial class ItemDetailViewModel : ObservableObject
     public bool HasRecycleComponents => RecycleComponents.Count > 0;
     public IReadOnlyList<ItemChipViewModel> SalvageComponents { get; }
     public bool HasSalvageComponents => SalvageComponents.Count > 0;
+    /// <summary>Strefy lootu, w których szukać przedmiotu — klik pokazuje je na mapie.</summary>
+    public IReadOnlyList<LootZoneChipViewModel> LootZones { get; }
+    public bool HasLootZones => LootZones.Count > 0;
+
     public IReadOnlyList<ItemChipViewModel> RecycleFrom { get; }
     public bool HasRecycleFrom => RecycleFrom.Count > 0;
     /// <summary>Następny tier broni.</summary>

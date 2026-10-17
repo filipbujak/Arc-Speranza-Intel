@@ -202,3 +202,41 @@ public sealed partial class ObjectiveViewModel : ObservableObject
     [RelayCommand]
     private void Toggle() => _set(Index, !IsDone);
 }
+
+/// <summary>Kolor każdej strefy lootu (te same w filtrze mapy i w szczegółach itemu).</summary>
+public static class LootZoneColors
+{
+    private static readonly Dictionary<string, Color> Known = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Industrial"] = Color.Parse("#E88629"),
+        ["Mechanical"] = Color.Parse("#C9A27A"),
+        ["Electrical"] = Color.Parse("#FFC72C"),
+        ["Technological"] = Color.Parse("#36B5E6"),
+        ["Medical"] = Color.Parse("#FF6B81"),
+        ["Security"] = Color.Parse("#7C86FF"),
+        ["Commercial"] = Color.Parse("#B57BFF"),
+        ["Residential"] = Color.Parse("#3FD07A"),
+        ["Old World"] = Color.Parse("#A3E05A"),
+        ["Exodus"] = Color.Parse("#5FC9D6"),
+        ["Nature"] = Color.Parse("#26BF57"),
+        ["ARC"] = Color.Parse("#F0503F"),
+        ["Raider"] = Color.Parse("#9AA3AE"),
+    };
+
+    public static Color For(string zone) => Known.TryGetValue(zone, out var c) ? c : Palette.Muted;
+}
+
+/// <summary>Chip strefy lootu: kolorowa kropka + nazwa (+ liczba kontenerów na mapie). Klik = przełącz / pokaż na mapie.</summary>
+public sealed partial class LootZoneChipViewModel(string zone, int? count, bool active, Action<string> click) : ObservableObject
+{
+    public string Zone { get; } = zone;
+    public string Name { get; } = zone;
+    public IBrush ColorBrush { get; } = Palette.Brush(LootZoneColors.For(zone));
+    public string CountText { get; } = count is { } c ? c.ToString() : "";
+    public bool HasCount => count is not null;
+
+    [ObservableProperty] private bool _isActive = active;
+
+    [RelayCommand]
+    private void Click() => click(Zone);
+}

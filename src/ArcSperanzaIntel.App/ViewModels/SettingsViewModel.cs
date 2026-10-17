@@ -147,7 +147,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty] private string _overlayOpacityText = "";
 
-    public string OverlayHotkeyText => Loc.F("OverlayHelp", GestureText(KeybindAction.ToggleOverlay));
+    public string OverlayHotkeyText => Loc.F("OverlayHelp", GestureText(KeybindAction.ToggleOverlay), GestureText(KeybindAction.LockOverlay));
 
     [RelayCommand]
     private void ToggleOverlay() => _main.Services.Overlay?.Toggle();
@@ -169,6 +169,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         row.IsCapturing = true;
         _main.Services.Hotkey.Unregister(); // żeby stary skrót globalny nie przechwycił klawiszy
         _main.Services.OverlayHotkey.Unregister();
+        _main.Services.OverlayLockHotkey.Unregister();
     }
 
     /// <summary>Klawisz naciśnięty w trakcie przypisywania. Esc = anuluj, Backspace = usuń skrót.</summary>

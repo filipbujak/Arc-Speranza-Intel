@@ -281,6 +281,26 @@
     <Setter Property="Background" Value="{StaticResource ArcYellow}" />
   </Style>
 
+  <!-- ============================================================ STREFY LOOTU: chip z kolorową kropką -->
+  <Style Selector="Button.zonechip">
+    <Setter Property="Background" Value="{StaticResource ArcPanel2}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcLine}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="9,4" />
+    <Setter Property="Margin" Value="0,0,6,6" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Foreground" Value="{StaticResource ArcText}" />
+  </Style>
+  <Style Selector="Button.zonechip:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ArcHover}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcLine2}" />
+  </Style>
+  <Style Selector="Button.zonechip.active /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#2A230B" />
+    <Setter Property="BorderBrush" Value="{StaticResource ArcYellow}" />
+  </Style>
+
   <!-- ============================================================ KAFELKI: lekkie podniesienie po najechaniu -->
   <Style Selector="Button.itemcard, Button.offer, Button.tile">
     <Setter Property="RenderTransform" Value="translateY(0px)" />

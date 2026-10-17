@@ -240,6 +240,8 @@ public sealed partial class MainViewModel : ObservableObject
         if (error is not null) Toast(error, ToastKind.Error);
         var overlayError = await Services.OverlayHotkey.RegisterAsync(Services.Keybinds.Get(KeybindAction.ToggleOverlay));
         if (overlayError is not null) Toast(Loc.T("KbOverlay") + ": " + overlayError, ToastKind.Error);
+        var lockError = await Services.OverlayLockHotkey.RegisterAsync(Services.Keybinds.Get(KeybindAction.LockOverlay));
+        if (lockError is not null) Toast(Loc.T("KbOverlayLock") + ": " + lockError, ToastKind.Error);
     }
 
     /// <summary>Po zmianie postępu questów odświeżamy wszystkie zależne widoki.</summary>
@@ -273,6 +275,13 @@ public sealed partial class MainViewModel : ObservableObject
     {
         Tab = AppTab.Maps;
         _ = Maps?.ShowQuestAsync(questId, mapId);
+    }
+
+    /// <summary>Z karty itemu: mapa z podświetlonymi kontenerami danej strefy lootu.</summary>
+    public void ShowLootZoneOnMap(string zone)
+    {
+        Tab = AppTab.Maps;
+        Maps?.ShowLootZone(zone);
     }
 
     public void OpenMap(string mapId)

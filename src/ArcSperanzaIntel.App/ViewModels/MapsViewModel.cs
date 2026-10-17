@@ -160,6 +160,53 @@ public sealed partial class MapsViewModel : ObservableObject
             o.QuestCount = available.Count(q => _main.Services.MapIndex.IsOn(q, o.Map));
     }
 
+    // ---------------------------------------------------------------- strefy lootu
+    private readonly HashSet<string> _activeZones = [];
+
+    /// <summary>Strefy lootu obecne na tej mapie (z kontenerów) — klik podświetla kontenery tej strefy.</summary>
+    public ObservableCollection<LootZoneChipViewModel> LootZoneFilters { get; } = [];
+    [ObservableProperty] private bool _hasLootZones;
+    [ObservableProperty] private bool _hasActiveZones;
+
+    private void BuildLootZones()
+    {
+        var counts = new Dictionary<string, int>();
+        foreach (var m in MarkersOnFloor())
+            if (!m.IsQuest)
+                foreach (var z in m.LootZoneList)
+                    counts[z] = counts.GetValueOrDefault(z) + 1;
+        foreach (var z in _activeZones) counts.TryAdd(z, 0);
+        LootZoneFilters.Clear();
+        foreach (var z in counts.Keys.OrderBy(LootZones.OrderOf).ThenBy(z => z, StringComparer.Ordinal))
+            LootZoneFilters.Add(new LootZoneChipViewModel(z, counts[z], _activeZones.Contains(z), ToggleLootZone));
+        HasLootZones = LootZoneFilters.Count > 0;
+        HasActiveZones = _activeZones.Count > 0;
+    }
+
+    private void ToggleLootZone(string zone)
+    {
+        if (!_activeZones.Remove(zone)) _activeZones.Add(zone);
+        BuildLootZones();
+        RebuildVisuals();
+    }
+
+    /// <summary>Z karty itemu: pokaż na mapie kontenery tej strefy (tylko ona aktywna).</summary>
+    public void ShowLootZone(string zone)
+    {
+        _activeZones.Clear();
+        _activeZones.Add(zone);
+        BuildLootZones();
+        RebuildVisuals();
+    }
+
+    [RelayCommand]
+    private void ClearLootZones()
+    {
+        _activeZones.Clear();
+        BuildLootZones();
+        RebuildVisuals();
+    }
+
     // ---------------------------------------------------------------- filtry
     public ObservableCollection<FilterGroupViewModel> FilterGroups { get; } = [];
 
@@ -215,6 +262,7 @@ public sealed partial class MapsViewModel : ObservableObject
 
     private void BuildFilters()
     {
+        BuildLootZones();
         var counts = new Dictionary<string, int>();
         foreach (var m in MarkersOnFloor())
         {
@@ -313,6 +361,22 @@ public sealed partial class MapsViewModel : ObservableObject
                     Dimmed = status == QuestStatus.Done,
                     Highlighted = highlighted,
                 });
+                continue;
+            }
+            if (_activeZones.Count > 0)
+            {
+                // aktywna strefa lootu: jej kontenery zawsze widoczne, w kolorze strefy; reszta przygaszona
+                var zone = m.LootZoneList.FirstOrDefault(_activeZones.Contains);
+                if (zone is not null)
+                {
+                    list.Add(new MarkerVisual(m, LootZoneColors.For(zone), MarkerIcons.For(m.Category, m.Subcategory), MarkerShape.Circle,
+                        (m.Name ?? TextFormat.Pretty(m.Subcategory)) + " — " + string.Join(", ", m.LootZoneList))
+                    { Favorite = fav, Highlighted = true });
+                    continue;
+                }
+                if (!IsOn(m.Key)) continue;
+                list.Add(new MarkerVisual(m, MarkerIcons.ColorOf(m.Category), MarkerIcons.For(m.Category, m.Subcategory), MarkerShape.Circle,
+                    m.Name ?? TextFormat.Pretty(m.Subcategory)) { Favorite = fav, Dimmed = true });
                 continue;
             }
             if (!IsOn(m.Key)) continue;

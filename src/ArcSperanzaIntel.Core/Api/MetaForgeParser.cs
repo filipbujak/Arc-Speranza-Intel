@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using ArcSperanzaIntel.Core.Maps;
 using ArcSperanzaIntel.Core.Models;
 using ArcSperanzaIntel.Core.Util;
 
@@ -114,6 +115,7 @@ public static class MetaForgeParser
                 Value = Num(i, "value") is { } v ? (int)v : null,
                 Workbench = NullIfEmpty(Str(i, "workbench")),
                 AmmoType = NullIfEmpty(Str(i, "ammo_type")),
+                LootAreas = LootZones.Parse(Str(i, "loot_area")),
                 Stats = Stats(i),
                 Components = ComponentStacks(i, "components"),
                 RecycleComponents = ComponentStacks(i, "recycle_components"),

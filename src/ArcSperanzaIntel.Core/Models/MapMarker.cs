@@ -19,6 +19,11 @@ public sealed record MapMarker(
     public LatLng Position => new(Lat, Lng);
 
     public bool IsQuest => Category == MarkerCategories.Quests;
+
+    /// <summary>Strefy lootu kontenera jako lista (z tekstu LootAreas). Bez pola cache — rekord porównuje pola.</summary>
+    public IReadOnlyList<string> LootZoneList => Maps.LootZones.Parse(LootAreas);
+
+    public bool HasLootZone(string zone) => LootZoneList.Contains(zone);
 }
 
 public static class MarkerCategories

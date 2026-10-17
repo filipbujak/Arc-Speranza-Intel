@@ -13,6 +13,11 @@ public partial class OverlayWindow : Window
     private const int GwlExStyle = -20;
     private const long WsExNoActivate = 0x08000000L;
     private const long WsExToolWindow = 0x00000080L;
+    private const long WsExTransparent = 0x00000020L;
+    private const long WsExLayered = 0x00080000L;
+
+    private static readonly Cursor NoCursor = new(StandardCursorType.None);
+    private bool _locked;
 
     public OverlayWindow()
     {
@@ -20,17 +25,59 @@ public partial class OverlayWindow : Window
         TransparencyLevelHint = [WindowTransparencyLevel.Transparent];
         DragBar.PointerPressed += (_, e) =>
         {
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
+            if (!_locked && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
         };
         ResizeGrip.PointerPressed += (_, e) =>
         {
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            if (!_locked && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
                 BeginResizeDrag(WindowEdge.SouthEast, e);
                 e.Handled = true;
             }
         };
-        Opened += (_, _) => MakeNonActivating();
+        Opened += (_, _) =>
+        {
+            MakeNonActivating();
+            ApplyLock();
+        };
+    }
+
+    /// <summary>
+    /// Zablokowany overlay: kursor nad nim jest ukryty, okno nie reaguje na mysz (brak dymków i przeciągania),
+    /// a jeśli okno jest warstwowe — kliknięcia przechodzą do gry. Dzięki temu przy dwóch monitorach
+    /// niewidoczny kursor gry nie „wyskakuje” jako strzałka, gdy przejedzie nad overlayem.
+    /// </summary>
+    public void SetLocked(bool locked)
+    {
+        _locked = locked;
+        ApplyLock();
+    }
+
+    private void ApplyLock()
+    {
+        Cursor = _locked ? NoCursor : Cursor.Default;
+        Root.IsHitTestVisible = !_locked;
+        SetClickThrough(_locked);
+    }
+
+    /// <summary>
+    /// WS_EX_TRANSPARENT działa tylko z WS_EX_LAYERED. Dokładamy go wyłącznie wtedy, gdy okno już jest warstwowe —
+    /// wymuszenie warstwowości na przezroczystym oknie Avalonii mogłoby je ukryć. Bez tego zostaje ukryty kursor.
+    /// </summary>
+    private void SetClickThrough(bool on)
+    {
+        if (!OperatingSystem.IsWindows() || TryGetPlatformHandle()?.Handle is not { } hwnd || hwnd == IntPtr.Zero) return;
+        try
+        {
+            var style = GetWindowLongPtr(hwnd, GwlExStyle).ToInt64();
+            if ((style & WsExLayered) == 0) return;
+            var next = on ? style | WsExTransparent : style & ~WsExTransparent;
+            if (next != style) SetWindowLongPtr(hwnd, GwlExStyle, new IntPtr(next));
+        }
+        catch (Exception ex)
+        {
+            CrashLog.Write(ex, "OverlayClickThrough");
+        }
     }
 
     /// <summary>

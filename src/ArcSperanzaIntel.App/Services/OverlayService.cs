@@ -38,6 +38,7 @@ public sealed class OverlayService : IDisposable
     {
         _window ??= Create();
         _vm.Rebuild();
+        SetLocked(true); // po każdym pokazaniu zablokowany — w grze mysz ma go ignorować
         _window.Show();
         // chwilowe przełączenie Topmost wyciąga okno nad grę w trybie okna bez ramek
         _window.Topmost = false;
@@ -49,6 +50,25 @@ public sealed class OverlayService : IDisposable
         if (_window is null) return;
         Remember(_window);
         _window.Hide();
+    }
+
+    /// <summary>Skrót „zablokuj / odblokuj”. Na schowanym overlayu najpierw go pokazuje (odblokowany, do ustawienia).</summary>
+    public void ToggleLock()
+    {
+        if (!IsVisible)
+        {
+            Show();
+            SetLocked(false);
+            return;
+        }
+        SetLocked(_vm.IsUnlocked);
+    }
+
+    private void SetLocked(bool locked)
+    {
+        _vm.IsUnlocked = !locked;
+        _window?.SetLocked(locked);
+        if (locked && _window is not null) Remember(_window);
     }
 
     /// <summary>Przezroczystość z ustawień (0.2–1), od razu widoczna na overlayu.</summary>

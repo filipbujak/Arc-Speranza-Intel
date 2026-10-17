@@ -34,6 +34,9 @@ public sealed class AppServices : IDisposable
     /// <summary>Drugi skrót globalny: pokaż / schowaj overlay szukanych.</summary>
     public GlobalHotkey OverlayHotkey { get; } = new();
 
+    /// <summary>Globalny skrót: zablokuj / odblokuj overlay (zablokowany = mysz go ignoruje, kursor się nie pokazuje).</summary>
+    public GlobalHotkey OverlayLockHotkey { get; } = new();
+
     /// <summary>Overlay z szukanymi przedmiotami (tworzony po załadowaniu danych).</summary>
     public OverlayService? Overlay { get; private set; }
     public UpdateService Updates { get; } = new();
@@ -130,6 +133,7 @@ public sealed class AppServices : IDisposable
         window.Closing += (_, _) => FlushSave();
         Hotkey.Pressed += () => Dispatcher.UIThread.Post(ToggleWindow);
         OverlayHotkey.Pressed += () => Dispatcher.UIThread.Post(() => Overlay?.Toggle());
+        OverlayLockHotkey.Pressed += () => Dispatcher.UIThread.Post(() => Overlay?.ToggleLock());
     }
 
     private void SaveWindowPlacement(Window w)
@@ -191,6 +195,7 @@ public sealed class AppServices : IDisposable
     {
         Hotkey.Dispose(); // zwalniamy skróty globalne, zanim nowy proces spróbuje je zarejestrować
         OverlayHotkey.Dispose();
+        OverlayLockHotkey.Dispose();
         Overlay?.Dispose();
         var exe = Environment.ProcessPath;
         if (exe is not null)
@@ -203,6 +208,7 @@ public sealed class AppServices : IDisposable
         FlushSave();
         Hotkey.Dispose();
         OverlayHotkey.Dispose();
+        OverlayLockHotkey.Dispose();
         Overlay?.Dispose();
         Images.Dispose();
         Http.Dispose();
