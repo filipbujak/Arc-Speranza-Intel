@@ -37,8 +37,14 @@ public sealed class ImageCache : IDisposable
         Shared = this;
     }
 
-    /// <summary>Obraz z pamięci, jeśli już jest (bez ładowania).</summary>
-    public Bitmap? Peek(string url) => _memory.TryGetValue(url, out var b) ? b : null;
+    /// <summary>Obraz z pamięci, jeśli już jest (bez ładowania) — w tym samym rozmiarze dekodowania.</summary>
+    public Bitmap? Peek(string url, int decodeWidth = 0) => _memory.TryGetValue(Key(url, decodeWidth), out var b) ? b : null;
+
+    /// <summary>
+    /// Klucz w pamięci = adres + szerokość dekodowania. Wcześniej był sam adres, więc ikona wczytana najpierw
+    /// mała (panel szukanych, nagrody) trafiała potem rozciągnięta do dużego kafelka i wyglądała na rozmytą.
+    /// </summary>
+    private static string Key(string url, int decodeWidth) => decodeWidth > 0 ? url + "#" + decodeWidth : url;
 
     /// <summary>Plik z listą ikon, których nie udało się pobrać (diagnostyka).</summary>
     public string LogPath => Path.Combine(Path.GetDirectoryName(_dir) ?? _dir, "images.log");
@@ -48,11 +54,12 @@ public sealed class ImageCache : IDisposable
     /// <summary>Ładuje obraz. decodeWidth &gt; 0 zmniejsza przy dekodowaniu (ikony), 0 = pełny rozmiar (kafelki).</summary>
     public Task<Bitmap?> GetAsync(string url, int decodeWidth = 0)
     {
-        if (_memory.TryGetValue(url, out var hit)) return Task.FromResult(hit);
-        return _pending.GetOrAdd(url, u => LoadAsync(u, decodeWidth));
+        var key = Key(url, decodeWidth);
+        if (_memory.TryGetValue(key, out var hit)) return Task.FromResult(hit);
+        return _pending.GetOrAdd(key, k => LoadAsync(url, decodeWidth, k));
     }
 
-    private async Task<Bitmap?> LoadAsync(string url, int decodeWidth)
+    private async Task<Bitmap?> LoadAsync(string url, int decodeWidth, string key)
     {
         try
         {
@@ -65,7 +72,7 @@ public sealed class ImageCache : IDisposable
                 var cached = Decode(await File.ReadAllBytesAsync(file).ConfigureAwait(false), decodeWidth);
                 if (cached is not null)
                 {
-                    Remember(url, cached);
+                    Remember(key, cached);
                     return cached;
                 }
                 TryDelete(file);
@@ -88,7 +95,7 @@ public sealed class ImageCache : IDisposable
                 }
                 await File.WriteAllBytesAsync(file, bytes!).ConfigureAwait(false);
                 _failedAt.TryRemove(url, out _);
-                Remember(url, bmp);
+                Remember(key, bmp);
                 return bmp;
             }
             finally
@@ -103,7 +110,7 @@ public sealed class ImageCache : IDisposable
         }
         finally
         {
-            _pending.TryRemove(url, out _);
+            _pending.TryRemove(key, out _);
         }
     }
 

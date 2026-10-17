@@ -107,7 +107,7 @@ public sealed class RemoteImage : Image
         if (change.Property == UrlProperty)
         {
             _loadedUrl = null;
-            var cached = Url is null ? null : ImageCache.Shared?.Peek(Url);
+            var cached = Url is null ? null : ImageCache.Shared?.Peek(Url, DecodeWidth);
             if (cached is not null && Url is not null)
             {
                 Show(Url, cached);
@@ -119,7 +119,13 @@ public sealed class RemoteImage : Image
                 if (_inViewport) TryLoad();
             }
         }
-        else if (change.Property == IsBlueprintProperty && Url is { } u && ImageCache.Shared?.Peek(u) is { } bmp)
+        else if (change.Property == DecodeWidthProperty && _loadedUrl is not null)
+        {
+            // inny rozmiar = inny wpis w cache; ładujemy ponownie, żeby nie rozciągać mniejszej wersji
+            _loadedUrl = null;
+            if (_inViewport) TryLoad();
+        }
+        else if (change.Property == IsBlueprintProperty && Url is { } u && ImageCache.Shared?.Peek(u, DecodeWidth) is { } bmp)
         {
             Show(u, bmp);
         }

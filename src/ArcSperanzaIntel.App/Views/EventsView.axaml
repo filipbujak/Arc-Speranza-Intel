@@ -20,8 +20,32 @@
     <Style Selector="Button.evchip:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="Transparent" />
     </Style>
+    <!-- najechanie: event lekko się podnosi, dostaje obwódkę w swoim kolorze, i cień -->
+    <Style Selector="Button.evchip">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="RenderTransform" Value="translateY(0px)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.evchip > Border">
+      <Setter Property="Transitions">
+        <Transitions>
+          <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.12" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.evchip:pointerover">
+      <Setter Property="RenderTransform" Value="translateY(-2px)" />
+    </Style>
     <Style Selector="Button.evchip:pointerover > Border">
-      <Setter Property="BorderThickness" Value="3,1,1,1" />
+      <Setter Property="BorderThickness" Value="3,1.5,1.5,1.5" />
+      <Setter Property="BoxShadow" Value="0 4 12 0 #80000000" />
+    </Style>
+    <Style Selector="Button.evchip:pressed">
+      <Setter Property="RenderTransform" Value="translateY(0px)" />
     </Style>
   </UserControl.Styles>
 

@@ -664,9 +664,10 @@ public sealed partial class MarkerCardViewModel : ObservableObject
         QuestButtonText = status == QuestStatus.Done ? Loc.T("UncheckQuest") : Loc.T("CompleteWholeQuest");
         TraderText = Quest.Trader;
         var states = book.ObjectiveStates(Quest.Id);
+        var here = ObjectiveMatcher.BestMatch(Quest.Objectives, Marker.Name);
         Objectives.Clear();
         for (var i = 0; i < Quest.Objectives.Count; i++)
-            Objectives.Add(new ObjectiveViewModel(i, Quest.Objectives[i], states[i], SetObjective));
+            Objectives.Add(new ObjectiveViewModel(i, Quest.Objectives[i], states[i], SetObjective, i == here));
         HasObjectives = Objectives.Count > 0;
     }
 

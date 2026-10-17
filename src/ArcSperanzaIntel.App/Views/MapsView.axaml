@@ -240,8 +240,14 @@
                         <ItemsControl.ItemTemplate>
                           <DataTemplate x:DataType="vm:ObjectiveViewModel">
                             <Grid ColumnDefinitions="*,Auto" Margin="0,3">
-                              <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="13" Opacity="{Binding TextOpacity}"
-                                         VerticalAlignment="Center" Margin="0,0,8,0" />
+                              <StackPanel VerticalAlignment="Center" Margin="0,0,8,0" Spacing="2" Opacity="{Binding TextOpacity}">
+                                <Border IsVisible="{Binding IsHere}" Background="{StaticResource ArcYellow}" CornerRadius="3" Padding="5,1"
+                                        HorizontalAlignment="Left">
+                                  <TextBlock Text="{l:T ObjectiveHere}" FontSize="10" FontWeight="Bold" Foreground="#0B0C0E" />
+                                </Border>
+                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="13"
+                                           FontWeight="{Binding TextWeight}" Foreground="{Binding TextBrush}" />
+                              </StackPanel>
                               <Button Grid.Column="1" Classes="done" Content="{Binding ButtonText}" Command="{Binding ToggleCommand}"
                                       IsVisible="{Binding IsNotDone}" FontSize="12" />
                               <Button Grid.Column="1" Classes="ghost" Content="{Binding ButtonText}" Command="{Binding ToggleCommand}"

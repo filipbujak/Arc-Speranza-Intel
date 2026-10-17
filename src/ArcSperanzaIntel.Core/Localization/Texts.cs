@@ -122,6 +122,7 @@ public static class Texts
         ["LanguageHelp"] = ("Zmiana języka uruchamia aplikację ponownie. Nazwy questów, itemów i map pochodzą z MetaForge i są po angielsku.", "Changing the language restarts the app. Quest, item and map names come from MetaForge and are in English."),
         ["LanguageTitle"] = ("JĘZYK", "LANGUAGE"),
         ["EventRegionTitle"] = ("REGION WYDARZEŃ", "EVENT REGION"),
+        ["ObjectiveHere"] = ("TEN ZNACZNIK", "THIS MARKER"),
         ["EventRegionAuto"] = ("Automatycznie ({0})", "Automatic ({0})"),
         ["EventRegionEurope"] = ("Europa", "Europe"),
         ["EventRegionNorthAmerica"] = ("Ameryka Północna", "North America"),

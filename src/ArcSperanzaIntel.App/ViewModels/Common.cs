@@ -14,6 +14,7 @@ public static class Palette
     public static readonly Color Red = Color.Parse("#F0503F");
     public static readonly Color Blue = Color.Parse("#36B5E6");
     public static readonly Color Muted = Color.Parse("#9298A3");
+    public static readonly Color Text = Color.Parse("#ECE7DC");
     public static readonly Color LockedQuest = Color.Parse("#7A7462");
 
     private static readonly Dictionary<Color, IBrush> Brushes = [];
@@ -173,16 +174,22 @@ public sealed partial class ObjectiveViewModel : ObservableObject
 {
     private readonly Action<int, bool> _set;
 
-    public ObjectiveViewModel(int index, string text, bool done, Action<int, bool> set)
+    public ObjectiveViewModel(int index, string text, bool done, Action<int, bool> set, bool isHere = false)
     {
         Index = index;
         Text = text;
         _isDone = done;
         _set = set;
+        IsHere = isHere;
     }
 
     public int Index { get; }
     public string Text { get; }
+
+    /// <summary>Ten podpunkt dotyczy klikniętego znacznika na mapie — wyróżniony żółtym, pogrubionym tekstem.</summary>
+    public bool IsHere { get; }
+    public FontWeight TextWeight => IsHere ? FontWeight.Bold : FontWeight.Normal;
+    public IBrush TextBrush => IsHere ? Palette.Brush(Palette.Yellow) : Palette.Brush(Palette.Text);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ButtonText), nameof(TextOpacity), nameof(IsNotDone))]
