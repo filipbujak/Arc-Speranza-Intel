@@ -261,6 +261,33 @@ public sealed partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private void OpenRepo() => MainViewModel.OpenUrl(AppInfo.RepoUrl);
 
+    // ---------------------------------------------------------------- zgłoszenia
+    [RelayCommand]
+    private void ReportBug() => MainViewModel.OpenUrl(_main.Services.Reports.BugUrl());
+
+    [RelayCommand]
+    private void ReportIdea() => MainViewModel.OpenUrl(_main.Services.Reports.IdeaUrl());
+
+    [RelayCommand]
+    private void ReportTranslation() => MainViewModel.OpenUrl(_main.Services.Reports.TranslationUrl());
+
+    [RelayCommand]
+    private void OpenLogsFolder()
+    {
+        Directory.CreateDirectory(ReportService.LogsFolder);
+        MainViewModel.OpenUrl(ReportService.LogsFolder);
+    }
+
+    /// <summary>Dla osób bez konta na GitHubie: te same informacje do schowka (np. na Discorda).</summary>
+    [RelayCommand]
+    private async Task CopyDiagnostics()
+    {
+        var window = (Avalonia.Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        if (window?.Clipboard is not { } clipboard) return;
+        await clipboard.SetTextAsync(_main.Services.Reports.Diagnostics());
+        _main.Toast(Loc.T("DiagnosticsCopied"), ToastKind.Ok);
+    }
+
     [RelayCommand]
     private void OpenGameIcons() => MainViewModel.OpenUrl("https://game-icons.net");
 }

@@ -308,5 +308,14 @@
 "WhatWorkshop": "oficina",
 "CraftNeeds": "PARA FABRICAR PRECISA",
 "RecyclesInto": "RECICLA EM",
-"HiddenByBlueprint": "Oculto até você encontrar o projeto: {0}. Marque um projeto como encontrado abaixo e o item aparece aqui."
+"HiddenByBlueprint": "Oculto até você encontrar o projeto: {0}. Marque um projeto como encontrado abaixo e o item aparece aqui.",
+"ReportsTitle": "FEEDBACK",
+"ReportBug": "Relatar um bug",
+"ReportIdea": "Sugerir um recurso",
+"ReportTranslation": "Erro de tradução",
+"ReportsHelp": "Abre um relato pronto no GitHub com a versão do app e o final do log de erros — sem o seu nome de usuário do Windows. Você vê tudo e pode editar antes de enviar.",
+"ReportsNoGithub": "Não tem conta no GitHub? Copie as informações e envie ao autor, por ex. no Discord.",
+"CopyDiagnostics": "Copiar informações de diagnóstico",
+"OpenLogsFolder": "Abrir pasta de logs",
+"DiagnosticsCopied": "Informações de diagnóstico copiadas — cole por ex. no Discord."
 }

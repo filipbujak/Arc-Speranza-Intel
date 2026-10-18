@@ -308,5 +308,14 @@
 "WhatWorkshop": "ワークショップ",
 "CraftNeeds": "クラフトに必要なもの",
 "RecyclesInto": "リサイクルで得られるもの",
-"HiddenByBlueprint": "設計図を見つけるまで非表示: {0}。下で設計図を入手済みにすると、アイテムがここに表示されます。"
+"HiddenByBlueprint": "設計図を見つけるまで非表示: {0}。下で設計図を入手済みにすると、アイテムがここに表示されます。",
+"ReportsTitle": "フィードバック",
+"ReportBug": "バグを報告",
+"ReportIdea": "機能を提案",
+"ReportTranslation": "翻訳の誤り",
+"ReportsHelp": "アプリのバージョンとエラーログの末尾を入れた報告を GitHub で開きます(Windows のユーザー名は含みません)。送信前にすべて確認・編集できます。",
+"ReportsNoGithub": "GitHub アカウントがない場合は、情報をコピーして作者に送ってください(Discord など)。",
+"CopyDiagnostics": "診断情報をコピー",
+"OpenLogsFolder": "ログフォルダーを開く",
+"DiagnosticsCopied": "診断情報をコピーしました — Discord などに貼り付けてください。"
 }

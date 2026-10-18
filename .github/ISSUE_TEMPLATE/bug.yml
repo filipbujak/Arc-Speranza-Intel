@@ -1,0 +1,45 @@
+name: Bug report
+description: Something doesn't work or looks wrong in ARC Speranza Intel
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! If you opened this from the app (Settings → Report a bug), the version and diagnostics are already filled in.
+        Please check that the diagnostics don't contain anything you don't want to share publicly.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead? Screenshots help a lot.
+      placeholder: "I opened the Events tab, picked North America, and the schedule stayed empty…"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      placeholder: "1.2.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where in the app?
+      options:
+        - Maps
+        - Quests
+        - Items
+        - Traders
+        - Workshop
+        - Events
+        - Overlay
+        - Settings / updates
+        - Other
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Filled in by the app (Settings → Copy diagnostic info). Your Windows user name is removed automatically.
+      render: text

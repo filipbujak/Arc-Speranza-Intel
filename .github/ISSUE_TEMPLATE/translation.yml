@@ -1,0 +1,34 @@
+name: Translation mistake
+description: A text in the app is translated wrong or reads oddly
+title: "[Translation] "
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Item, quest and map names come from MetaForge and are only in English — this form is for the app's own texts (buttons, tabs, settings, messages).
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      placeholder: "Deutsch (de)"
+    validations:
+      required: true
+  - type: textarea
+    id: where
+    attributes:
+      label: Where is the text?
+      description: Tab / screen and the current text (a screenshot is perfect).
+    validations:
+      required: true
+  - type: textarea
+    id: better
+    attributes:
+      label: How should it read?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      placeholder: "1.2.0"

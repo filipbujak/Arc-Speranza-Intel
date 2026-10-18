@@ -308,5 +308,14 @@
 "WhatWorkshop": "Werkstatt",
 "CraftNeeds": "ZUM HERSTELLEN BENÖTIGT",
 "RecyclesInto": "RECYCELT ZU",
-"HiddenByBlueprint": "Ausgeblendet, bis du den Bauplan findest: {0}. Markiere unten einen Bauplan als gefunden, dann erscheint der Gegenstand hier."
+"HiddenByBlueprint": "Ausgeblendet, bis du den Bauplan findest: {0}. Markiere unten einen Bauplan als gefunden, dann erscheint der Gegenstand hier.",
+"ReportsTitle": "FEEDBACK",
+"ReportBug": "Fehler melden",
+"ReportIdea": "Funktion vorschlagen",
+"ReportTranslation": "Übersetzungsfehler",
+"ReportsHelp": "Öffnet eine vorbereitete Meldung auf GitHub mit der App-Version und dem Ende des Fehlerprotokolls — ohne deinen Windows-Benutzernamen. Vor dem Absenden siehst du alles und kannst es ändern.",
+"ReportsNoGithub": "Kein GitHub-Konto? Kopiere die Infos und schicke sie dem Autor, z. B. auf Discord.",
+"CopyDiagnostics": "Diagnose-Infos kopieren",
+"OpenLogsFolder": "Protokollordner öffnen",
+"DiagnosticsCopied": "Diagnose-Infos kopiert — füge sie z. B. auf Discord ein."
 }

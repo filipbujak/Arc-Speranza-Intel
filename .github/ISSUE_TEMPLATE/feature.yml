@@ -1,0 +1,22 @@
+name: Feature idea
+description: Suggest something new or an improvement
+title: "[Idea] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: Describe the idea and how you'd use it in a raid or between raids.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would it help?
+      description: What problem does it solve? How do you handle it today?
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      placeholder: "1.2.0"

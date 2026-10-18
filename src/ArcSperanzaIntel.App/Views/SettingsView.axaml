@@ -185,6 +185,26 @@
         </Border>
       </StackPanel>
 
+      <!-- zgłoszenia -->
+      <StackPanel Spacing="10">
+        <TextBlock Text="{l:T ReportsTitle}" Classes="label" Foreground="{StaticResource ArcText}" />
+        <Border Classes="card" Padding="16,12">
+          <StackPanel Spacing="10">
+            <WrapPanel Orientation="Horizontal">
+              <Button Classes="ghost" Content="{l:T ReportBug}" Command="{Binding ReportBugCommand}" Margin="0,0,8,8" />
+              <Button Classes="ghost" Content="{l:T ReportIdea}" Command="{Binding ReportIdeaCommand}" Margin="0,0,8,8" />
+              <Button Classes="ghost" Content="{l:T ReportTranslation}" Command="{Binding ReportTranslationCommand}" Margin="0,0,8,8" />
+            </WrapPanel>
+            <TextBlock Text="{l:T ReportsHelp}" Classes="muted small" TextWrapping="Wrap" />
+            <TextBlock Text="{l:T ReportsNoGithub}" Classes="muted small" TextWrapping="Wrap" />
+            <WrapPanel Orientation="Horizontal">
+              <Button Classes="flat" Content="{l:T CopyDiagnostics}" Command="{Binding CopyDiagnosticsCommand}" Margin="0,0,8,0" />
+              <Button Classes="flat" Content="{l:T OpenLogsFolder}" Command="{Binding OpenLogsFolderCommand}" />
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
       <!-- informacje -->
       <StackPanel Spacing="8">
         <TextBlock Text="{l:T AboutTitle}" Classes="label" Foreground="{StaticResource ArcText}" />

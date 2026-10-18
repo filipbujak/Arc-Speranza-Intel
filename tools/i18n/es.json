@@ -308,5 +308,14 @@
 "WhatWorkshop": "taller",
 "CraftNeeds": "PARA FABRICAR SE NECESITA",
 "RecyclesInto": "SE RECICLA EN",
-"HiddenByBlueprint": "Oculto hasta que encuentres el plano: {0}. Marca un plano como encontrado abajo y el objeto aparecerá aquí."
+"HiddenByBlueprint": "Oculto hasta que encuentres el plano: {0}. Marca un plano como encontrado abajo y el objeto aparecerá aquí.",
+"ReportsTitle": "COMENTARIOS",
+"ReportBug": "Informar de un error",
+"ReportIdea": "Sugerir una función",
+"ReportTranslation": "Error de traducción",
+"ReportsHelp": "Abre una incidencia lista en GitHub con la versión de la aplicación y el final del registro de errores — sin tu nombre de usuario de Windows. Antes de enviarla lo ves todo y puedes cambiarlo.",
+"ReportsNoGithub": "¿No tienes cuenta de GitHub? Copia la información y envíasela al autor, p. ej. por Discord.",
+"CopyDiagnostics": "Copiar información de diagnóstico",
+"OpenLogsFolder": "Abrir carpeta de registros",
+"DiagnosticsCopied": "Información de diagnóstico copiada — pégala p. ej. en Discord."
 }

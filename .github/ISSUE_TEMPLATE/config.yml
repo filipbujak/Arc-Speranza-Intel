@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: MetaForge (data source)
+    url: https://metaforge.app/arc-raiders
+    about: Wrong item stats, missing markers or quests usually come from MetaForge's data — you can also report them there.

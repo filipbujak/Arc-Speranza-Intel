@@ -308,5 +308,14 @@
 "WhatWorkshop": "atelier",
 "CraftNeeds": "NÉCESSAIRE À LA FABRICATION",
 "RecyclesInto": "SE RECYCLE EN",
-"HiddenByBlueprint": "Masqué tant que tu n'as pas trouvé le plan : {0}. Marque un plan comme trouvé ci-dessous et l'objet apparaîtra ici."
+"HiddenByBlueprint": "Masqué tant que tu n'as pas trouvé le plan : {0}. Marque un plan comme trouvé ci-dessous et l'objet apparaîtra ici.",
+"ReportsTitle": "RETOURS",
+"ReportBug": "Signaler un bug",
+"ReportIdea": "Proposer une fonctionnalité",
+"ReportTranslation": "Erreur de traduction",
+"ReportsHelp": "Ouvre un ticket prêt sur GitHub avec la version de l'application et la fin du journal d'erreurs — sans ton nom d'utilisateur Windows. Tu vois tout et peux le modifier avant l'envoi.",
+"ReportsNoGithub": "Pas de compte GitHub ? Copie les infos et envoie-les à l'auteur, par ex. sur Discord.",
+"CopyDiagnostics": "Copier les infos de diagnostic",
+"OpenLogsFolder": "Ouvrir le dossier des journaux",
+"DiagnosticsCopied": "Infos de diagnostic copiées — colle-les par ex. sur Discord."
 }

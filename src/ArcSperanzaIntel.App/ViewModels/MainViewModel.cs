@@ -1,3 +1,4 @@
+using ArcSperanzaIntel.Core.Util;
 using ArcSperanzaIntel.Core.Localization;
 using System.Collections.ObjectModel;
 using ArcSperanzaIntel.App.Services;
@@ -207,11 +208,19 @@ public sealed partial class MainViewModel : ObservableObject
             await Services.Updates.DownloadAndApplyOnExitAsync();
             Dispatcher.UIThread.Post(() => Toast(Loc.F("UpdateReady", v), ToastKind.Ok));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!IsExpectedUpdateError(ex))
         {
             CrashLog.Write(ex, "UpdateCheck");
         }
+        catch (Exception)
+        {
+            // brak sieci / inna operacja aktualizacji już trwa — spróbujemy przy następnym uruchomieniu
+        }
     }
+
+    /// <summary>Normalne sytuacje przy aktualizacji, nie błędy: brak sieci albo druga operacja Velopack w toku.</summary>
+    private static bool IsExpectedUpdateError(Exception ex) =>
+        TransientErrors.IsTransient(ex) || ex is Velopack.Exceptions.AcquireLockFailedException;
 
     /// <summary>Markery wszystkich map w tle — potrzebne, żeby wiedzieć, na których mapach są questy.</summary>
     private async Task PreloadAllMarkersAsync()
@@ -222,9 +231,13 @@ public sealed partial class MainViewModel : ObservableObject
             {
                 await Services.Data.LoadMarkersAsync(map.Id, force: false, CancellationToken.None);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!TransientErrors.IsTransient(ex))
             {
                 CrashLog.Write(ex, "Preload " + map.Id);
+            }
+            catch (Exception)
+            {
+                // przerwane pobieranie — mapa weźmie znaczniki z pamięci podręcznej albo pobierze je przy wejściu
             }
         }
         Dispatcher.UIThread.Post(() =>

@@ -46,6 +46,13 @@ Pobierz `ArcSperanzaIntel-win-Setup.exe` z [Releases](../../releases). Instaluje
 **Workshop** – station levels, what the next upgrade needs, crafts per level and blueprints you've found.
 ![Workshop](docs/screenshots/workshop.jpg)
 
+## Feedback
+
+Found a bug or have an idea? Use **Settings → Feedback** in the app — it opens a ready GitHub issue with the app version and recent errors (your Windows user name is removed). Or open one directly:
+[Report a bug](../../issues/new?template=bug.yml) · [Suggest a feature](../../issues/new?template=feature.yml) · [Translation mistake](../../issues/new?template=translation.yml)
+
+No GitHub account? In the app click **Copy diagnostic info** and send it to the author.
+
 ## Translations
 
 The interface is available in 9 languages; it picks your Windows language on first start and can be changed in Settings. Item, quest and map names come from MetaForge and stay in English. Translations other than Polish and English are new — if something reads wrong, please open an issue. Texts live in `tools/i18n/<language>.json`; run `python tools/i18n_gen.py` to regenerate the C# files.

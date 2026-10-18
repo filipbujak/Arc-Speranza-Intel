@@ -12,6 +12,9 @@ public sealed class UpdateService
     private readonly UpdateManager? _manager;
     private UpdateInfo? _pending;
 
+    // Velopack pozwala na jedno pobieranie naraz (plik blokady); cichy start i przycisk w ustawieniach nie mogą się zderzyć
+    private readonly SemaphoreSlim _download = new(1, 1);
+
     public UpdateService()
     {
         try
@@ -47,16 +50,32 @@ public sealed class UpdateService
     public async Task DownloadAndApplyOnExitAsync()
     {
         if (_pending is null || _manager is null || IsReadyOnExit) return;
-        await _manager.DownloadUpdatesAsync(_pending).ConfigureAwait(false);
-        _manager.WaitExitThenApplyUpdates(_pending, silent: true, restart: false);
-        IsReadyOnExit = true;
+        if (!await _download.WaitAsync(0).ConfigureAwait(false)) return; // już pobieramy — nie dublujemy
+        try
+        {
+            await _manager.DownloadUpdatesAsync(_pending).ConfigureAwait(false);
+            _manager.WaitExitThenApplyUpdates(_pending, silent: true, restart: false);
+            IsReadyOnExit = true;
+        }
+        finally
+        {
+            _download.Release();
+        }
     }
 
     /// <summary>Pobiera sprawdzoną wersję, instaluje i uruchamia aplikację ponownie.</summary>
     public async Task DownloadAndRestartAsync()
     {
         if (_pending is null || _manager is null) return;
-        await _manager.DownloadUpdatesAsync(_pending).ConfigureAwait(false);
-        _manager.ApplyUpdatesAndRestart(_pending);
+        await _download.WaitAsync().ConfigureAwait(false); // poczekaj, aż ciche pobieranie się skończy
+        try
+        {
+            await _manager.DownloadUpdatesAsync(_pending).ConfigureAwait(false);
+            _manager.ApplyUpdatesAndRestart(_pending);
+        }
+        finally
+        {
+            _download.Release();
+        }
     }
 }

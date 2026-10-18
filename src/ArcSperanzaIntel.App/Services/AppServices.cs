@@ -27,6 +27,9 @@ public sealed class AppServices : IDisposable
     public JsonFileCache ApiCache { get; }
     public GameData Data { get; }
     public GameDataRepository Repository { get; }
+
+    /// <summary>Zgłoszenia na GitHubie i informacje diagnostyczne.</summary>
+    public ReportService Reports { get; }
     public ImageCache Images { get; }
     public Keybinds Keybinds { get; private set; }
     public GlobalHotkey Hotkey { get; } = new();
@@ -57,6 +60,7 @@ public sealed class AppServices : IDisposable
         ApiCache = new JsonFileCache(Paths.ApiCacheDir);
         Repository = new GameDataRepository(Http, ApiCache) { EventRegion = EventRegions.Resolve(State.EventRegion) };
         Data = new GameData(Repository);
+        Reports = new ReportService(() => Repository.EventRegion);
         Images = new ImageCache(Paths.ImageCacheDir);
         Keybinds = new Keybinds(State.Keybinds);
         Data.MarkersLoaded += (_, mapId) => MapIndex.AddMarkers(Data.MarkersOf(mapId));
