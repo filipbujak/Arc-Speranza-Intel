@@ -182,16 +182,16 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Zmiana języka: zapis w stanie i restart (wszystkie teksty budują się od nowa).</summary>
     public async Task ApplyLanguageAsync(AppLanguage language)
     {
-        var code = language == AppLanguage.Polish ? "pl" : "en";
-        if (Services.State.Language == code && Loc.Instance.Language == language) return;
-        Services.State.Language = code;
+        var info = Languages.Of(language);
+        if (Services.State.Language == info.Code && Loc.Instance.Language == language) return;
+        Services.State.Language = info.Code;
         Services.FlushSave();
         // pytanie w języku docelowym, bo to on będzie po restarcie
-        var pl = language == AppLanguage.Polish;
+        var loc = Loc.Instance;
         var ok = await ConfirmAsync(
-            pl ? "Język: polski" : "Language: English",
-            pl ? "Aplikacja uruchomi się ponownie w nowym języku." : "The app will restart in the new language.",
-            pl ? "Uruchom ponownie" : "Restart");
+            string.Format(info.Culture, loc.Get("LangRestartTitle", language), info.NativeName),
+            loc.Get("LangRestartText", language),
+            loc.Get("LangRestartButton", language));
         if (ok) Services.SaveAndRestart();
     }
 

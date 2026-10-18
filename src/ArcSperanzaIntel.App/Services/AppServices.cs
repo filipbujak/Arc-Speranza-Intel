@@ -52,12 +52,7 @@ public sealed class AppServices : IDisposable
         Paths.EnsureCreated();
         Store = new JsonStateStore(Paths.StateFile);
         State = Store.Load();
-        Loc.Instance.Language = State.Language switch
-        {
-            "pl" => AppLanguage.Polish,
-            "en" => AppLanguage.English,
-            _ => Loc.SystemDefault(),
-        };
+        Loc.Instance.Language = Languages.FromCode(State.Language)?.Language ?? Loc.SystemDefault();
         Http = new MetaForgeHttp();
         ApiCache = new JsonFileCache(Paths.ApiCacheDir);
         Repository = new GameDataRepository(Http, ApiCache) { EventRegion = EventRegions.Resolve(State.EventRegion) };

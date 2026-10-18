@@ -1,8 +1,10 @@
 # ARC Speranza Intel
 
-A free, unofficial desktop companion for **ARC Raiders** (Windows): interactive maps with markers and floors, the full quest tree with subtasks, an item wiki, traders (including Ermal's weekly offers) and the live event schedule. Polish and English UI.
+![ARC Speranza Intel over ARC Raiders – map, quest marker and wanted-items overlay](docs/screenshots/in-game.jpg)
 
-Darmowy, nieoficjalny towarzysz do **ARC Raiders** (Windows): mapy z markerami i piętrami, drzewko questów z subtaskami, wiki itemów, handlarze (z tygodniowymi ofertami Ermala) i harmonogram wydarzeń. Interfejs po polsku i angielsku.
+A free, unofficial desktop companion for **ARC Raiders** (Windows): interactive maps with markers and floors, the full quest tree with subtasks, an item wiki, traders (including Ermal's weekly offers) and the live event schedule. UI in English, Polish, German, French, Spanish, Portuguese (Brazil), Russian, Japanese and Simplified Chinese.
+
+Darmowy, nieoficjalny towarzysz do **ARC Raiders** (Windows): mapy z markerami i piętrami, drzewko questów z subtaskami, wiki itemów, handlarze (z tygodniowymi ofertami Ermala) i harmonogram wydarzeń. Interfejs w 9 językach: angielski, polski, niemiecki, francuski, hiszpański, portugalski (BR), rosyjski, japoński i chiński uproszczony.
 
 > Fan project, not affiliated with Embark Studios. ARC Raiders and its names and artwork belong to Embark Studios.
 > The app does **not** read game memory or files, inject anything or simulate input.
@@ -26,6 +28,27 @@ Pobierz `ArcSperanzaIntel-win-Setup.exe` z [Releases](../../releases). Instaluje
 - **Traders** — every trader's stock with prices (coins, or seeds for Celeste) and Ermal's weekly rotation with accepted items and their values.
 - **Events** — what's live now and what's coming, per map; event region (Europe, North America, Oceania) picked automatically from your time zone or set in Settings.
 - **Settings** — editable shortcuts, global hotkeys (Ctrl+F window, Ctrl+Shift+O overlay, Ctrl+Shift+L overlay lock), overlay opacity, always-on-top, language, event region, updates, reset.
+
+## Screenshots
+
+**Items** – every item as a game-style tile, details with crafting, recycling and where to look, plus your wanted list.
+![Items](docs/screenshots/items.jpg)
+
+**Quests** – the whole quest tree with your progress, subtasks, rewards and what each quest unlocks.
+![Quests](docs/screenshots/quests.jpg)
+
+**Events** – what's live now and in the next hours on every map, for your server region.
+![Events](docs/screenshots/events.jpg)
+
+**Traders** – all traders' stock with prices and Ermal's weekly trades with the items he accepts.
+![Traders](docs/screenshots/traders.jpg)
+
+**Workshop** – station levels, what the next upgrade needs, crafts per level and blueprints you've found.
+![Workshop](docs/screenshots/workshop.jpg)
+
+## Translations
+
+The interface is available in 9 languages; it picks your Windows language on first start and can be changed in Settings. Item, quest and map names come from MetaForge and stay in English. Translations other than Polish and English are new — if something reads wrong, please open an issue. Texts live in `tools/i18n/<language>.json`; run `python tools/i18n_gen.py` to regenerate the C# files.
 
 ## Build from source
 

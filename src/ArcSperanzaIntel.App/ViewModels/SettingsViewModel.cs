@@ -88,21 +88,16 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 
     // ---------------------------------------------------------------- język
-    public bool IsPolish
-    {
-        get => Loc.Instance.Language == AppLanguage.Polish;
-        set
-        {
-            if (value) Avalonia.Threading.Dispatcher.UIThread.Post(() => _ = _main.ApplyLanguageAsync(AppLanguage.Polish));
-        }
-    }
+    /// <summary>Lista języków (nazwy we własnym języku); wybór = zapis i restart w nowym języku.</summary>
+    public IReadOnlyList<LanguageInfo> LanguageOptions => Languages.All;
 
-    public bool IsEnglish
+    public LanguageInfo SelectedLanguage
     {
-        get => Loc.Instance.Language == AppLanguage.English;
+        get => Languages.Of(Loc.Instance.Language);
         set
         {
-            if (value) Avalonia.Threading.Dispatcher.UIThread.Post(() => _ = _main.ApplyLanguageAsync(AppLanguage.English));
+            if (value is null || value.Language == Loc.Instance.Language) return;
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => _ = _main.ApplyLanguageAsync(value.Language));
         }
     }
 

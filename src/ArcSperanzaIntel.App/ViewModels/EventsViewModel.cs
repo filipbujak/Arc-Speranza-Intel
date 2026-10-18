@@ -212,8 +212,8 @@ public sealed partial class EventsViewModel : ObservableObject
         PageText = $"{pageStart:HH:mm} – {pageStart.AddHours(HoursPerPage):HH:mm}";
         NoData = data.Events.Count == 0;
         SourceText = data.EventsSavedAt is { } t
-            ? Loc.F("EventsSource", t.ToLocalTime().ToString("dd.MM HH:mm", Pl))
-            : Loc.T("EventsSourceShort");
+            ? Loc.F("EventsSource", t.ToLocalTime().ToString("dd.MM HH:mm", Pl), EventRegionOptionViewModel.NameOf(_main.Services.Repository.EventRegion))
+            : Loc.F("EventsSourceShort", EventRegionOptionViewModel.NameOf(_main.Services.Repository.EventRegion));
     }
 
     /// <summary>„18:00”, a po północy z dniem: „jutro 01:00”.</summary>

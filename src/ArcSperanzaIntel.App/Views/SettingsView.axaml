@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:l="using:ArcSperanzaIntel.App.Localization"
              xmlns:vm="using:ArcSperanzaIntel.App.ViewModels"
+             xmlns:core="using:ArcSperanzaIntel.Core.Localization"
              xmlns:icons="using:ArcSperanzaIntel.App.Icons"
              x:Class="ArcSperanzaIntel.App.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
@@ -51,11 +52,15 @@
         <TextBlock Text="{l:T LanguageTitle}" Classes="label" Foreground="{StaticResource ArcText}" />
         <Border Classes="card" Padding="16,12">
           <StackPanel Spacing="10">
-            <StackPanel Orientation="Horizontal" Spacing="18">
-              <RadioButton GroupName="lang" IsChecked="{Binding IsPolish}" Content="Polski" />
-              <RadioButton GroupName="lang" IsChecked="{Binding IsEnglish}" Content="English" />
-            </StackPanel>
+            <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedItem="{Binding SelectedLanguage}" MinWidth="220">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="core:LanguageInfo">
+                  <TextBlock Text="{Binding NativeName}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
             <TextBlock Text="{l:T LanguageHelp}" Classes="muted small" TextWrapping="Wrap" />
+            <TextBlock Text="{l:T TranslationNote}" Classes="dim small" TextWrapping="Wrap" />
           </StackPanel>
         </Border>
       </StackPanel>
