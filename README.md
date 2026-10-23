@@ -2,9 +2,9 @@
 
 ![ARC Speranza Intel over ARC Raiders – map, quest marker and wanted-items overlay](docs/screenshots/in-game.jpg)
 
-A free, unofficial desktop companion for **ARC Raiders** (Windows): interactive maps with markers and floors, the full quest tree with subtasks, an item wiki, traders (including Ermal's weekly offers) and the live event schedule. UI in English, Polish, German, French, Spanish, Portuguese (Brazil), Russian, Japanese and Simplified Chinese.
+A free, unofficial desktop companion for **ARC Raiders** (Windows): interactive maps with markers and floors, the full quest tree with subtasks, an item wiki, traders (including Cassio's weekly offers) and the live event schedule. UI in English, Polish, German, French, Spanish, Portuguese (Brazil), Russian, Japanese and Simplified Chinese.
 
-Darmowy, nieoficjalny towarzysz do **ARC Raiders** (Windows): mapy z markerami i piętrami, drzewko questów z subtaskami, wiki itemów, handlarze (z tygodniowymi ofertami Ermala) i harmonogram wydarzeń. Interfejs w 9 językach: angielski, polski, niemiecki, francuski, hiszpański, portugalski (BR), rosyjski, japoński i chiński uproszczony.
+Darmowy, nieoficjalny towarzysz do **ARC Raiders** (Windows): mapy z markerami i piętrami, drzewko questów z subtaskami, wiki itemów, handlarze (z tygodniowymi ofertami Cassio) i harmonogram wydarzeń. Interfejs w 9 językach: angielski, polski, niemiecki, francuski, hiszpański, portugalski (BR), rosyjski, japoński i chiński uproszczony.
 
 > Fan project, not affiliated with Embark Studios. ARC Raiders and its names and artwork belong to Embark Studios.
 > The app does **not** read game memory or files, inject anything or simulate input.
@@ -25,7 +25,7 @@ Pobierz `ArcSperanzaIntel-win-Setup.exe` z [Releases](../../releases). Instaluje
 - **Items** — wiki of every item by category with search and filters; which loot zones to search (click to see them on the map); crafting ingredients, what it recycles / salvages into, what it is recycled from, weapon upgrades.
 - **Workshop** — station levels, what the next level needs (goes to Wanted), crafts per level, weapon upgrade chains, blueprints you have found.
 - **Overlay** — a small always-on-top window with your wanted items over the game (Ctrl+Shift+O, borderless mode). It starts locked so the mouse ignores it and no cursor shows over it (handy with two monitors); Ctrl+Shift+L unlocks it to move or resize. Plain window: it does not read the game or the screen.
-- **Traders** — every trader's stock with prices (coins, or seeds for Celeste) and Ermal's weekly rotation with accepted items and their values.
+- **Traders** — every trader's stock with prices (coins, or seeds for Celeste) and Cassio's weekly rotation with accepted items and their values.
 - **Events** — what's live now and what's coming, per map; event region (Europe, North America, Oceania) picked automatically from your time zone or set in Settings.
 - **Settings** — editable shortcuts, global hotkeys (Ctrl+F window, Ctrl+Shift+O overlay, Ctrl+Shift+L overlay lock), overlay opacity, always-on-top, language, event region, updates, reset.
 
@@ -40,7 +40,7 @@ Pobierz `ArcSperanzaIntel-win-Setup.exe` z [Releases](../../releases). Instaluje
 **Events** – what's live now and in the next hours on every map, for your server region.
 ![Events](docs/screenshots/events.jpg)
 
-**Traders** – all traders' stock with prices and Ermal's weekly trades with the items he accepts.
+**Traders** – all traders' stock with prices and Cassio's weekly trades with the items he accepts.
 ![Traders](docs/screenshots/traders.jpg)
 
 **Workshop** – station levels, what the next upgrade needs, crafts per level and blueprints you've found.

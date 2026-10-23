@@ -21,7 +21,14 @@ public sealed record TraderOffer(
     string? Type,
     string? Description,
     int Price,
-    int? Value);
+    int? Value)
+{
+    /// <summary>Druga możliwa zapłata (np. 1× Free Loadout Augment u Lance'a). Null = tylko cena główna.</summary>
+    public AltPrice? AltPrice { get; init; }
+}
+
+/// <summary>Zapłata przedmiotem zamiast waluty: ile sztuk którego przedmiotu.</summary>
+public sealed record AltPrice(string ItemId, string Name, int Amount);
 
 /// <summary>Wszystko z endpointu /traders: stali handlarze + Ermal.</summary>
 public sealed record TradersData(IReadOnlyList<Trader> Traders, ErmalStock? Ermal);

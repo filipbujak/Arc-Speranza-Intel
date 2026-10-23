@@ -93,7 +93,7 @@ public static class Palette
         "TianWen" => Color.Parse("#FF7A45"),
         "Apollo" => Color.Parse("#3FD07A"),
         "Lance" => Color.Parse("#B57BFF"),
-        "Ermal" => Color.Parse("#F0503F"),
+        "Cassio" => Color.Parse("#F0503F"),
         _ => Muted,
     };
 

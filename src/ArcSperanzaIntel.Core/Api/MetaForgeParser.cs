@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using ArcSperanzaIntel.Core.Maps;
+using ArcSperanzaIntel.Core.Traders;
 using ArcSperanzaIntel.Core.Models;
 using ArcSperanzaIntel.Core.Util;
 
@@ -233,7 +234,10 @@ public static class MetaForgeParser
                     offers.Add(new TraderOffer(
                         id, name.Trim(), NullIfEmpty(Str(o, "icon")), NullIfEmpty(Str(o, "rarity")),
                         NullIfEmpty(Str(o, "item_type")), NullIfEmpty(Str(o, "description")),
-                        (int)(Num(o, "trader_price") ?? 0), Num(o, "value") is { } v ? (int)v : null));
+                        (int)(Num(o, "trader_price") ?? 0), Num(o, "value") is { } v ? (int)v : null)
+                    {
+                        AltPrice = AlternativePrices.For(t.Name, id),
+                    });
                 }
                 list.Add(new Trader
                 {

@@ -11,7 +11,7 @@ namespace ArcSperanzaIntel.App.ViewModels;
 
 /// <summary>
 /// Zakładka Handlarze: jedna długa strona — handlarz, pod nim jego itemy z ceną, pod nim kolejny handlarz,
-/// na końcu Ermal (tygodniowe oferty za monety albo za oddane przedmioty).
+/// na końcu Cassio (tygodniowe oferty za monety albo za oddane przedmioty). W API MetaForge nadal jako "ermal".
 /// Wyszukiwarka po lewej przewija płynnie do itemu i go wyróżnia.
 /// </summary>
 public sealed partial class ShopsViewModel : ObservableObject
@@ -24,17 +24,25 @@ public sealed partial class ShopsViewModel : ObservableObject
         var data = main.Services.Data;
         CoinsIconUrl = data.FindItem("coins")?.IconUrl ?? "https://static.metaforge.app/arc-raiders/icons/coins.webp";
         SeedsIconUrl = data.FindItem("assorted-seeds")?.IconUrl;
+        _altIcons = id => data.FindItem(id)?.IconUrl ?? $"https://static.metaforge.app/arc-raiders/icons/{id}.webp";
         Traders = data.Traders
             .Select(t => new TraderSectionViewModel(t, this))
             .ToList();
         Ermal = data.Ermal is { } e ? new ErmalSectionViewModel(e, this) : null;
         var hidden = main.Services.State.HiddenTraders;
+        // Do 1.2.0 sekcja nazywała się "Ermal" — przenosimy zapamiętane ukrycie na nową nazwę.
+        if (hidden.Remove("Ermal")) { hidden.Add(ErmalSectionViewModel.DisplayName); main.Services.RequestSave(); }
         var chips = Traders.Select(t => new TraderToggleViewModel(t, !hidden.Contains(t.Name), this)).ToList();
         if (Ermal is not null) chips.Add(new TraderToggleViewModel(Ermal, !hidden.Contains(Ermal.Name), this));
         TraderChips = chips;
         TotalText = Loc.F("TradersTotal", Traders.Sum(t => t.Offers.Count), Traders.Count)
                     + (Ermal is null ? "" : Loc.F("PlusErmal", Ermal.Offers.Count));
     }
+
+    private readonly Func<string, string?> _altIcons;
+
+    /// <summary>Ikona przedmiotu, którym można zapłacić zamiast waluty (z bazy itemów).</summary>
+    internal string? IconOf(string itemId) => _altIcons(itemId);
 
     public string CoinsIconUrl { get; }
     public string? SeedsIconUrl { get; }
@@ -188,6 +196,11 @@ public sealed partial class OfferCardViewModel(TraderOffer offer, string? curren
     public IBrush RarityBrush { get; } = Palette.Brush(Palette.Rarity(offer.Rarity));
     public string Tooltip { get; } = offer.Description ?? offer.Name;
 
+    public bool HasAltPrice { get; } = offer.AltPrice is not null;
+    public string AltPriceText { get; } = offer.AltPrice is { } a ? TextFormat.Number(a.Amount) : "";
+    public string? AltIconUrl { get; } = offer.AltPrice is { } a2 ? owner.IconOf(a2.ItemId) : null;
+    public string AltTip { get; } = offer.AltPrice is { } a3 ? Loc.F("AltPriceTip", a3.Amount, a3.Name) : "";
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(BorderThickness))]
     private bool _isHighlighted;
@@ -261,7 +274,10 @@ public sealed partial class ErmalSectionViewModel : ObservableObject, ITraderSec
 
     private readonly DateTimeOffset? _rotationEnd;
 
-    public string Name => "Ermal";
+    /// <summary>Ermal został zastąpiony przez Cassio (Frozen Trail 2.0); MetaForge wciąż podaje go jako "ermal".</summary>
+    public const string DisplayName = "Cassio";
+
+    public string Name => DisplayName;
     public string NameUpper => "ERMAL";
     public string PortraitUrl => "https://static.metaforge.app/arc-raiders/custom/ermalicon.webp";
     public IBrush AccentBrush { get; }
